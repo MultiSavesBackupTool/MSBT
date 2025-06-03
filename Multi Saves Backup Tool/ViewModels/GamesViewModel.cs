@@ -2,4 +2,5 @@
 
 public class GamesViewModel : ViewModelBase
 {
+    public override string Title { get; }
 }

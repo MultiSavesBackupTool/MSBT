@@ -1,0 +1,123 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Multi_Saves_Backup_Tool.Views.AddGameOverlay"
+             x:CompileBindings="True">
+    <Grid>
+        <Rectangle Fill="Black" Opacity="0.5"/>
+        
+        <Border Background="#272727"
+                CornerRadius="8"
+                Width="600"
+                Height="600"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                BoxShadow="0 4 8 0 #40000000">
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Add New Game"
+                           FontSize="24"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,20"/>
+
+                <ScrollViewer Grid.Row="1" 
+                              VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="10">
+                        <TextBox Watermark="Game Name"
+                                 x:Name="GameNameTextBox"/>
+                        
+                        <TextBox Watermark="Game Executable (e.g., NMS.exe)"
+                                 x:Name="GameExeTextBox"/>
+                        
+                        <TextBox Watermark="Alternative Executable (optional)"
+                                 x:Name="GameExeAltTextBox"/>
+                        
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBox Watermark="Save Files Location"
+                                     x:Name="SaveLocationTextBox"/>
+                            <Button Content="Browse"
+                                    Margin="5,0,0,0"
+                                    Grid.Column="1"
+                                    Click="BrowseSaveLocation"/>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBox Watermark="Mods Folder (optional)"
+                                     x:Name="ModPathTextBox"/>
+                            <Button Content="Browse"
+                                    Margin="5,0,0,0"
+                                    Grid.Column="1"
+                                    Click="BrowseModPath"/>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBox Watermark="Additional Backup Path (optional)"
+                                     x:Name="AddPathTextBox"/>
+                            <Button Content="Browse"
+                                    Margin="5,0,0,0"
+                                    Grid.Column="1"
+                                    Click="BrowseAddPath"/>
+                        </Grid>
+
+                        <StackPanel>
+                            <TextBlock Text="Backup Settings:"
+                                       FontWeight="Bold"
+                                       Margin="0,10,0,5"/>
+                                       
+                            <Grid ColumnDefinitions="*, Auto">
+                                <TextBlock Text="Days to keep backups (0 - keep all)"
+                                           VerticalAlignment="Center"/>
+                                <NumericUpDown Value="0"
+                                               Minimum="0"
+                                               x:Name="DaysForKeepNumeric"
+                                               Grid.Column="1"
+                                               Width="100"/>
+                            </Grid>
+
+                            <ComboBox x:Name="OldFilesStatusComboBox"
+                                      SelectedIndex="0"
+                                      Margin="0,5,0,0">
+                                <ComboBoxItem>Keep all files</ComboBoxItem>
+                                <ComboBoxItem>Move to archive</ComboBoxItem>
+                                <ComboBoxItem>Delete permanently</ComboBoxItem>
+                            </ComboBox>
+
+                            <CheckBox Content="Include timestamp in archive name"
+                                      IsChecked="True"
+                                      x:Name="IncludeTimestampCheck"
+                                      Margin="0,5,0,0"/>
+
+                            <ComboBox x:Name="BackupModeComboBox"
+                                      SelectedIndex="0"
+                                      Margin="0,5,0,0">
+                                <ComboBoxItem>Backup all files</ComboBoxItem>
+                                <ComboBoxItem>Backup only new files</ComboBoxItem>
+                            </ComboBox>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <StackPanel Grid.Row="2" 
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Spacing="10"
+                            Margin="0,20,0,0">
+                    <Button Content="Cancel"
+                            Click="Close"/>
+                    <Button Content="Add"
+                            Classes="accent"
+                            Click="Add"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
+
