@@ -36,11 +36,9 @@
                                       Tag="archives"/>
             </ui:NavigationView.MenuItems>
 
-            <!-- Контент для отображения выбранной секции -->
             <ContentControl Content="{Binding CurrentViewModel}">
                 <ContentControl.DataTemplates>
                     
-                    <!-- Шаблон для MonitoringViewModel -->
                     <DataTemplate DataType="{x:Type vm:MonitoringViewModel}">
                         <StackPanel Margin="20">
                             <TextBlock Text="{Binding Title}" 
@@ -48,16 +46,13 @@
                                       FontWeight="Bold"/>
                             <TextBlock Text="{Binding Status}" 
                                       Margin="0,10"/>
-                            <!-- Дополнительный контент мониторинга -->
                         </StackPanel>
                     </DataTemplate>
                     
-                    <!-- Шаблон для GamesViewModel -->
                     <DataTemplate DataType="{x:Type vm:GamesViewModel}">
-                        <views:GamesView/>
+                        <views:GamesView />
                     </DataTemplate>
-                    
-                    <!-- Шаблон для ArchivesViewModel -->
+
                     <DataTemplate DataType="{x:Type vm:ArchivesViewModel}">
                         <StackPanel Margin="20">
                             <TextBlock Text="{Binding Title}" 
@@ -65,7 +60,6 @@
                                       FontWeight="Bold"/>
                             <TextBlock Text="{Binding ArchiveCount, StringFormat='Архивов: {0}'}" 
                                       Margin="0,10"/>
-                            <!-- Дополнительный контент архивов -->
                         </StackPanel>
                     </DataTemplate>
                     

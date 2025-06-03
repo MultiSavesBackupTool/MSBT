@@ -15,7 +15,6 @@ public class ArchivesViewModel : ViewModelBase
     
     public void LoadArchives()
     {
-        ArchiveCount = 42; // Пример
-        // Логика загрузки архивов
+        ArchiveCount = 42;
     }
 }

@@ -23,24 +23,20 @@ public class MainWindowViewModel : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _currentViewModel, value);
     }
     
-    // ViewModels для каждой секции
     public MonitoringViewModel MonitoringViewModel { get; }
     public GamesViewModel GamesViewModel { get; }
     public ArchivesViewModel ArchivesViewModel { get; }
     
     public MainWindowViewModel()
     {
-        // Инициализация ViewModels
         MonitoringViewModel = new MonitoringViewModel();
         GamesViewModel = new GamesViewModel();
         ArchivesViewModel = new ArchivesViewModel();
         
-        // Реакция на изменение выбранного пункта меню
         this.WhenAnyValue(x => x.SelectedMenuItem)
             .Where(item => item != null)
             .Subscribe(OnNavigationChanged);
         
-        // Устанавливаем начальное значение
         CurrentViewModel = MonitoringViewModel;
     }
     
@@ -53,10 +49,9 @@ public class MainWindowViewModel : ReactiveObject
             "monitoring" => MonitoringViewModel,
             "games" => GamesViewModel,
             "archives" => ArchivesViewModel,
-            _ => MonitoringViewModel // по умолчанию
+            _ => MonitoringViewModel
         };
         
-        // Дополнительная логика при переключении
         switch (tag)
         {
             case "monitoring":
@@ -73,19 +68,17 @@ public class MainWindowViewModel : ReactiveObject
     
     private void OnMonitoringSelected()
     {
-        // Логика при выборе мониторинга
         MonitoringViewModel.RefreshData();
         Debug.WriteLine("Переключение на Мониторинг");
     }
     
     private void OnGamesSelected()
     {
-        
+        Debug.WriteLine("Переключение на Игры");
     }
     
     private void OnArchivesSelected()
     {
-        // Логика при выборе архивов
         ArchivesViewModel.LoadArchives();
         Debug.WriteLine("Переключение на Архивы");
     }
