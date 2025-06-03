@@ -36,11 +36,25 @@
                         <TextBox Watermark="Game Name"
                                 Text="{Binding GameName}"/>
                         
-                        <TextBox Watermark="Game Executable (e.g., NMS.exe)"
-                                Text="{Binding GameExe}"/>
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBox Watermark="Game Executable (e.g., NMS.exe)"
+                                    Text="{Binding GameExe}"/>
+                            <Button Content="Browse"
+                                    Margin="5,0,0,0"
+                                    Grid.Column="1"
+                                    Command="{Binding BrowseGameExeCommand}"
+                                    CommandParameter="{Binding $parent[TopLevel].StorageProvider}"/>
+                        </Grid>
                         
-                        <TextBox Watermark="Alternative Executable (optional)"
-                                Text="{Binding GameExeAlt}"/>
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBox Watermark="Alternative Executable (optional)"
+                                    Text="{Binding GameExeAlt}"/>
+                            <Button Content="Browse"
+                                    Margin="5,0,0,0"
+                                    Grid.Column="1"
+                                    Command="{Binding BrowseGameExeAltCommand}"
+                                    CommandParameter="{Binding $parent[TopLevel].StorageProvider}"/>
+                        </Grid>
                         
                         <Grid ColumnDefinitions="*, Auto">
                             <TextBox Watermark="Save Files Location"

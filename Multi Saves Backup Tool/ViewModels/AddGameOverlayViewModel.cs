@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.Linq;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
 
@@ -64,6 +65,22 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private async Task BrowseGameExe(IStorageProvider storageProvider)
+    {
+        var filePath = await BrowseExecutableFile(storageProvider);
+        if (!string.IsNullOrEmpty(filePath))
+            GameExe = filePath;
+    }
+
+    [RelayCommand]
+    private async Task BrowseGameExeAlt(IStorageProvider storageProvider)
+    {
+        var filePath = await BrowseExecutableFile(storageProvider);
+        if (!string.IsNullOrEmpty(filePath))
+            GameExeAlt = filePath;
+    }
+
+    [RelayCommand]
     private void Add()
     {
         // TODO: Implement add logic
@@ -80,6 +97,30 @@ public partial class AddGameOverlayViewModel : ViewModelBase
             });
 
             return folder.Count > 0 ? folder[0].Path.LocalPath : string.Empty;
+        }
+        return string.Empty;
+    }
+
+    private async Task<string> BrowseExecutableFile(IStorageProvider storageProvider)
+    {
+        if (storageProvider != null)
+        {
+            var options = new FilePickerOpenOptions
+            {
+                Title = "Select Game Executable",
+                AllowMultiple = false,
+                FileTypeFilter = new[] 
+                { 
+                    new FilePickerFileType("Executable Files")
+                    {
+                        Patterns = new[] { "*.exe" },
+                        MimeTypes = new[] { "application/x-msdownload" }
+                    }
+                }
+            };
+
+            var files = await storageProvider.OpenFilePickerAsync(options);
+            return files.Count > 0 ? files[0].Path.LocalPath : string.Empty;
         }
         return string.Empty;
     }
