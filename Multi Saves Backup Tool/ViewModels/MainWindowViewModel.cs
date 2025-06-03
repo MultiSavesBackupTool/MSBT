@@ -68,7 +68,6 @@ public class MainWindowViewModel : ReactiveObject
     
     private void OnMonitoringSelected()
     {
-        MonitoringViewModel.RefreshData();
         Debug.WriteLine("Переключение на Мониторинг");
     }
     
@@ -79,7 +78,6 @@ public class MainWindowViewModel : ReactiveObject
     
     private void OnArchivesSelected()
     {
-        ArchivesViewModel.LoadArchives();
         Debug.WriteLine("Переключение на Архивы");
     }
 }

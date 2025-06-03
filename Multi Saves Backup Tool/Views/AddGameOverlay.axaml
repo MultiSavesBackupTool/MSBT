@@ -2,9 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Multi_Saves_Backup_Tool.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Multi_Saves_Backup_Tool.Views.AddGameOverlay"
-             x:CompileBindings="True">
+             x:CompileBindings="True"
+             x:DataType="vm:AddGameOverlayViewModel">
     <Grid>
         <Rectangle Fill="Black" Opacity="0.5"/>
         
@@ -32,39 +34,42 @@
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="10">
                         <TextBox Watermark="Game Name"
-                                 x:Name="GameNameTextBox"/>
+                                Text="{Binding GameName}"/>
                         
                         <TextBox Watermark="Game Executable (e.g., NMS.exe)"
-                                 x:Name="GameExeTextBox"/>
+                                Text="{Binding GameExe}"/>
                         
                         <TextBox Watermark="Alternative Executable (optional)"
-                                 x:Name="GameExeAltTextBox"/>
+                                Text="{Binding GameExeAlt}"/>
                         
                         <Grid ColumnDefinitions="*, Auto">
                             <TextBox Watermark="Save Files Location"
-                                     x:Name="SaveLocationTextBox"/>
+                                    Text="{Binding SaveLocation}"/>
                             <Button Content="Browse"
                                     Margin="5,0,0,0"
                                     Grid.Column="1"
-                                    Click="BrowseSaveLocation"/>
+                                    Command="{Binding BrowseSaveLocationCommand}"
+                                    CommandParameter="{Binding $parent[TopLevel].StorageProvider}"/>
                         </Grid>
 
                         <Grid ColumnDefinitions="*, Auto">
                             <TextBox Watermark="Mods Folder (optional)"
-                                     x:Name="ModPathTextBox"/>
+                                    Text="{Binding ModPath}"/>
                             <Button Content="Browse"
                                     Margin="5,0,0,0"
                                     Grid.Column="1"
-                                    Click="BrowseModPath"/>
+                                    Command="{Binding BrowseModPathCommand}"
+                                    CommandParameter="{Binding $parent[TopLevel].StorageProvider}"/>
                         </Grid>
 
                         <Grid ColumnDefinitions="*, Auto">
                             <TextBox Watermark="Additional Backup Path (optional)"
-                                     x:Name="AddPathTextBox"/>
+                                    Text="{Binding AddPath}"/>
                             <Button Content="Browse"
                                     Margin="5,0,0,0"
                                     Grid.Column="1"
-                                    Click="BrowseAddPath"/>
+                                    Command="{Binding BrowseAddPathCommand}"
+                                    CommandParameter="{Binding $parent[TopLevel].StorageProvider}"/>
                         </Grid>
 
                         <StackPanel>
@@ -75,15 +80,13 @@
                             <Grid ColumnDefinitions="*, Auto">
                                 <TextBlock Text="Days to keep backups (0 - keep all)"
                                            VerticalAlignment="Center"/>
-                                <NumericUpDown Value="0"
+                                <NumericUpDown Value="{Binding DaysForKeep}"
                                                Minimum="0"
-                                               x:Name="DaysForKeepNumeric"
                                                Grid.Column="1"
                                                Width="100"/>
                             </Grid>
 
-                            <ComboBox x:Name="OldFilesStatusComboBox"
-                                      SelectedIndex="0"
+                            <ComboBox SelectedIndex="{Binding OldFilesStatus}"
                                       Margin="0,5,0,0">
                                 <ComboBoxItem>Keep all files</ComboBoxItem>
                                 <ComboBoxItem>Move to archive</ComboBoxItem>
@@ -91,30 +94,27 @@
                             </ComboBox>
 
                             <CheckBox Content="Include timestamp in archive name"
-                                      IsChecked="True"
-                                      x:Name="IncludeTimestampCheck"
+                                      IsChecked="{Binding IncludeTimestamp}"
                                       Margin="0,5,0,0"/>
 
-                            <ComboBox x:Name="BackupModeComboBox"
-                                      SelectedIndex="0"
+                            <ComboBox SelectedIndex="{Binding BackupMode}"
                                       Margin="0,5,0,0">
                                 <ComboBoxItem>Backup all files</ComboBoxItem>
-                                <ComboBoxItem>Backup only new files</ComboBoxItem>
+                                <ComboBoxItem>Backup changed files only</ComboBoxItem>
                             </ComboBox>
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
 
-                <StackPanel Grid.Row="2" 
-                            Orientation="Horizontal"
-                            HorizontalAlignment="Right"
-                            Spacing="10"
-                            Margin="0,20,0,0">
+                <StackPanel Grid.Row="2"
+                          Orientation="Horizontal"
+                          HorizontalAlignment="Right"
+                          Spacing="10"
+                          Margin="0,20,0,0">
+                    <Button Content="Add"
+                            Command="{Binding AddCommand}"/>
                     <Button Content="Cancel"
                             Click="Close"/>
-                    <Button Content="Add"
-                            Classes="accent"
-                            Click="Add"/>
                 </StackPanel>
             </Grid>
         </Border>
