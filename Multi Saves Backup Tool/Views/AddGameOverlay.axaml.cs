@@ -12,12 +12,6 @@ public partial class AddGameOverlay : UserControl
         InitializeComponent();
     }
 
-    public AddGameOverlay(GamesViewModel gamesViewModel)
-    {
-        InitializeComponent();
-        Initialize(gamesViewModel);
-    }
-
     public void Initialize(GamesViewModel gamesViewModel)
     {
         var viewModel = new AddGameOverlayViewModel(gamesViewModel);

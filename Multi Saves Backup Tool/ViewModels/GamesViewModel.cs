@@ -44,7 +44,7 @@ public class GamesViewModel : ViewModelBase
         SaveGames();
     }
 
-    public void LoadGames()
+    private void LoadGames()
     {
         try
         {
@@ -91,9 +91,18 @@ public class GamesViewModel : ViewModelBase
             });
             File.WriteAllText(jsonPath, json);
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            Console.WriteLine($"Error saving games: {ex.Message}");
+            Console.WriteLine($"Error saving games: {e.Message}");
+        }
+    }
+
+    public void AddGame(GameModel game)
+    {
+        if (game != null)
+        {
+            Games.Add(game);
+            game.PropertyChanged += Game_PropertyChanged;
         }
     }
 

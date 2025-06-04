@@ -6,17 +6,22 @@ namespace Multi_Saves_Backup_Tool.Views;
 
 public partial class GamesView : UserControl
 {
+    private GamesViewModel _viewModel;
+    
     public GamesView()
     {
         InitializeComponent();
-        DataContext = new GamesViewModel();
+        _viewModel = new GamesViewModel();
+        DataContext = _viewModel;
     }
 
     private void AddGameButton_Click(object sender, RoutedEventArgs e)
     {
         if (TopLevel.GetTopLevel(this) is MainWindow mainWindow && mainWindow.AddGameOverlay != null)
         {
-            mainWindow.AddGameOverlay.Show();
+            var overlay = mainWindow.AddGameOverlay;
+            overlay.Initialize(_viewModel);
+            overlay.Show();
         }
     }
 }

@@ -31,41 +31,43 @@
                               IsSettingsVisible="False">
 
                 <ui:NavigationView.MenuItems>
-                    <ui:NavigationViewItem Content="Мониторинг" 
-                                          IconSource="Home" 
+                    <ui:NavigationViewItem Content="Мониторинг"
+                                          IconSource="Home"
                                           Tag="monitoring"/>
-                    <ui:NavigationViewItem Content="Игры" 
-                                          IconSource="Games" 
+                    <ui:NavigationViewItem Content="Игры"
+                                          IconSource="Games"
                                           Tag="games"/>
                 </ui:NavigationView.MenuItems>
 
                 <ui:NavigationView.FooterMenuItems>
-                    <ui:NavigationViewItem Content="Настройки" 
-                                          IconSource="Settings" 
+                    <ui:NavigationViewItem Content="Настройки"
+                                          IconSource="Settings"
                                           Tag="settings"/>
                 </ui:NavigationView.FooterMenuItems>
 
                 <ContentControl Content="{Binding CurrentViewModel}">
                     <ContentControl.DataTemplates>
-                        
+
                         <DataTemplate DataType="{x:Type vm:MonitoringViewModel}">
-                            <views:MonitoringView />
+                            <views:MonitoringView/>
                         </DataTemplate>
-                        
+
                         <DataTemplate DataType="{x:Type vm:GamesViewModel}">
-                            <views:GamesView />
+                            <views:GamesView x:Name="GamesView"/>
                         </DataTemplate>
 
                         <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
-                            <views:SettingsView />
+                            <views:SettingsView/>
                         </DataTemplate>
-                        
+
                     </ContentControl.DataTemplates>
                 </ContentControl>
             </ui:NavigationView>
         </Grid>
-        
-        <views:AddGameOverlay x:Name="AddGameOverlay" IsVisible="False"/>
+
+        <views:AddGameOverlay x:Name="AddGameOverlay" 
+                             IsVisible="False"
+                             DataContext="{x:Null}"/>
     </Panel>
 </Window>
 

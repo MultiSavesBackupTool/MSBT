@@ -60,6 +60,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     private string _saveLocationError = string.Empty;
 
     public event EventHandler? CloseRequested;
+    public event EventHandler<GameModel>? GameAdded;
 
     [RelayCommand]
     private async Task BrowseSaveLocation(IStorageProvider storageProvider)
@@ -142,7 +143,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
             return;
         }
 
-        var game = new GameModel
+        var newGame = new GameModel
         {
             GameName = GameName,
             GameExe = GameExe,
@@ -151,11 +152,12 @@ public partial class AddGameOverlayViewModel : ViewModelBase
             ModPath = string.IsNullOrEmpty(ModPath) ? null : ModPath,
             AddPath = string.IsNullOrEmpty(AddPath) ? null : AddPath,
             DaysForKeep = DaysForKeep,
-            SetOldFilesStatus = OldFilesStatus
+            SetOldFilesStatus = OldFilesStatus,
+            IsEnabled = true
         };
 
-        AddGame(game);
-
+        AddGame(newGame);
+        GameAdded?.Invoke(this, newGame);
         CloseRequested?.Invoke(this, EventArgs.Empty);
     }
 
@@ -200,15 +202,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
 
     private void AddGame(GameModel newGame)
     {
-        var jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "games.json");
-        var games = File.Exists(jsonPath)
-            ? JsonSerializer.Deserialize<List<GameModel>>(File.ReadAllText(jsonPath)) ?? new List<GameModel>()
-            : new List<GameModel>();
-
-        games.Add(newGame);
-        File.WriteAllText(jsonPath, JsonSerializer.Serialize(games));
-
-        _gamesViewModel.LoadGames();
+        _gamesViewModel.AddGame(newGame);
     }
 
     public void ClearForm()
