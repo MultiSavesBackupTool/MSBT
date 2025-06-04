@@ -129,7 +129,7 @@ public class BackupWorker : BackgroundService
             if (_backupService.VerifyBackupPaths(game))
             {
                 await _backupService.CreateBackupAsync(game);
-                await _backupService.CleanupOldBackupsAsync(game);
+                _backupService.CleanupOldBackups(game);
                 
                 gameState.LastBackupTime = DateTime.Now;
                 gameState.Status = "Success";

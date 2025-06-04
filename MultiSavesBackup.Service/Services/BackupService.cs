@@ -55,7 +55,7 @@ public class BackupService : IBackupService
         }
     }
 
-    public async Task CleanupOldBackupsAsync(GameModel game)
+    public void CleanupOldBackups(GameModel game)
     {
         try
         {
