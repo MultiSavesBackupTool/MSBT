@@ -107,15 +107,15 @@
                                     CommandParameter="{Binding $parent[TopLevel].StorageProvider}"/>
                         </Grid>
 
-                        <Grid ColumnDefinitions="*, Auto">
+                        <Grid ColumnDefinitions="*, 200">
                             <TextBlock Text="Интервал резервного копирования (в минутах):"
                                      VerticalAlignment="Center"/>
                             <NumericUpDown Value="{Binding BackupInterval, Mode=TwoWay}"
                                          Minimum="1"
                                          Maximum="1440"
                                          Increment="5"
-                                         Grid.Column="1"
-                                         Width="100"/>
+                                         Width="200"
+                                         Grid.Column="1"/>
                         </Grid>
                         <TextBlock Text="От 1 минуты до 24 часов (1440 минут)"
                                  Opacity="0.7"
@@ -126,16 +126,16 @@
                             <TextBlock Text="Настройки резервного копирования:"
                                        FontWeight="Bold"
                                        Margin="0,10,0,5"/>
-                                       
-                            <Grid ColumnDefinitions="*, Auto">
+                            
+                            <Grid ColumnDefinitions="*, 200">
                                 <TextBlock Text="Дни для хранения резервных копий (0 - хранить все)"
                                            VerticalAlignment="Center"/>
                                 <NumericUpDown Value="{Binding DaysForKeep, Mode=TwoWay}"
                                                Minimum="0"
                                                Maximum="365"
                                                Increment="1"
+                                               Width="200"
                                                Grid.Column="1"
-                                               Width="100"
                                                FormatString="0"/>
                             </Grid>
 
