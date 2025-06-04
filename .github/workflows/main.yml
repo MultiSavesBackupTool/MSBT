@@ -1,0 +1,49 @@
+name: Build Installer
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Publish MultiSavesBackup.Service
+        run: |
+          dotnet publish "MultiSavesBackup.Service/MultiSavesBackup.Service.csproj" `
+            -c Release -r win-x64 --self-contained true `
+            -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false `
+            -o "publish/release"
+
+      - name: Publish Multi Saves Backup Tool
+        run: |
+          dotnet publish ".\Multi Saves Backup Tool\Multi Saves Backup Tool.csproj" `
+            -c Release -r win-x64 --self-contained true `
+            -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false `
+            -o "publish/release"
+
+      - name: Install Inno Setup
+        run: |
+          Invoke-WebRequest https://jrsoftware.org/download.php/is.exe -OutFile is.exe
+          Start-Process -FilePath .\is.exe -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-' -Wait
+        shell: powershell
+
+      - name: Build installer with Inno Setup
+        run: |
+          "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
+        shell: cmd
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MultiSavesBackupInstaller
+          path: installer/MultiSavesBackupSetup.exe
