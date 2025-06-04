@@ -6,7 +6,7 @@ using Multi_Saves_Backup_Tool.Views;
 
 namespace Multi_Saves_Backup_Tool;
 
-public partial class App : Application
+public class App : Application
 {
     public override void Initialize()
     {

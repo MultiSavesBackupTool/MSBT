@@ -18,15 +18,9 @@ public class GamesViewModel : ViewModelBase
         get => _games;
         set
         {
-            if (_games != null)
-            {
-                _games.CollectionChanged -= Games_CollectionChanged;
-            }
+            _games.CollectionChanged -= Games_CollectionChanged;
             SetProperty(ref _games, value);
-            if (_games != null)
-            {
-                _games.CollectionChanged += Games_CollectionChanged;
-            }
+            _games.CollectionChanged += Games_CollectionChanged;
         }
     }
 
@@ -35,7 +29,7 @@ public class GamesViewModel : ViewModelBase
     public GamesViewModel()
     {
         _games = new ObservableCollection<GameModel>();
-        DeleteGameCommand = new RelayCommand<GameModel>(DeleteGame);
+        DeleteGameCommand = new RelayCommand<GameModel?>(DeleteGame);
         LoadGames();
     }
 
@@ -99,20 +93,16 @@ public class GamesViewModel : ViewModelBase
 
     public void AddGame(GameModel game)
     {
-        if (game != null)
-        {
-            Games.Add(game);
-            game.PropertyChanged += Game_PropertyChanged;
-        }
+        Games.Add(game);
+        game.PropertyChanged += Game_PropertyChanged;
     }
 
     private void DeleteGame(GameModel? game)
     {
-        if (game != null)
-        {
-            game.PropertyChanged -= Game_PropertyChanged;
-            Games.Remove(game);
-            SaveGames();
-        }
+        if (game is null) return;
+        
+        game.PropertyChanged -= Game_PropertyChanged;
+        Games.Remove(game);
+        SaveGames();
     }
 }

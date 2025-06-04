@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace Multi_Saves_Backup_Tool.Models;
 
 public class ServiceSettings

@@ -40,7 +40,7 @@ public class GameMonitoringInfo
     public string NextBackupScheduled { get; set; } = "Не запланировано";
 }
 
-public partial class MonitoringViewModel : ViewModelBase
+public class MonitoringViewModel : ViewModelBase
 {
     private string _serviceStatus = "Неизвестно";
     private DateTime _lastUpdateTime;
@@ -109,6 +109,7 @@ public partial class MonitoringViewModel : ViewModelBase
                     GameName = gameState.GameName,
                     Status = gameState.Status switch
                     {
+                        "Success" => "Успешно",
                         "Waiting" => "Ожидание",
                         "Backing up" => "Создание резервной копии",
                         "Cleaning" => "Очистка старых копий",

@@ -3,10 +3,6 @@ using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Linq;
-using System.Text.Json;
-using System.IO;
-using System.Collections.Generic;
 using Multi_Saves_Backup_Tool.Models;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
@@ -63,7 +59,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     public event EventHandler<GameModel>? GameAdded;
 
     [RelayCommand]
-    private async Task BrowseSaveLocation(IStorageProvider storageProvider)
+    private async Task BrowseSaveLocation(IStorageProvider? storageProvider)
     {
         var folderPath = await BrowseFolder(storageProvider);
         if (!string.IsNullOrEmpty(folderPath))
@@ -71,7 +67,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task BrowseModPath(IStorageProvider storageProvider)
+    private async Task BrowseModPath(IStorageProvider? storageProvider)
     {
         var folderPath = await BrowseFolder(storageProvider);
         if (!string.IsNullOrEmpty(folderPath))
@@ -79,7 +75,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task BrowseAddPath(IStorageProvider storageProvider)
+    private async Task BrowseAddPath(IStorageProvider? storageProvider)
     {
         var folderPath = await BrowseFolder(storageProvider);
         if (!string.IsNullOrEmpty(folderPath))
@@ -87,7 +83,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task BrowseGameExe(IStorageProvider storageProvider)
+    private async Task BrowseGameExe(IStorageProvider? storageProvider)
     {
         var filePath = await BrowseExecutableFile(storageProvider);
         if (!string.IsNullOrEmpty(filePath))
@@ -95,7 +91,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task BrowseGameExeAlt(IStorageProvider storageProvider)
+    private async Task BrowseGameExeAlt(IStorageProvider? storageProvider)
     {
         var filePath = await BrowseExecutableFile(storageProvider);
         if (!string.IsNullOrEmpty(filePath))
@@ -161,7 +157,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
         CloseRequested?.Invoke(this, EventArgs.Empty);
     }
 
-    private async Task<string> BrowseFolder(IStorageProvider storageProvider)
+    private async Task<string> BrowseFolder(IStorageProvider? storageProvider)
     {
         if (storageProvider != null)
         {
@@ -176,7 +172,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
         return string.Empty;
     }
 
-    private async Task<string> BrowseExecutableFile(IStorageProvider storageProvider)
+    private async Task<string> BrowseExecutableFile(IStorageProvider? storageProvider)
     {
         if (storageProvider != null)
         {
