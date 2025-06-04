@@ -53,8 +53,6 @@ public partial class MonitoringViewModel : ViewModelBase
     }
     
     public string LastUpdateTime => _lastUpdateTime.ToString("g");
-
-    public override string Title => "Мониторинг";
     
     public MonitoringViewModel()
     {

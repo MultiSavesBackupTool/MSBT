@@ -12,8 +12,6 @@ namespace Multi_Saves_Backup_Tool.ViewModels;
 
 public class GamesViewModel : ViewModelBase
 {
-    public override string Title => "Games";
-    
     private ObservableCollection<GameModel> _games;
     public ObservableCollection<GameModel> Games
     {

@@ -13,8 +13,6 @@ namespace Multi_Saves_Backup_Tool.ViewModels;
 
 public partial class AddGameOverlayViewModel : ViewModelBase
 {
-    public override string Title => "Add New Game";
-
     [ObservableProperty]
     private string _gameName = string.Empty;
 

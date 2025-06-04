@@ -29,7 +29,7 @@ public class NotificationSettings
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum CompressionLevel
 {
-    Fastest,
-    Optimal,
-    SmallestSize
+    Fastest = 0,
+    Optimal = 1,
+    SmallestSize = 2
 }

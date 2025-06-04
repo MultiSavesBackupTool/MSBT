@@ -49,13 +49,7 @@
                     <ContentControl.DataTemplates>
                         
                         <DataTemplate DataType="{x:Type vm:MonitoringViewModel}">
-                            <StackPanel Margin="20">
-                                <TextBlock Text="{Binding Title}" 
-                                          FontSize="24" 
-                                          FontWeight="Bold"/>
-                                <TextBlock Text="{Binding ServiceStatus}" 
-                                          Margin="0,10"/>
-                            </StackPanel>
+                            <views:MonitoringView />
                         </DataTemplate>
                         
                         <DataTemplate DataType="{x:Type vm:GamesViewModel}">

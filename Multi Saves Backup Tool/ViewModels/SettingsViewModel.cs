@@ -17,8 +17,6 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty]
     private ServiceSettings _settings;
 
-    public override string Title => "Настройки";
-
     public SettingsViewModel()
     {
         _settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");

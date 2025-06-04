@@ -16,8 +16,6 @@ public partial class MainWindowViewModel : ViewModelBase
     public GamesViewModel GamesViewModel { get; }
     public SettingsViewModel SettingsViewModel { get; }
 
-    public override string Title => "Multi Saves Backup Tool";
-
     public MainWindowViewModel()
     {
         var window = new Window();

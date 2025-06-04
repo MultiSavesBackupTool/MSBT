@@ -38,8 +38,8 @@ public class NotificationSettings
 
 public enum CompressionLevel
 {
-    Optimal,
-    Fastest,
-    NoCompression
+    Optimal = 0,
+    Fastest = 1,
+    SmallestSize = 2
 }
 
