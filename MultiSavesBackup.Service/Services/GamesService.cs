@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.Text.Json;
-using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Models;
 using MultiSavesBackup.Service.Models;
+using Microsoft.Extensions.Logging;
 
 namespace MultiSavesBackup.Service.Services;
 
@@ -25,7 +25,7 @@ public class GamesService : IGamesService
             if (_cachedGames != null)
                 return _cachedGames;
 
-            var gamesPath = _settingsService.CurrentSettings.BackupSettings.GetAbsoluteGamesConfigPath();
+            var gamesPath = _settingsService.CurrentSettings.BackupSettings.GamesConfigPath;
             
             if (!File.Exists(gamesPath))
             {

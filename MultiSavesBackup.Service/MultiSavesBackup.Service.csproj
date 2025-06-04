@@ -5,6 +5,13 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>dotnet-MultiSavesBackup.Service-1A2B3C4D</UserSecretsId>
+        <OutputType>exe</OutputType>
+        <PublishSingleFile>true</PublishSingleFile>
+        <SelfContained>true</SelfContained>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+        <UseAppHost>true</UseAppHost>
+        <DebugType>embedded</DebugType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,8 +21,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="settings.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
+        <ProjectReference Include="..\Multi Saves Backup Tool\Multi Saves Backup Tool.csproj" />
     </ItemGroup>
 </Project>

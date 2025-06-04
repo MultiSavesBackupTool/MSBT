@@ -1,7 +1,7 @@
-using System.IO.Compression;
-using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Models;
 using MultiSavesBackup.Service.Models;
+using System.IO.Compression;
+using Microsoft.Extensions.Logging;
 
 namespace MultiSavesBackup.Service.Services;
 
@@ -138,13 +138,14 @@ public class BackupService : IBackupService
         });
     }
 
-    private CompressionLevel GetCompressionLevel()
+    private System.IO.Compression.CompressionLevel GetCompressionLevel()
     {
-        return _settingsService.CurrentSettings.BackupSettings.CompressionLevel switch
+        var compressionLevel = (Multi_Saves_Backup_Tool.Models.CompressionLevel)_settingsService.CurrentSettings.BackupSettings.CompressionLevel;
+        return compressionLevel switch
         {
-            Models.CompressionLevel.Fastest => CompressionLevel.Fastest,
-            Models.CompressionLevel.SmallestSize => CompressionLevel.SmallestSize,
-            _ => CompressionLevel.Optimal
+            Multi_Saves_Backup_Tool.Models.CompressionLevel.Fastest => System.IO.Compression.CompressionLevel.NoCompression,
+            Multi_Saves_Backup_Tool.Models.CompressionLevel.SmallestSize => System.IO.Compression.CompressionLevel.Optimal,
+            _ => System.IO.Compression.CompressionLevel.NoCompression
         };
     }
 }
