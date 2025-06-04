@@ -126,7 +126,7 @@ public class BackupWorker : BackgroundService
             gameState.Status = "Processing";
             SaveServiceState();
 
-            if (await _backupService.VerifyBackupPathsAsync(game))
+            if (_backupService.VerifyBackupPaths(game))
             {
                 await _backupService.CreateBackupAsync(game);
                 await _backupService.CleanupOldBackupsAsync(game);
