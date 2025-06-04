@@ -13,7 +13,7 @@ public class BackupWorker : BackgroundService
     private readonly IGamesService _gamesService;
     private readonly IBackupService _backupService;
     private ServiceState _serviceState;
-    private const string StateFilePath = "service_state.json";
+    private static readonly string StateFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "service_state.json");
 
     public BackupWorker(
         ILogger<BackupWorker> logger,
@@ -71,7 +71,6 @@ public class BackupWorker : BackgroundService
             
             _logger.LogInformation("Found {Count} enabled games for backup", enabledGames.Count);
 
-            // Обновляем состояние для всех игр
             foreach (var game in games)
             {
                 if (!_serviceState.GamesState.ContainsKey(game.GameName))
@@ -135,7 +134,6 @@ public class BackupWorker : BackgroundService
                 gameState.Status = "Success";
                 gameState.LastError = "";
                 
-                // Вычисляем время следующего бэкапа
                 var interval = TimeSpan.FromMinutes(game.BackupInterval);
                 gameState.NextBackupScheduled = DateTime.Now.Add(interval);
             }

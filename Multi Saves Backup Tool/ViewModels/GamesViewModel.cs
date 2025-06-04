@@ -93,7 +93,7 @@ public class GamesViewModel : ViewModelBase
         }
         catch (Exception)
         {
-            // Можно добавить логирование ошибки
+            Console.WriteLine($"Error saving games: {ex.Message}");
         }
     }
 

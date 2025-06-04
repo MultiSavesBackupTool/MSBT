@@ -26,7 +26,6 @@ public class NotificationSettings
     public bool ShowSuccessNotifications { get; set; } = true;
 }
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum CompressionLevel
 {
     Fastest = 0,
