@@ -2,14 +2,54 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Multi_Saves_Backup_Tool.ViewModels"
+             xmlns:models="using:Multi_Saves_Backup_Tool.Models"
+             x:DataType="vm:GamesViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Multi_Saves_Backup_Tool.Views.GamesView">
+
+    <Design.DataContext>
+        <vm:GamesViewModel/>
+    </Design.DataContext>
+
+    <DockPanel>
+        <Button Content="Add Game"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Click="AddGameButton_Click"
+                DockPanel.Dock="Top"
+                Margin="10,10,0,10"/>
+        
+        <ScrollViewer>
+            <ItemsControl ItemsSource="{Binding Games}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="models:GameModel">
+                        <Border Background="#22000000"
+                                Margin="10,5"
+                                Padding="10"
+                                CornerRadius="4">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <CheckBox IsChecked="{Binding IsEnabled}"
+                                         VerticalAlignment="Center"/>
+                                <StackPanel Grid.Column="1" Margin="10,0">
+                                    <TextBlock Text="{Binding GameName}"
+                                             FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding SavePath}"
+                                             FontSize="12"
+                                             Opacity="0.7"/>
+                                </StackPanel>
+                                <Button Grid.Column="2"
+                                        Content="Delete"
+                                        Command="{Binding ((vm:GamesViewModel)DataContext).DeleteGameCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        CommandParameter="{Binding}"
+                                        Padding="8,4">
+                                </Button>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
     
-    <Button x:Name="AddGameButton"
-            Content="Add Game"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Click="AddGameButton_Click"
-            Margin="10,10,0,0"/>
-            
 </UserControl>
