@@ -85,7 +85,7 @@ public partial class SettingsViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            // TODO: Add proper error handling/logging
+            Console.WriteLine($"Ошибка при загрузке настроек: {ex}");
             return new ServiceSettings();
         }
     }
@@ -103,7 +103,7 @@ public partial class SettingsViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            // TODO: Add proper error handling/logging
+            Console.WriteLine($"Ошибка при сохранении настроек: {ex}");
         }
     }
 

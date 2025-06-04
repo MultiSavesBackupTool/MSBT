@@ -59,7 +59,7 @@ public class GamesService : IGamesService
         return games.FirstOrDefault(g => g.GameName.Equals(gameName, StringComparison.OrdinalIgnoreCase));
     }
 
-    public async Task<bool> IsGameRunningAsync(GameModel game)
+    public bool IsGameRunning(GameModel game)
     {
         try
         {
@@ -69,7 +69,9 @@ public class GamesService : IGamesService
             var isMainExeRunning = processes.Any(p => p.ProcessName.Equals(gameExeName, StringComparison.OrdinalIgnoreCase));
             
             if (isMainExeRunning)
+            {
                 return true;
+            }
 
             if (!string.IsNullOrEmpty(game.GameExeAlt))
             {
@@ -81,7 +83,7 @@ public class GamesService : IGamesService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error checking if game {GameName} is running", game.GameName);
+            _logger.LogError(ex, "Error checking if game is running");
             return false;
         }
     }

@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Multi_Saves_Backup_Tool.Models;
 
 public class ServiceSettings
@@ -24,6 +26,7 @@ public class NotificationSettings
     public bool ShowSuccessNotifications { get; set; } = true;
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum CompressionLevel
 {
     Fastest,

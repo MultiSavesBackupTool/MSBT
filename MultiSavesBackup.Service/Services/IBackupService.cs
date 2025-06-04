@@ -6,5 +6,5 @@ public interface IBackupService
 {
     Task CreateBackupAsync(GameModel game);
     Task CleanupOldBackupsAsync(GameModel game);
-    Task<bool> VerifyBackupPathsAsync(GameModel game);
+    bool VerifyBackupPaths(GameModel game);
 }

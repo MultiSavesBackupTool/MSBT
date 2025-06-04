@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using System;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Multi_Saves_Backup_Tool.ViewModels;
 
@@ -14,7 +15,8 @@ public partial class AddGameOverlay : UserControl
         DataContext = viewModel;
     }
 
-    private AddGameOverlayViewModel ViewModel => (AddGameOverlayViewModel)DataContext;
+    private AddGameOverlayViewModel ViewModel => DataContext as AddGameOverlayViewModel 
+        ?? throw new InvalidOperationException("DataContext is not AddGameOverlayViewModel");
 
     public void Show()
     {

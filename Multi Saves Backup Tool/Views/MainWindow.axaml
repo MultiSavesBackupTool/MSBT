@@ -56,7 +56,7 @@
                                 <TextBlock Text="{Binding Title}" 
                                           FontSize="24" 
                                           FontWeight="Bold"/>
-                                <TextBlock Text="{Binding Status}" 
+                                <TextBlock Text="{Binding ServiceStatus}" 
                                           Margin="0,10"/>
                             </StackPanel>
                         </DataTemplate>

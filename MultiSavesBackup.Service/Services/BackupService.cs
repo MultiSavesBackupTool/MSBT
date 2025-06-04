@@ -98,7 +98,7 @@ public class BackupService : IBackupService
         }
     }
 
-    public async Task<bool> VerifyBackupPathsAsync(GameModel game)
+    public bool VerifyBackupPaths(GameModel game)
     {
         if (!Directory.Exists(game.SavePath))
         {

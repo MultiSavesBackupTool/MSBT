@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:Multi_Saves_Backup_Tool.ViewModels"
+             xmlns:models="using:Multi_Saves_Backup_Tool.Models"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Multi_Saves_Backup_Tool.Views.SettingsView"
              x:DataType="vm:SettingsViewModel">
@@ -10,7 +11,6 @@
         <StackPanel Spacing="10" Margin="20">
             <TextBlock Text="Настройки резервного копирования" Classes="h2"/>
             
-            <!-- Основные настройки -->
             <StackPanel Margin="0,10">
                 <TextBlock Text="Папка для резервных копий:" Margin="0,0,0,5"/>
                 <Grid ColumnDefinitions="*, Auto">
@@ -31,13 +31,17 @@
                 <TextBlock Text="Уровень сжатия:" Margin="0,10,0,5"/>
                 <ComboBox SelectedItem="{Binding Settings.BackupSettings.CompressionLevel}"
                          HorizontalAlignment="Stretch">
-                    <ComboBoxItem Tag="Fastest">Быстрый</ComboBoxItem>
-                    <ComboBoxItem Tag="Optimal">Оптимальный</ComboBoxItem>
-                    <ComboBoxItem Tag="SmallestSize">Максимальный</ComboBoxItem>
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Mode=OneTime, Converter={StaticResource CompressionLevelConverter}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                    <models:CompressionLevel>Fastest</models:CompressionLevel>
+                    <models:CompressionLevel>Optimal</models:CompressionLevel>
+                    <models:CompressionLevel>SmallestSize</models:CompressionLevel>
                 </ComboBox>
             </StackPanel>
             
-            <!-- Логирование -->
             <StackPanel Margin="0,10">
                 <TextBlock Text="Настройки логирования" Classes="h3"/>
                 <CheckBox Content="Включить логирование" 
@@ -55,7 +59,6 @@
                 </Grid>
             </StackPanel>
             
-            <!-- Уведомления -->
             <StackPanel Margin="0,10">
                 <TextBlock Text="Настройки уведомлений" Classes="h3"/>
                 <CheckBox Content="Включить уведомления"
@@ -70,7 +73,6 @@
                 </StackPanel>
             </StackPanel>
             
-            <!-- Кнопки -->
             <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0"
                         HorizontalAlignment="Right">
                 <Button Content="Сохранить" Command="{Binding SaveCurrentSettingsCommand}"/>
