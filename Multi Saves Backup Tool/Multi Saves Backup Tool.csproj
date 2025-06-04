@@ -16,24 +16,24 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**" />
+        <AvaloniaResource Include="Assets\**"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.3.0" />
-        <PackageReference Include="Avalonia.Desktop" Version="11.3.0" />
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.0" />
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.0" />
-        <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.0" />
+        <PackageReference Include="Avalonia" Version="11.3.0"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.0"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.0"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.0"/>
+        <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.0"/>
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Include="Avalonia.Diagnostics" Version="11.3.0">
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
-        <PackageReference Include="FluentAvaloniaUI" Version="2.3.0" />
-        <PackageReference Include="ReactiveUI" Version="20.3.1" />
-        <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1"/>
+        <PackageReference Include="FluentAvaloniaUI" Version="2.3.0"/>
+        <PackageReference Include="ReactiveUI" Version="20.3.1"/>
+        <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -43,30 +43,30 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Views\AddGameOverlay.axaml.cs">
-        <DependentUpon>AddGameOverlay.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Views\MainWindow.axaml.cs">
-        <DependentUpon>MainWindow.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Views\SettingsView.axaml.cs">
-        <DependentUpon>SettingsView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Views\MonitoringView.axaml.cs">
-        <DependentUpon>MonitoringView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
+        <Compile Update="Views\AddGameOverlay.axaml.cs">
+            <DependentUpon>AddGameOverlay.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\MainWindow.axaml.cs">
+            <DependentUpon>MainWindow.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\SettingsView.axaml.cs">
+            <DependentUpon>SettingsView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\MonitoringView.axaml.cs">
+            <DependentUpon>MonitoringView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>
-      <AdditionalFiles Include="Views\**\*.axaml" />
+        <AdditionalFiles Include="Views\**\*.axaml"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Services\" />
+        <Folder Include="Services\"/>
     </ItemGroup>
 
     <ItemGroup>

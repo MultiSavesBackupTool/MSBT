@@ -14,8 +14,7 @@ public partial class SettingsViewModel : ViewModelBase
     private readonly string _settingsPath;
     private readonly IStorageProvider? _storageProvider;
 
-    [ObservableProperty]
-    private ServiceSettings _settings;
+    [ObservableProperty] private ServiceSettings _settings;
 
     public SettingsViewModel()
     {

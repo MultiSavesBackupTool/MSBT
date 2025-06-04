@@ -16,48 +16,48 @@
         Background="#272727">
 
     <Design.DataContext>
-        <vm:MainWindowViewModel/>
+        <vm:MainWindowViewModel />
     </Design.DataContext>
 
     <Panel>
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
             <ui:NavigationView x:Name="MainNavigationView"
-                              SelectedItem="{Binding SelectedMenuItem}"
-                              PaneDisplayMode="Top"
-                              IsSettingsVisible="False">
+                               SelectedItem="{Binding SelectedMenuItem}"
+                               PaneDisplayMode="Top"
+                               IsSettingsVisible="False">
 
                 <ui:NavigationView.MenuItems>
                     <ui:NavigationViewItem Content="Monitoring"
-                                          IconSource="Home"
-                                          Tag="monitoring"/>
+                                           IconSource="Home"
+                                           Tag="monitoring" />
                     <ui:NavigationViewItem Content="Games"
-                                          IconSource="Games"
-                                          Tag="games"/>
+                                           IconSource="Games"
+                                           Tag="games" />
                 </ui:NavigationView.MenuItems>
 
                 <ui:NavigationView.FooterMenuItems>
                     <ui:NavigationViewItem Content="Settings"
-                                          IconSource="Settings"
-                                          Tag="settings"/>
+                                           IconSource="Settings"
+                                           Tag="settings" />
                 </ui:NavigationView.FooterMenuItems>
 
                 <ContentControl Content="{Binding CurrentViewModel}">
                     <ContentControl.DataTemplates>
 
                         <DataTemplate DataType="{x:Type vm:MonitoringViewModel}">
-                            <views:MonitoringView/>
+                            <views:MonitoringView />
                         </DataTemplate>
 
                         <DataTemplate DataType="{x:Type vm:GamesViewModel}">
-                            <views:GamesView x:Name="GamesView"/>
+                            <views:GamesView x:Name="GamesView" />
                         </DataTemplate>
 
                         <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
-                            <views:SettingsView/>
+                            <views:SettingsView />
                         </DataTemplate>
 
                     </ContentControl.DataTemplates>
@@ -65,9 +65,8 @@
             </ui:NavigationView>
         </Grid>
 
-        <views:AddGameOverlay x:Name="AddGameOverlay" 
-                             IsVisible="False"
-                             DataContext="{x:Null}"/>
+        <views:AddGameOverlay x:Name="AddGameOverlay"
+                              IsVisible="False"
+                              DataContext="{x:Null}" />
     </Panel>
 </Window>
-

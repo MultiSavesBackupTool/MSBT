@@ -6,8 +6,8 @@ namespace Multi_Saves_Backup_Tool.Views;
 
 public partial class GamesView : UserControl
 {
-    private GamesViewModel _viewModel;
-    
+    private readonly GamesViewModel _viewModel;
+
     public GamesView()
     {
         InitializeComponent();

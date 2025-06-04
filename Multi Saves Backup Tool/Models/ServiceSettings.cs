@@ -12,6 +12,7 @@ public class BackupSettings
     public int MaxParallelBackups { get; set; } = 2;
     public CompressionLevel CompressionLevel { get; set; } = CompressionLevel.Optimal;
     public string GamesConfigPath { get; set; } = "games.json";
+
     public bool EnableLogging { get; set; } = true;
     //public NotificationSettings NotificationSettings { get; set; } = new();
 }

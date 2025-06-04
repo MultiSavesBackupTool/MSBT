@@ -11,52 +11,38 @@ public partial class AddGameOverlayViewModel : ViewModelBase
 {
     private readonly GamesViewModel _gamesViewModel;
 
+    [ObservableProperty] private string _addPath = string.Empty;
+
+    [ObservableProperty] private int _backupInterval = 60;
+
+    [ObservableProperty] private int _backupMode;
+
+    [ObservableProperty] private int _daysForKeep;
+
+    [ObservableProperty] private string _gameExe = string.Empty;
+
+    [ObservableProperty] private string _gameExeAlt = string.Empty;
+
+    [ObservableProperty] private string _gameExeError = string.Empty;
+
+    [ObservableProperty] private string _gameName = string.Empty;
+
+    [ObservableProperty] private string _gameNameError = string.Empty;
+
+    [ObservableProperty] private bool _includeTimestamp = true;
+
+    [ObservableProperty] private string _modPath = string.Empty;
+
+    [ObservableProperty] private int _oldFilesStatus;
+
+    [ObservableProperty] private string _saveLocation = string.Empty;
+
+    [ObservableProperty] private string _saveLocationError = string.Empty;
+
     public AddGameOverlayViewModel(GamesViewModel gamesViewModel)
     {
         _gamesViewModel = gamesViewModel;
     }
-
-    [ObservableProperty]
-    private string _gameName = string.Empty;
-
-    [ObservableProperty]
-    private string _gameExe = string.Empty;
-
-    [ObservableProperty]
-    private string _gameExeAlt = string.Empty;
-
-    [ObservableProperty]
-    private string _saveLocation = string.Empty;
-
-    [ObservableProperty]
-    private string _modPath = string.Empty;
-
-    [ObservableProperty]
-    private string _addPath = string.Empty;
-
-    [ObservableProperty]
-    private int _daysForKeep;
-
-    [ObservableProperty]
-    private int _oldFilesStatus;
-
-    [ObservableProperty]
-    private bool _includeTimestamp = true;
-
-    [ObservableProperty]
-    private int _backupMode;
-
-    [ObservableProperty]
-    private int _backupInterval = 60;
-
-    [ObservableProperty]
-    private string _gameNameError = string.Empty;
-
-    [ObservableProperty]
-    private string _gameExeError = string.Empty;
-
-    [ObservableProperty]
-    private string _saveLocationError = string.Empty;
 
     public event EventHandler? CloseRequested;
     public event EventHandler<GameModel>? GameAdded;
@@ -112,19 +98,19 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     {
         ClearErrors();
         var isValid = true;
-        
+
         if (string.IsNullOrWhiteSpace(GameName))
         {
             GameNameError = "Game name is required";
             isValid = false;
         }
-        
+
         if (string.IsNullOrWhiteSpace(GameExe))
         {
             GameExeError = "Game executable path is required";
             isValid = false;
         }
-        
+
         if (string.IsNullOrWhiteSpace(SaveLocation))
         {
             SaveLocationError = "Save location is required";
@@ -137,10 +123,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     [RelayCommand]
     private void Add()
     {
-        if (!ValidateForm())
-        {
-            return;
-        }
+        if (!ValidateForm()) return;
 
         var newGame = new GameModel
         {
@@ -173,6 +156,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
 
             return folder.Count > 0 ? folder[0].Path.LocalPath : string.Empty;
         }
+
         return string.Empty;
     }
 
@@ -184,8 +168,8 @@ public partial class AddGameOverlayViewModel : ViewModelBase
             {
                 Title = "Select Game Executable",
                 AllowMultiple = false,
-                FileTypeFilter = new[] 
-                { 
+                FileTypeFilter = new[]
+                {
                     new FilePickerFileType("Executable Files")
                     {
                         Patterns = new[] { "*.exe" },
@@ -197,6 +181,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
             var files = await storageProvider.OpenFilePickerAsync(options);
             return files.Count > 0 ? files[0].Path.LocalPath : string.Empty;
         }
+
         return string.Empty;
     }
 

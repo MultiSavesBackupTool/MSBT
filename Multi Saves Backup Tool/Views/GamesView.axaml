@@ -9,7 +9,7 @@
              x:Class="Multi_Saves_Backup_Tool.Views.GamesView">
 
     <Design.DataContext>
-        <vm:GamesViewModel/>
+        <vm:GamesViewModel />
     </Design.DataContext>
 
     <DockPanel>
@@ -18,8 +18,8 @@
                 VerticalAlignment="Top"
                 Click="AddGameButton_Click"
                 DockPanel.Dock="Top"
-                Margin="10,10,0,10"/>
-        
+                Margin="10,10,0,10" />
+
         <ScrollViewer>
             <ItemsControl ItemsSource="{Binding Games}">
                 <ItemsControl.ItemTemplate>
@@ -30,20 +30,19 @@
                                 CornerRadius="4">
                             <Grid ColumnDefinitions="Auto,*,Auto">
                                 <CheckBox IsChecked="{Binding IsEnabled}"
-                                         VerticalAlignment="Center"/>
+                                          VerticalAlignment="Center" />
                                 <StackPanel Grid.Column="1" Margin="10,0">
                                     <TextBlock Text="{Binding GameName}"
-                                             FontWeight="Bold"/>
+                                               FontWeight="Bold" />
                                     <TextBlock Text="{Binding SavePath}"
-                                             FontSize="12"
-                                             Opacity="0.7"/>
+                                               FontSize="12"
+                                               Opacity="0.7" />
                                 </StackPanel>
                                 <Button Grid.Column="2"
                                         Content="Delete"
                                         Command="{Binding ((vm:GamesViewModel)DataContext).DeleteGameCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                         CommandParameter="{Binding}"
-                                        Padding="8,4">
-                                </Button>
+                                        Padding="8,4" />
                             </Grid>
                         </Border>
                     </DataTemplate>
@@ -51,5 +50,5 @@
             </ItemsControl>
         </ScrollViewer>
     </DockPanel>
-    
+
 </UserControl>

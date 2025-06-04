@@ -6,15 +6,9 @@ namespace Multi_Saves_Backup_Tool.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    [ObservableProperty]
-    private ViewModelBase? _currentViewModel;
+    [ObservableProperty] private ViewModelBase? _currentViewModel;
 
-    [ObservableProperty]
-    private NavigationViewItem? _selectedMenuItem;
-
-    public MonitoringViewModel MonitoringViewModel { get; }
-    public GamesViewModel GamesViewModel { get; }
-    public SettingsViewModel SettingsViewModel { get; }
+    [ObservableProperty] private NavigationViewItem? _selectedMenuItem;
 
     public MainWindowViewModel()
     {
@@ -32,7 +26,11 @@ public partial class MainWindowViewModel : ViewModelBase
         SettingsViewModel = new SettingsViewModel(mainWindow.StorageProvider);
         CurrentViewModel = MonitoringViewModel;
     }
-    
+
+    public MonitoringViewModel MonitoringViewModel { get; }
+    public GamesViewModel GamesViewModel { get; }
+    public SettingsViewModel SettingsViewModel { get; }
+
     partial void OnSelectedMenuItemChanged(NavigationViewItem? oldValue, NavigationViewItem? newValue)
     {
         if (newValue == null) return;
@@ -46,5 +44,3 @@ public partial class MainWindowViewModel : ViewModelBase
         };
     }
 }
-
-

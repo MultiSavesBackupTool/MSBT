@@ -6,16 +6,16 @@ namespace Multi_Saves_Backup_Tool.Models;
 
 public class GameModel : INotifyPropertyChanged
 {
-    private string _gameName = string.Empty;
+    private string? _addPath;
+    private int _backupInterval = 60;
+    private int _daysForKeep;
     private string _gameExe = string.Empty;
     private string? _gameExeAlt;
-    private string _savePath = string.Empty;
-    private string? _modPath;
-    private string? _addPath;
-    private int _daysForKeep;
-    private int _setOldFilesStatus;
+    private string _gameName = string.Empty;
     private bool _isEnabled = true;
-    private int _backupInterval = 60;
+    private string? _modPath;
+    private string _savePath = string.Empty;
+    private int _setOldFilesStatus;
 
     public string GameName
     {

@@ -19,7 +19,7 @@ public class App : Application
         {
             var mainWindow = new MainWindow();
             var mainViewModel = new MainWindowViewModel(mainWindow);
-            
+
             mainWindow.DataContext = mainViewModel;
             desktop.MainWindow = mainWindow;
         }
@@ -27,4 +27,3 @@ public class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 }
-

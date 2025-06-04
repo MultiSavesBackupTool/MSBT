@@ -13,12 +13,12 @@ public class LocalServiceState
     public DateTime LastUpdateTime { get; set; }
     public Dictionary<string, LocalGameState> GamesState { get; set; } = new();
     public string ServiceStatus { get; set; } = "Running";
-    
+
     public static LocalServiceState LoadFromFile(string path)
     {
         if (!File.Exists(path))
             return new LocalServiceState();
-        
+
         var json = File.ReadAllText(path);
         return JsonSerializer.Deserialize<LocalServiceState>(json) ?? new LocalServiceState();
     }
@@ -42,25 +42,26 @@ public class GameMonitoringInfo
 
 public class MonitoringViewModel : ViewModelBase
 {
-    private string _serviceStatus = "Unknown";
-    private DateTime _lastUpdateTime;
     private readonly CancellationTokenSource _cancellationTokenSource;
-    public ObservableCollection<GameMonitoringInfo> Games { get; } = new();
-    
-    public string ServiceStatus
-    {
-        get => _serviceStatus;
-        set => SetProperty(ref _serviceStatus, value);
-    }
-    
-    public string LastUpdateTime => _lastUpdateTime.ToString("g");
-    
+    private DateTime _lastUpdateTime;
+    private string _serviceStatus = "Unknown";
+
     public MonitoringViewModel()
     {
         _cancellationTokenSource = new CancellationTokenSource();
         _ = StartMonitoring(_cancellationTokenSource.Token);
     }
-    
+
+    public ObservableCollection<GameMonitoringInfo> Games { get; } = new();
+
+    public string ServiceStatus
+    {
+        get => _serviceStatus;
+        set => SetProperty(ref _serviceStatus, value);
+    }
+
+    public string LastUpdateTime => _lastUpdateTime.ToString("g");
+
     private async Task StartMonitoring(CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
@@ -76,7 +77,7 @@ public class MonitoringViewModel : ViewModelBase
             }
         }
     }
-    
+
     private async Task UpdateServiceState()
     {
         try
@@ -90,20 +91,19 @@ public class MonitoringViewModel : ViewModelBase
 
             var json = await File.ReadAllTextAsync(statePath);
             var state = JsonSerializer.Deserialize<LocalServiceState>(json) ?? new LocalServiceState();
-            
+
             ServiceStatus = state.ServiceStatus switch
             {
                 "Running" => "Running",
                 "Stopped" => "Stopped",
                 _ => "Unknown"
             };
-            
+
             _lastUpdateTime = state.LastUpdateTime;
             OnPropertyChanged(nameof(LastUpdateTime));
 
             Games.Clear();
             foreach (var (_, gameState) in state.GamesState)
-            {
                 Games.Add(new GameMonitoringInfo
                 {
                     GameName = gameState.GameName,
@@ -118,7 +118,6 @@ public class MonitoringViewModel : ViewModelBase
                     LastBackupTime = gameState.LastBackupTime?.ToString("g") ?? "No data",
                     NextBackupScheduled = gameState.NextBackupScheduled?.ToString("g") ?? "Not scheduled"
                 });
-            }
         }
         catch (Exception ex)
         {

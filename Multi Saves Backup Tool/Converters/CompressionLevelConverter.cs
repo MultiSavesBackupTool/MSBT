@@ -10,7 +10,6 @@ public class CompressionLevelConverter : IValueConverter
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is CompressionLevel level)
-        {
             return level switch
             {
                 CompressionLevel.Fastest => "Fast",
@@ -18,14 +17,12 @@ public class CompressionLevelConverter : IValueConverter
                 CompressionLevel.SmallestSize => "Smallest Size",
                 _ => level.ToString()
             };
-        }
         return null;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is string stringValue)
-        {
             return stringValue switch
             {
                 "Fast" => CompressionLevel.Fastest,
@@ -33,7 +30,6 @@ public class CompressionLevelConverter : IValueConverter
                 "Smallest Size" => CompressionLevel.SmallestSize,
                 _ => Enum.TryParse<CompressionLevel>(stringValue, out var level) ? level : null
             };
-        }
         return null;
     }
 }

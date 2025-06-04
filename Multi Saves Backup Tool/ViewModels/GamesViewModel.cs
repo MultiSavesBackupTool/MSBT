@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.IO;
 using System.Text.Json;
 using System.Windows.Input;
@@ -13,6 +14,14 @@ namespace Multi_Saves_Backup_Tool.ViewModels;
 public class GamesViewModel : ViewModelBase
 {
     private ObservableCollection<GameModel> _games;
+
+    public GamesViewModel()
+    {
+        _games = new ObservableCollection<GameModel>();
+        DeleteGameCommand = new RelayCommand<GameModel?>(DeleteGame);
+        LoadGames();
+    }
+
     public ObservableCollection<GameModel> Games
     {
         get => _games;
@@ -25,13 +34,6 @@ public class GamesViewModel : ViewModelBase
     }
 
     public ICommand DeleteGameCommand { get; }
-
-    public GamesViewModel()
-    {
-        _games = new ObservableCollection<GameModel>();
-        DeleteGameCommand = new RelayCommand<GameModel?>(DeleteGame);
-        LoadGames();
-    }
 
     private void Games_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
@@ -53,10 +55,7 @@ public class GamesViewModel : ViewModelBase
                 if (games != null)
                 {
                     Games = new ObservableCollection<GameModel>(games);
-                    foreach (var game in Games)
-                    {
-                        game.PropertyChanged += Game_PropertyChanged;
-                    }
+                    foreach (var game in Games) game.PropertyChanged += Game_PropertyChanged;
                 }
             }
         }
@@ -66,12 +65,9 @@ public class GamesViewModel : ViewModelBase
         }
     }
 
-    private void Game_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void Game_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(GameModel.IsEnabled))
-        {
-            SaveGames();
-        }
+        if (e.PropertyName == nameof(GameModel.IsEnabled)) SaveGames();
     }
 
     private void SaveGames()
@@ -100,7 +96,7 @@ public class GamesViewModel : ViewModelBase
     private void DeleteGame(GameModel? game)
     {
         if (game is null) return;
-        
+
         game.PropertyChanged -= Game_PropertyChanged;
         Games.Remove(game);
         SaveGames();

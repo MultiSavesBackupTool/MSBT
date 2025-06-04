@@ -12,15 +12,16 @@ public partial class AddGameOverlay : UserControl
         InitializeComponent();
     }
 
+    private AddGameOverlayViewModel ViewModel => DataContext as AddGameOverlayViewModel
+                                                 ?? throw new InvalidOperationException(
+                                                     "DataContext is not AddGameOverlayViewModel");
+
     public void Initialize(GamesViewModel gamesViewModel)
     {
         var viewModel = new AddGameOverlayViewModel(gamesViewModel);
         viewModel.CloseRequested += (_, _) => IsVisible = false;
         DataContext = viewModel;
     }
-
-    private AddGameOverlayViewModel ViewModel => DataContext as AddGameOverlayViewModel 
-        ?? throw new InvalidOperationException("DataContext is not AddGameOverlayViewModel");
 
     public void Show()
     {
