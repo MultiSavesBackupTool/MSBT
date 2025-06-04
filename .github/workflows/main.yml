@@ -46,13 +46,14 @@ jobs:
         run: |
           "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
         shell: cmd
-
+        
       - name: Verify installer exists
         run: |
           if not exist "installer/MultiSavesBackupSetup.exe" (
-            echo "Installer file not found!"
+            echo Installer file not found!
             exit 1
           )
+        shell: cmd
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
