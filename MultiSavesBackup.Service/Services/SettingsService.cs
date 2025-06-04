@@ -22,13 +22,20 @@ public class SettingsService : ISettingsService, IDisposable
 
     public SettingsService(IOptions<ServiceSettings> options, ILogger<SettingsService> logger)
     {
-        _currentSettings = options.Value;
+        _currentSettings = options.Value ?? new ServiceSettings();
         _logger = logger;
 
         var mainAppDirectory = AppContext.BaseDirectory;
         _settingsPath = Path.Combine(mainAppDirectory, "settings.json");
-        
-        if (string.IsNullOrEmpty(_currentSettings.BackupSettings?.GamesConfigPath))
+
+        if (_currentSettings.BackupSettings == null)
+        {
+            _currentSettings.BackupSettings = new BackupSettings
+            {
+                GamesConfigPath = Path.Combine(mainAppDirectory, "games.json")
+            };
+        }
+        else if (string.IsNullOrEmpty(_currentSettings.BackupSettings.GamesConfigPath))
         {
             _currentSettings.BackupSettings.GamesConfigPath = Path.Combine(mainAppDirectory, "games.json");
         }
