@@ -35,4 +35,10 @@
         <DependentUpon>MainWindow.axaml</DependentUpon>
       </Compile>
     </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="settings.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
 </Project>
