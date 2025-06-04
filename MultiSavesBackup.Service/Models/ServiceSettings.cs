@@ -25,7 +25,6 @@ public class BackupSettings
     }
 
     public string GetAbsoluteGamesConfigPath() => GetAbsolutePath(GamesConfigPath);
-    public string GetAbsoluteLogPath() => GetAbsolutePath(LogPath);
 }
 
 //public class NotificationSettings

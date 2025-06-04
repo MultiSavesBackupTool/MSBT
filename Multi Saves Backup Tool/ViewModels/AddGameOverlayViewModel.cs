@@ -47,6 +47,9 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     private int _backupMode;
 
     [ObservableProperty]
+    private int _backupInterval = 60;
+
+    [ObservableProperty]
     private string _gameNameError = string.Empty;
 
     [ObservableProperty]
@@ -149,6 +152,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
             AddPath = string.IsNullOrEmpty(AddPath) ? null : AddPath,
             DaysForKeep = DaysForKeep,
             SetOldFilesStatus = OldFilesStatus,
+            BackupInterval = BackupInterval,
             IsEnabled = true
         };
 
@@ -213,5 +217,6 @@ public partial class AddGameOverlayViewModel : ViewModelBase
         OldFilesStatus = 0;
         IncludeTimestamp = true;
         BackupMode = 0;
+        BackupInterval = 60;
     }
 }

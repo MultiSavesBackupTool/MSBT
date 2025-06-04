@@ -34,7 +34,10 @@ public class GamesService : IGamesService
             }
 
             var json = await File.ReadAllTextAsync(gamesPath);
-            var games = JsonSerializer.Deserialize<List<GameModel>>(json);
+            var games = JsonSerializer.Deserialize<List<GameModel>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
             
             if (games == null)
             {

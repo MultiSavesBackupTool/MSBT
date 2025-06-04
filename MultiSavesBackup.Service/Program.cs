@@ -16,7 +16,7 @@ var settings = configuration.Get<ServiceSettings>();
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.File(
-        Path.Combine(mainAppDir, settings?.LogPath ?? "backup_service.log"),
+        Path.Combine(mainAppDir, "backup_service.log"),
         rollingInterval: RollingInterval.Day,
         outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}")
     .CreateLogger();

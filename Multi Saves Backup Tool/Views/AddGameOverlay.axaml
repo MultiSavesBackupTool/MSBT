@@ -107,6 +107,21 @@
                                     CommandParameter="{Binding $parent[TopLevel].StorageProvider}"/>
                         </Grid>
 
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBlock Text="Интервал резервного копирования (в минутах):"
+                                     VerticalAlignment="Center"/>
+                            <NumericUpDown Value="{Binding BackupInterval, Mode=TwoWay}"
+                                         Minimum="1"
+                                         Maximum="1440"
+                                         Increment="5"
+                                         Grid.Column="1"
+                                         Width="100"/>
+                        </Grid>
+                        <TextBlock Text="От 1 минуты до 24 часов (1440 минут)"
+                                 Opacity="0.7"
+                                 FontSize="12"
+                                 Margin="0,2,0,0"/>
+
                         <StackPanel>
                             <TextBlock Text="Настройки резервного копирования:"
                                        FontWeight="Bold"
@@ -115,13 +130,16 @@
                             <Grid ColumnDefinitions="*, Auto">
                                 <TextBlock Text="Дни для хранения резервных копий (0 - хранить все)"
                                            VerticalAlignment="Center"/>
-                                <NumericUpDown Value="{Binding DaysForKeep}"
+                                <NumericUpDown Value="{Binding DaysForKeep, Mode=TwoWay}"
                                                Minimum="0"
+                                               Maximum="365"
+                                               Increment="1"
                                                Grid.Column="1"
-                                               Width="100"/>
+                                               Width="100"
+                                               FormatString="0"/>
                             </Grid>
 
-                            <ComboBox SelectedIndex="{Binding OldFilesStatus}"
+                            <ComboBox SelectedIndex="{Binding OldFilesStatus, Mode=TwoWay}"
                                       Margin="0,5,0,0">
                                 <ComboBoxItem>Хранить все файлы</ComboBoxItem>
                                 <ComboBoxItem>Переместить в архив</ComboBoxItem>
