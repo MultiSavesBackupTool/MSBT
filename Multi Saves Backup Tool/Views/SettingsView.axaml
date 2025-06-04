@@ -31,9 +31,9 @@
                 <TextBlock Text="Уровень сжатия:" Margin="0,10,0,5"/>
                 <ComboBox SelectedItem="{Binding Settings.BackupSettings.CompressionLevel}"
                          HorizontalAlignment="Stretch">
-                    <ComboBoxItem Content="Быстрый">Fastest</ComboBoxItem>
-                    <ComboBoxItem Content="Оптимальный">Optimal</ComboBoxItem>
-                    <ComboBoxItem Content="Максимальный">SmallestSize</ComboBoxItem>
+                    <ComboBoxItem Tag="Fastest">Быстрый</ComboBoxItem>
+                    <ComboBoxItem Tag="Optimal">Оптимальный</ComboBoxItem>
+                    <ComboBoxItem Tag="SmallestSize">Максимальный</ComboBoxItem>
                 </ComboBox>
             </StackPanel>
             

@@ -27,7 +27,8 @@
 
             <ui:NavigationView x:Name="MainNavigationView"
                               SelectedItem="{Binding SelectedMenuItem}"
-                              PaneDisplayMode="Top">
+                              PaneDisplayMode="Top"
+                              IsSettingsVisible="False">
 
                 <ui:NavigationView.MenuItems>
                     <ui:NavigationViewItem Content="Мониторинг" 
@@ -40,6 +41,12 @@
                                           IconSource="Library" 
                                           Tag="archives"/>
                 </ui:NavigationView.MenuItems>
+
+                <ui:NavigationView.FooterMenuItems>
+                    <ui:NavigationViewItem Content="Настройки" 
+                                          IconSource="Settings" 
+                                          Tag="settings"/>
+                </ui:NavigationView.FooterMenuItems>
 
                 <ContentControl Content="{Binding CurrentViewModel}">
                     <ContentControl.DataTemplates>
@@ -66,6 +73,10 @@
                                 <TextBlock Text="{Binding ArchiveCount, StringFormat='Архивов: {0}'}" 
                                           Margin="0,10"/>
                             </StackPanel>
+                        </DataTemplate>
+
+                        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+                            <views:SettingsView />
                         </DataTemplate>
                         
                     </ContentControl.DataTemplates>
