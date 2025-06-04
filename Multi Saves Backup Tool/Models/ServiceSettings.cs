@@ -8,7 +8,7 @@ public class ServiceSettings
 public class BackupSettings
 {
     public string BackupRootFolder { get; set; } = "C:\\Backups";
-    public int ScanIntervalMinutes { get; set; } = 60;
+    public int ScanIntervalMinutes { get; set; } = 5;
     public int MaxParallelBackups { get; set; } = 2;
     public CompressionLevel CompressionLevel { get; set; } = CompressionLevel.Optimal;
     public string GamesConfigPath { get; set; } = "games.json";
