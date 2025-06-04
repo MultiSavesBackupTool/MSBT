@@ -5,13 +5,7 @@
     "MaxParallelBackups": 1,
     "CompressionLevel": 2,
     "GamesConfigPath": "games.json",
-    "EnableLogging": true,
-    "LogPath": "backup_service.log",
-    "NotificationSettings": {
-      "EnableNotifications": true,
-      "ShowErrorNotifications": true,
-      "ShowSuccessNotifications": true
-    }
+    "EnableLogging": true
   }
 }
 

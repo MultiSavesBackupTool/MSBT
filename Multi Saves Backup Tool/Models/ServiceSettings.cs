@@ -13,7 +13,6 @@ public class BackupSettings
     public CompressionLevel CompressionLevel { get; set; } = CompressionLevel.Optimal;
     public string GamesConfigPath { get; set; } = "games.json";
     public bool EnableLogging { get; set; } = true;
-    public string LogPath { get; set; } = "backup_service.log";
     //public NotificationSettings NotificationSettings { get; set; } = new();
 }
 

@@ -46,26 +46,6 @@ public partial class SettingsViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
-    private async Task BrowseLogFile()
-    {
-        if (_storageProvider == null) return;
-
-        var file = await _storageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
-        {
-            Title = "Выберите расположение файла лога",
-            DefaultExtension = "log",
-            ShowOverwritePrompt = true,
-            SuggestedFileName = "backup_service.log"
-        });
-
-        if (file != null)
-        {
-            Settings.BackupSettings.LogPath = file.Path.LocalPath;
-            await SaveCurrentSettingsAsync();
-        }
-    }
-
     private ServiceSettings LoadSettings()
     {
         try

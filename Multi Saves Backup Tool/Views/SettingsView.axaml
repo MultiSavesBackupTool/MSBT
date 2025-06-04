@@ -46,17 +46,6 @@
                 <TextBlock Text="Настройки логирования" Classes="h3"/>
                 <CheckBox Content="Включить логирование" 
                           IsChecked="{Binding Settings.BackupSettings.EnableLogging}"/>
-                
-                <TextBlock Text="Путь к файлу лога:" Margin="0,10,0,5"
-                          IsEnabled="{Binding Settings.BackupSettings.EnableLogging}"/>
-                <Grid ColumnDefinitions="*, Auto">
-                    <TextBox Text="{Binding Settings.BackupSettings.LogPath}"
-                             IsEnabled="{Binding Settings.BackupSettings.EnableLogging}"
-                             Margin="0,0,10,0"/>
-                    <Button Grid.Column="1" Content="Обзор"
-                            Command="{Binding BrowseLogFileCommand}"
-                            IsEnabled="{Binding Settings.BackupSettings.EnableLogging}"/>
-                </Grid>
             </StackPanel>
             
             <!-- <StackPanel Margin="0,10">

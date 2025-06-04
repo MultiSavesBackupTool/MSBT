@@ -15,7 +15,6 @@ public class GameModel : INotifyPropertyChanged
     private int _daysForKeep;
     private int _setOldFilesStatus;
     private bool _isEnabled = true;
-    private int _backupInterval = 60;
 
     public string GameName
     {
@@ -70,13 +69,6 @@ public class GameModel : INotifyPropertyChanged
         get => _isEnabled;
         set => SetField(ref _isEnabled, value);
     }
-
-    public int BackupInterval
-    {
-        get => _backupInterval;
-        set => SetField(ref _backupInterval, value);
-    }
-
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
