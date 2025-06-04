@@ -14,15 +14,15 @@ public class BackupSettings
     public string GamesConfigPath { get; set; } = "games.json";
     public bool EnableLogging { get; set; } = true;
     public string LogPath { get; set; } = "backup_service.log";
-    public NotificationSettings NotificationSettings { get; set; } = new();
+    //public NotificationSettings NotificationSettings { get; set; } = new();
 }
 
-public class NotificationSettings
-{
-    public bool EnableNotifications { get; set; } = true;
-    public bool ShowErrorNotifications { get; set; } = true;
-    public bool ShowSuccessNotifications { get; set; } = true;
-}
+//public class NotificationSettings
+//{
+//    public bool EnableNotifications { get; set; } = true;
+//    public bool ShowErrorNotifications { get; set; } = true;
+//    public bool ShowSuccessNotifications { get; set; } = true;
+//}
 
 public enum CompressionLevel
 {

@@ -32,7 +32,7 @@ public partial class MainWindowViewModel : ViewModelBase
         SettingsViewModel = new SettingsViewModel(mainWindow.StorageProvider);
         CurrentViewModel = MonitoringViewModel;
     }
-
+    
     partial void OnSelectedMenuItemChanged(NavigationViewItem? oldValue, NavigationViewItem? newValue)
     {
         if (newValue == null) return;
@@ -46,4 +46,5 @@ public partial class MainWindowViewModel : ViewModelBase
         };
     }
 }
+
 

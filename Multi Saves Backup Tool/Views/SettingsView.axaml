@@ -59,19 +59,19 @@
                 </Grid>
             </StackPanel>
             
-            <StackPanel Margin="0,10">
+            <!-- <StackPanel Margin="0,10">
                 <TextBlock Text="Настройки уведомлений" Classes="h3"/>
                 <CheckBox Content="Включить уведомления"
                           IsChecked="{Binding Settings.BackupSettings.NotificationSettings.EnableNotifications}"/>
-                
-                <StackPanel Margin="20,5" 
+
+                <StackPanel Margin="20,5"
                            IsEnabled="{Binding Settings.BackupSettings.NotificationSettings.EnableNotifications}">
                     <CheckBox Content="Показывать уведомления об ошибках"
                               IsChecked="{Binding Settings.BackupSettings.NotificationSettings.ShowErrorNotifications}"/>
                     <CheckBox Content="Показывать уведомления об успешных операциях"
                               IsChecked="{Binding Settings.BackupSettings.NotificationSettings.ShowSuccessNotifications}"/>
                 </StackPanel>
-            </StackPanel>
+            </StackPanel> -->
             
             <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0"
                         HorizontalAlignment="Right">
