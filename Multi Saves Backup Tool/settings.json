@@ -1,7 +1,7 @@
 {
   "BackupSettings": {
     "BackupRootFolder": "C:\\Backups",
-    "ScanIntervalMinutes": 5,
+    "ScanIntervalMinutes": 60,
     "MaxParallelBackups": 1,
     "CompressionLevel": 2,
     "GamesConfigPath": "games.json",

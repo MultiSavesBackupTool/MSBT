@@ -71,6 +71,17 @@ public class BackupWorker : BackgroundService
             
             _logger.LogInformation("Found {Count} enabled games for backup", enabledGames.Count);
 
+            var gameNames = games.Select(g => g.GameName).ToHashSet();
+            var removedGames = _serviceState.GamesState.Keys
+                .Where(gameName => !gameNames.Contains(gameName))
+                .ToList();
+
+            foreach (var gameName in removedGames)
+            {
+                _logger.LogInformation("Removing state for deleted game: {GameName}", gameName);
+                _serviceState.GamesState.Remove(gameName);
+            }
+
             foreach (var game in games)
             {
                 if (!_serviceState.GamesState.ContainsKey(game.GameName))
@@ -89,6 +100,14 @@ public class BackupWorker : BackgroundService
             {
                 if (stoppingToken.IsCancellationRequested)
                     break;
+
+                var gameState = _serviceState.GamesState[game.GameName];
+                if (gameState.NextBackupScheduled > DateTime.Now)
+                {
+                    _logger.LogInformation("Skipping backup for {GameName} as it's not time yet. Next backup scheduled at {NextBackup}", 
+                        game.GameName, gameState.NextBackupScheduled);
+                    continue;
+                }
 
                 await semaphore.WaitAsync(stoppingToken);
 
