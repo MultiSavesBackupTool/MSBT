@@ -4,7 +4,7 @@
     "ScanIntervalMinutes": 5,
     "MaxParallelBackups": 2,
     "CompressionLevel": "Optimal",
-    "GamesConfigPath": "C:\\Users\\Luki\\RiderProjects\\Multi Saves Backup Tool\\Multi Saves Backup Tool\\games.json",
+    "GamesConfigPath": "games.json",
     "EnableLogging": true,
     "LogPath": "backup_service.log",
     "NotificationSettings": {

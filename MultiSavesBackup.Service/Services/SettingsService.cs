@@ -25,54 +25,38 @@ public class SettingsService : ISettingsService, IDisposable
         _currentSettings = options.Value;
         _logger = logger;
 
-        // Определяем путь к папке с основным приложением
-        var mainAppDirectory = Path.GetFullPath(Path.Combine(
-            AppDomain.CurrentDomain.BaseDirectory,
-            "..",
-            "..",
-            "..",
-            "Multi Saves Backup Tool",
-            "bin",
-            "Debug",
-            "net9.0"));
+        var gamesConfigPath = _currentSettings.BackupSettings.GamesConfigPath;
+        var mainAppDirectory = Path.GetDirectoryName(gamesConfigPath);
+        
+        if (string.IsNullOrEmpty(mainAppDirectory))
+        {
+            throw new InvalidOperationException("Cannot determine main application directory from GamesConfigPath");
+        }
 
         _settingsPath = Path.Combine(mainAppDirectory, "settings.json");
-        _logger.LogInformation("Using settings file from main application: {Path}", _settingsPath);
+        _logger.LogInformation("Using settings file: {Path}", _settingsPath);
 
-        // Настраиваем отслеживание изменений файла настроек
-        var settingsDir = Path.GetDirectoryName(_settingsPath);
-        if (settingsDir != null)
+        _watcher = new FileSystemWatcher(mainAppDirectory)
         {
-            _watcher = new FileSystemWatcher(settingsDir)
-            {
-                Filter = "settings.json",
-                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime,
-                EnableRaisingEvents = true
-            };
+            Filter = "settings.json",
+            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime,
+            EnableRaisingEvents = true
+        };
 
-            _watcher.Changed += async (sender, args) =>
-            {
-                if (args.ChangeType == WatcherChangeTypes.Changed)
-                {
-                    await ReloadSettingsAsync();
-                }
-            };
-        }
-        else
+        _watcher.Changed += async (sender, args) =>
         {
-            _logger.LogError("Settings directory path is invalid");
-            throw new DirectoryNotFoundException("Settings directory not found");
-        }
+            if (args.ChangeType == WatcherChangeTypes.Changed)
+            {
+                await ReloadSettingsAsync();
+            }
+        };
     }
 
     public async Task SaveSettingsAsync(ServiceSettings settings)
     {
         try
         {
-            var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions 
-            { 
-                WriteIndented = true 
-            });
+            var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
             await File.WriteAllTextAsync(_settingsPath, json);
             _currentSettings = settings;
             _logger.LogInformation("Settings successfully saved to {Path}", _settingsPath);
@@ -88,7 +72,6 @@ public class SettingsService : ISettingsService, IDisposable
     {
         try
         {
-            // Добавляем небольшую задержку, чтобы избежать проблем с блокировкой файла
             await Task.Delay(100);
 
             if (!File.Exists(_settingsPath))

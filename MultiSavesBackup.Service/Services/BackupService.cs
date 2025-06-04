@@ -31,19 +31,16 @@ public class BackupService : IBackupService
 
             using var archive = ZipFile.Open(archivePath, ZipArchiveMode.Create);
             
-            // Архивируем основную папку сохранений
             if (Directory.Exists(game.SavePath))
             {
                 await AddToArchiveAsync(archive, game.SavePath, "saves");
             }
 
-            // Архивируем папку с модами, если она указана
             if (!string.IsNullOrEmpty(game.ModPath) && Directory.Exists(game.ModPath))
             {
                 await AddToArchiveAsync(archive, game.ModPath, "mods");
             }
 
-            // Архивируем дополнительную папку, если она указана
             if (!string.IsNullOrEmpty(game.AddPath) && Directory.Exists(game.AddPath))
             {
                 await AddToArchiveAsync(archive, game.AddPath, "additional");

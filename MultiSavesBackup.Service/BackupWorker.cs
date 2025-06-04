@@ -98,24 +98,20 @@ public class BackupWorker : BackgroundService
         {
             _logger.LogInformation("Processing backup for game: {GameName}", game.GameName);
 
-            // Проверяем, не запущена ли игра
             if (await _gamesService.IsGameRunningAsync(game))
             {
                 _logger.LogInformation("Skipping backup for {GameName} as it is currently running", game.GameName);
                 return;
             }
 
-            // Проверяем существование всех путей
             if (!await _backupService.VerifyBackupPathsAsync(game))
             {
                 _logger.LogWarning("Skipping backup for {GameName} due to missing paths", game.GameName);
                 return;
             }
 
-            // Создаем резервную копию
             await _backupService.CreateBackupAsync(game);
 
-            // Очищаем старые копии
             await _backupService.CleanupOldBackupsAsync(game);
         }
         catch (Exception ex)
