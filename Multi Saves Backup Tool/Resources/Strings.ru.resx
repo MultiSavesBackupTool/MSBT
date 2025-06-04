@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+            <xsd:complexType>
+                <xsd:choice maxOccurs="unbounded">
+                    <xsd:element name="data">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" />
+                            <xsd:attribute name="type" type="xsd:string" />
+                            <xsd:attribute name="mimetype" type="xsd:string" />
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:choice>
+            </xsd:complexType>
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>2.0</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="AppTitle">
+        <value>Multi Saves Backup Tool</value>
+    </data>
+    <data name="Monitoring">
+        <value>Мониторинг</value>
+    </data>
+    <data name="Games">
+        <value>Игры</value>
+    </data>
+    <data name="Settings">
+        <value>Настройки</value>
+    </data>
+    <data name="AddGame">
+        <value>Добавить игру</value>
+    </data>
+    <data name="Delete">
+        <value>Удалить</value>
+    </data>
+    <data name="ServiceStatus">
+        <value>Статус сервиса:</value>
+    </data>
+    <data name="LastUpdate">
+        <value>Последнее обновление:</value>
+    </data>
+    <data name="GameName">
+        <value>Название игры</value>
+    </data>
+    <data name="Status">
+        <value>Статус</value>
+    </data>
+    <data name="LastBackup">
+        <value>Последний бэкап</value>
+    </data>
+    <data name="NextBackup">
+        <value>Следующий бэкап</value>
+    </data>
+    <data name="BackupSettings">
+        <value>Настройки резервного копирования</value>
+    </data>
+    <data name="Browse">
+        <value>Обзор</value>
+    </data>
+    <data name="ScanInterval">
+        <value>Интервал сканирования (минуты):</value>
+    </data>
+    <data name="MaxParallelOperations">
+        <value>Максимум параллельных операций:</value>
+    </data>
+    <data name="CompressionLevel">
+        <value>Уровень сжатия:</value>
+    </data>
+    <data name="CompressionLevelFastest">
+        <value>Самый быстрый</value>
+    </data>
+    <data name="CompressionLevelOptimal">
+        <value>Оптимальный</value>
+    </data>
+    <data name="CompressionLevelSmallest">
+        <value>Наименьший размер</value>
+    </data>
+    <data name="LoggingSettings">
+        <value>Настройки логирования</value>
+    </data>
+    <data name="EnableLogging">
+        <value>Включить логирование</value>
+    </data>
+    <data name="Save">
+        <value>Сохранить</value>
+    </data>
+    <data name="AddNewGame">
+        <value>Добавить новую игру</value>
+    </data>
+    <data name="GameNamePlaceholder">
+        <value>Имя игры</value>
+    </data>
+    <data name="GameExePlaceholder">
+        <value>Исполняемый файл игры (например, NMS.exe)</value>
+    </data>
+    <data name="AltExePlaceholder">
+        <value>Альтернативный исполняемый файл (необязательно)</value>
+    </data>
+    <data name="SaveLocationPlaceholder">
+        <value>Расположение файлов сохранения</value>
+    </data>
+    <data name="ModPathPlaceholder">
+        <value>Папка модов (необязательно)</value>
+    </data>
+    <data name="AdditionalBackupPathPlaceholder">
+        <value>Дополнительный путь для резервного копирования (необязательно)</value>
+    </data>
+    <data name="BackupInterval">
+        <value>Интервал резервного копирования (в минутах):</value>
+    </data>
+    <data name="BackupIntervalHint">
+        <value>От 1 минуты до 24 часов (1440 минут)</value>
+    </data>
+    <data name="DaysForKeep">
+        <value>Дни для хранения резервных копий (0 - хранить все)</value>
+    </data>
+    <data name="KeepAllFiles">
+        <value>Хранить все файлы</value>
+    </data>
+    <data name="MoveToArchive">
+        <value>Переместить в архив</value>
+    </data>
+    <data name="DeleteForever">
+        <value>Удалить навсегда</value>
+    </data>
+    <data name="IncludeTimestamp">
+        <value>Включить временную метку в имя архива</value>
+    </data>
+    <data name="BackupAllFiles">
+        <value>Резервное копирование всех файлов</value>
+    </data>
+    <data name="BackupChangedFiles">
+        <value>Резервное копирование только измененных файлов</value>
+    </data>
+    <data name="Cancel">
+        <value>Отмена</value>
+    </data>
+    <data name="ErrorGameNameRequired">
+        <value>Требуется указать имя игры</value>
+    </data>
+    <data name="ErrorGameExeRequired">
+        <value>Требуется указать исполняемый файл игры</value>
+    </data>
+    <data name="ErrorSaveLocationRequired">
+        <value>Требуется указать расположение файлов сохранения</value>
+    </data>
+    <data name="DialogSelectFolder">
+        <value>Выберите папку</value>
+    </data>
+    <data name="DialogSelectGameExe">
+        <value>Выберите исполняемый файл игры</value>
+    </data>
+    <data name="DialogExecutableFiles">
+        <value>Исполняемые файлы</value>
+    </data>
+    <data name="DialogSelectBackupFolder">
+        <value>Выберите папку для резервных копий</value>
+    </data>
+    <data name="ErrorLoadingSettings">
+        <value>Ошибка при загрузке настроек: {0}</value>
+    </data>
+    <data name="ErrorSavingSettings">
+        <value>Ошибка при сохранении настроек: {0}</value>
+    </data>
+    <data name="StatusUnknown">
+        <value>Неизвестно</value>
+    </data>
+    <data name="StatusServiceNotRunning">
+        <value>Сервис не запущен</value>
+    </data>
+    <data name="StatusRunning">
+        <value>Работает</value>
+    </data>
+    <data name="StatusStopped">
+        <value>Остановлен</value>
+    </data>
+    <data name="NoData">
+        <value>Нет данных</value>
+    </data>
+    <data name="StatusWaiting">
+        <value>Ожидание</value>
+    </data>
+    <data name="NotScheduled">
+        <value>Не запланировано</value>
+    </data>
+</root>
+

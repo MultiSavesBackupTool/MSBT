@@ -71,10 +71,10 @@
 
     <ItemGroup>
       <EmbeddedResource Update="Resources\Strings.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
+        <Generator>ResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Resources\Strings.ru.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
+        <Generator>ResXFileCodeGenerator</Generator>
       </EmbeddedResource>
     </ItemGroup>
 </Project>
