@@ -6,5 +6,5 @@ public interface IGamesService
 {
     Task<IReadOnlyList<GameModel>> LoadGamesAsync();
     Task<GameModel?> GetGameByNameAsync(string gameName);
-    Task<bool> IsGameRunningAsync(GameModel game);
+    bool IsGameRunning(GameModel game);
 }
