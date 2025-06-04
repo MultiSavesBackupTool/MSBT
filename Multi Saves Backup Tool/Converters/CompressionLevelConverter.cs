@@ -13,9 +13,9 @@ public class CompressionLevelConverter : IValueConverter
         {
             return level switch
             {
-                CompressionLevel.Fastest => "Быстрый",
-                CompressionLevel.Optimal => "Оптимальный",
-                CompressionLevel.SmallestSize => "Максимальный",
+                CompressionLevel.Fastest => "Fast",
+                CompressionLevel.Optimal => "Optimal",
+                CompressionLevel.SmallestSize => "Smallest Size",
                 _ => level.ToString()
             };
         }
@@ -28,9 +28,9 @@ public class CompressionLevelConverter : IValueConverter
         {
             return stringValue switch
             {
-                "Быстрый" => CompressionLevel.Fastest,
-                "Оптимальный" => CompressionLevel.Optimal,
-                "Максимальный" => CompressionLevel.SmallestSize,
+                "Fast" => CompressionLevel.Fastest,
+                "Optimal" => CompressionLevel.Optimal,
+                "Smallest Size" => CompressionLevel.SmallestSize,
                 _ => Enum.TryParse<CompressionLevel>(stringValue, out var level) ? level : null
             };
         }

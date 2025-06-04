@@ -35,14 +35,14 @@ public class LocalGameState
 public class GameMonitoringInfo
 {
     public string GameName { get; set; } = "";
-    public string LastBackupTime { get; set; } = "Нет данных";
-    public string Status { get; set; } = "Ожидание";
-    public string NextBackupScheduled { get; set; } = "Не запланировано";
+    public string LastBackupTime { get; set; } = "No data";
+    public string Status { get; set; } = "Waiting";
+    public string NextBackupScheduled { get; set; } = "Not scheduled";
 }
 
 public class MonitoringViewModel : ViewModelBase
 {
-    private string _serviceStatus = "Неизвестно";
+    private string _serviceStatus = "Unknown";
     private DateTime _lastUpdateTime;
     private readonly CancellationTokenSource _cancellationTokenSource;
     public ObservableCollection<GameMonitoringInfo> Games { get; } = new();
@@ -84,7 +84,7 @@ public class MonitoringViewModel : ViewModelBase
             var statePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "service_state.json");
             if (!File.Exists(statePath))
             {
-                ServiceStatus = "Сервис не запущен";
+                ServiceStatus = "Service not running";
                 return;
             }
 
@@ -93,9 +93,9 @@ public class MonitoringViewModel : ViewModelBase
             
             ServiceStatus = state.ServiceStatus switch
             {
-                "Running" => "Работает",
-                "Stopped" => "Остановлен",
-                _ => "Неизвестно"
+                "Running" => "Running",
+                "Stopped" => "Stopped",
+                _ => "Unknown"
             };
             
             _lastUpdateTime = state.LastUpdateTime;
@@ -109,21 +109,21 @@ public class MonitoringViewModel : ViewModelBase
                     GameName = gameState.GameName,
                     Status = gameState.Status switch
                     {
-                        "Success" => "Успешно",
-                        "Waiting" => "Ожидание",
-                        "Backing up" => "Создание резервной копии",
-                        "Cleaning" => "Очистка старых копий",
+                        "Success" => "Success",
+                        "Waiting" => "Waiting",
+                        "Backing up" => "Backing up",
+                        "Cleaning" => "Cleaning old backups",
                         _ => gameState.Status
                     },
-                    LastBackupTime = gameState.LastBackupTime?.ToString("g") ?? "Нет данных",
-                    NextBackupScheduled = gameState.NextBackupScheduled?.ToString("g") ?? "Не запланировано"
+                    LastBackupTime = gameState.LastBackupTime?.ToString("g") ?? "No data",
+                    NextBackupScheduled = gameState.NextBackupScheduled?.ToString("g") ?? "Not scheduled"
                 });
             }
         }
         catch (Exception ex)
         {
-            ServiceStatus = $"Ошибка подключения: {ex.Message}";
-            Console.WriteLine($"Ошибка при обновлении состояния: {ex}");
+            ServiceStatus = $"Connection error: {ex.Message}";
+            Console.WriteLine($"Error updating state: {ex}");
         }
     }
 

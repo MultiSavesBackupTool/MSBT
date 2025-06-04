@@ -13,7 +13,7 @@
     </Design.DataContext>
 
     <DockPanel>
-        <Button Content="Добавить игру"
+        <Button Content="Add Game"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Click="AddGameButton_Click"

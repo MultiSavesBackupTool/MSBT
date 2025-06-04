@@ -31,16 +31,16 @@
                               IsSettingsVisible="False">
 
                 <ui:NavigationView.MenuItems>
-                    <ui:NavigationViewItem Content="Мониторинг"
+                    <ui:NavigationViewItem Content="Monitoring"
                                           IconSource="Home"
                                           Tag="monitoring"/>
-                    <ui:NavigationViewItem Content="Игры"
+                    <ui:NavigationViewItem Content="Games"
                                           IconSource="Games"
                                           Tag="games"/>
                 </ui:NavigationView.MenuItems>
 
                 <ui:NavigationView.FooterMenuItems>
-                    <ui:NavigationViewItem Content="Настройки"
+                    <ui:NavigationViewItem Content="Settings"
                                           IconSource="Settings"
                                           Tag="settings"/>
                 </ui:NavigationView.FooterMenuItems>
@@ -70,3 +70,4 @@
                              DataContext="{x:Null}"/>
     </Panel>
 </Window>
+

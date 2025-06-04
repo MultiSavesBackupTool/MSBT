@@ -9,32 +9,32 @@
              x:DataType="vm:SettingsViewModel">
     <ScrollViewer>
         <StackPanel Spacing="10" Margin="20">
-            <TextBlock Text="Настройки резервного копирования" Classes="h2"/>
+            <TextBlock Text="Backup Settings" Classes="h2"/>
             
             <StackPanel Margin="0,10">
-                <TextBlock Text="Папка для резервных копий:" Margin="0,0,0,5"/>
+                <TextBlock Text="Backup folder:" Margin="0,0,0,5"/>
                 <Grid ColumnDefinitions="*, Auto">
                     <TextBox Text="{Binding Settings.BackupSettings.BackupRootFolder}"
                              Margin="0,0,10,0"/>
-                    <Button Grid.Column="1" Content="Обзор" 
+                    <Button Grid.Column="1" Content="Browse" 
                             Command="{Binding BrowseBackupFolderCommand}"/>
                 </Grid>
                 
-                <TextBlock Text="Интервал сканирования (минуты):" Margin="0,10,0,5"/>
+                <TextBlock Text="Scan interval (minutes):" Margin="0,10,0,5"/>
                 <NumericUpDown Value="{Binding Settings.BackupSettings.ScanIntervalMinutes, Mode=TwoWay}"
                               Minimum="1" 
                               Maximum="1440"
                               Increment="1"
                               FormatString="0"/>
                 
-                <TextBlock Text="Максимум параллельных операций:" Margin="0,10,0,5"/>
+                <TextBlock Text="Maximum parallel operations:" Margin="0,10,0,5"/>
                 <NumericUpDown Value="{Binding Settings.BackupSettings.MaxParallelBackups, Mode=TwoWay}"
                               Minimum="1" 
                               Maximum="10"
                               Increment="1"
                               FormatString="0"/>
                 
-                <TextBlock Text="Уровень сжатия:" Margin="0,10,0,5"/>
+                <TextBlock Text="Compression level:" Margin="0,10,0,5"/>
                 <ComboBox SelectedItem="{Binding Settings.BackupSettings.CompressionLevel}"
                          HorizontalAlignment="Stretch">
                     <ComboBox.ItemTemplate>
@@ -49,28 +49,28 @@
             </StackPanel>
             
             <StackPanel Margin="0,10">
-                <TextBlock Text="Настройки логирования" Classes="h3"/>
-                <CheckBox Content="Включить логирование" 
+                <TextBlock Text="Logging Settings" Classes="h3"/>
+                <CheckBox Content="Enable logging" 
                           IsChecked="{Binding Settings.BackupSettings.EnableLogging}"/>
             </StackPanel>
             
             <!-- <StackPanel Margin="0,10">
-                <TextBlock Text="Настройки уведомлений" Classes="h3"/>
-                <CheckBox Content="Включить уведомления"
+                <TextBlock Text="Notification Settings" Classes="h3"/>
+                <CheckBox Content="Enable notifications"
                           IsChecked="{Binding Settings.BackupSettings.NotificationSettings.EnableNotifications}"/>
 
                 <StackPanel Margin="20,5"
                            IsEnabled="{Binding Settings.BackupSettings.NotificationSettings.EnableNotifications}">
-                    <CheckBox Content="Показывать уведомления об ошибках"
+                    <CheckBox Content="Show error notifications"
                               IsChecked="{Binding Settings.BackupSettings.NotificationSettings.ShowErrorNotifications}"/>
-                    <CheckBox Content="Показывать уведомления об успешных операциях"
+                    <CheckBox Content="Show success notifications"
                               IsChecked="{Binding Settings.BackupSettings.NotificationSettings.ShowSuccessNotifications}"/>
                 </StackPanel>
             </StackPanel> -->
             
             <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0"
                         HorizontalAlignment="Right">
-                <Button Content="Сохранить" Command="{Binding SaveCurrentSettingsCommand}"/>
+                <Button Content="Save" Command="{Binding SaveCurrentSettingsCommand}"/>
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

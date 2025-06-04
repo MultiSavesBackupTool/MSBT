@@ -35,7 +35,7 @@ public partial class SettingsViewModel : ViewModelBase
 
         var folder = await _storageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
         {
-            Title = "Выберите папку для резервных копий",
+            Title = "Select backup folder",
             AllowMultiple = false
         });
 
@@ -63,7 +63,7 @@ public partial class SettingsViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Ошибка при загрузке настроек: {ex}");
+            Console.WriteLine($"Error loading settings: {ex}");
             return new ServiceSettings();
         }
     }
@@ -81,7 +81,7 @@ public partial class SettingsViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Ошибка при сохранении настроек: {ex}");
+            Console.WriteLine($"Error saving settings: {ex}");
         }
     }
 
