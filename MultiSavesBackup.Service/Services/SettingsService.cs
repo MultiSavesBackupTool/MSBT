@@ -25,16 +25,16 @@ public class SettingsService : ISettingsService, IDisposable
         _currentSettings = options.Value;
         _logger = logger;
 
-        var gamesConfigPath = _currentSettings.BackupSettings.GamesConfigPath;
-        var mainAppDirectory = Path.GetDirectoryName(gamesConfigPath);
+        var mainAppDirectory = AppContext.BaseDirectory;
+        _settingsPath = Path.Combine(mainAppDirectory, "settings.json");
         
-        if (string.IsNullOrEmpty(mainAppDirectory))
+        if (string.IsNullOrEmpty(_currentSettings.BackupSettings?.GamesConfigPath))
         {
-            throw new InvalidOperationException("Cannot determine main application directory from GamesConfigPath");
+            _currentSettings.BackupSettings.GamesConfigPath = Path.Combine(mainAppDirectory, "games.json");
         }
 
-        _settingsPath = Path.Combine(mainAppDirectory, "settings.json");
         _logger.LogInformation("Using settings file: {Path}", _settingsPath);
+        _logger.LogInformation("Using games config: {Path}", _currentSettings.BackupSettings.GamesConfigPath);
 
         _watcher = new FileSystemWatcher(mainAppDirectory)
         {

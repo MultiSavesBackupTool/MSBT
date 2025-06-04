@@ -22,6 +22,15 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include="..\Multi Saves Backup Tool\settings.json" Link="settings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Multi Saves Backup Tool\games.json" Link="games.json" Condition="Exists('..\Multi Saves Backup Tool\games.json')">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\Multi Saves Backup Tool\Multi Saves Backup Tool.csproj" />
     </ItemGroup>
 </Project>
