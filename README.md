@@ -27,7 +27,6 @@ A tool for automatic game save backup with flexible settings and real-time monit
 3. After installation, the program will start automatically
 
 ## Usage
-[Multi Saves Backup Tool.csproj](Multi%20Saves%20Backup%20Tool/Multi%20Saves%20Backup%20Tool.csproj)
 ### Adding a Game
 
 1. Go to the "Games" tab
