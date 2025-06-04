@@ -13,8 +13,7 @@ public class BackupWorker : BackgroundService
     private readonly IGamesService _gamesService;
     private readonly IBackupService _backupService;
     private ServiceState _serviceState;
-    private static readonly string StateFilePath =
-        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "service_state.json");
+    private static readonly string StateFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "service_state.json");
 
     public BackupWorker(
         ILogger<BackupWorker> logger,
