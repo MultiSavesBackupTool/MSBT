@@ -10,7 +10,17 @@ public partial class AddGameOverlay : UserControl
     public AddGameOverlay()
     {
         InitializeComponent();
-        var viewModel = new AddGameOverlayViewModel();
+    }
+
+    public AddGameOverlay(GamesViewModel gamesViewModel)
+    {
+        InitializeComponent();
+        Initialize(gamesViewModel);
+    }
+
+    public void Initialize(GamesViewModel gamesViewModel)
+    {
+        var viewModel = new AddGameOverlayViewModel(gamesViewModel);
         viewModel.CloseRequested += (_, _) => IsVisible = false;
         DataContext = viewModel;
     }
