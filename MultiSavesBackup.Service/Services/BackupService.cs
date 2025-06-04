@@ -16,13 +16,20 @@ public class BackupService : IBackupService
         _logger = logger;
     }
 
+    private string GetSafeDirectoryName(string name)
+    {
+        var invalid = Path.GetInvalidFileNameChars().Concat(Path.GetInvalidPathChars()).ToArray();
+        return string.Join("_", name.Split(invalid));
+    }
+
     public async Task CreateBackupAsync(GameModel game)
     {
         try
         {
             var settings = _settingsService.CurrentSettings.BackupSettings;
             var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-            var backupDir = Path.Combine(settings.BackupRootFolder, game.GameName);
+            var safeName = GetSafeDirectoryName(game.GameName);
+            var backupDir = Path.Combine(settings.BackupRootFolder, safeName);
             var archivePath = Path.Combine(backupDir, $"{timestamp}.zip");
 
             Directory.CreateDirectory(backupDir);
@@ -66,7 +73,8 @@ public class BackupService : IBackupService
                 return;
             }
 
-            var backupDir = Path.Combine(_settingsService.CurrentSettings.BackupSettings.BackupRootFolder, game.GameName);
+            var safeName = GetSafeDirectoryName(game.GameName);
+            var backupDir = Path.Combine(_settingsService.CurrentSettings.BackupSettings.BackupRootFolder, safeName);
             if (!Directory.Exists(backupDir))
                 return;
 

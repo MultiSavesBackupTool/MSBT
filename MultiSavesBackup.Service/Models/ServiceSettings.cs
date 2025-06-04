@@ -41,3 +41,4 @@ public enum CompressionLevel
     SmallestSize = 2
 }
 
+

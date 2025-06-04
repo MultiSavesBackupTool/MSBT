@@ -25,7 +25,7 @@ public class GamesService : IGamesService
             if (_cachedGames != null)
                 return _cachedGames;
 
-            var gamesPath = _settingsService.CurrentSettings.BackupSettings.GamesConfigPath;
+            var gamesPath = _settingsService.CurrentSettings.BackupSettings.GetAbsoluteGamesConfigPath();
             
             if (!File.Exists(gamesPath))
             {
