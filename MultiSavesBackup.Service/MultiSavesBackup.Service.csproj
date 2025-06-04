@@ -6,12 +6,13 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>dotnet-MultiSavesBackup.Service-1A2B3C4D</UserSecretsId>
         <OutputType>exe</OutputType>
-        <PublishSingleFile>false</PublishSingleFile>
-        <SelfContained>false</SelfContained>
-        <RuntimeIdentifier></RuntimeIdentifier>
-        <IncludeNativeLibrariesForSelfExtract>false</IncludeNativeLibrariesForSelfExtract>
-        <UseAppHost>false</UseAppHost>
-        <DebugType>embedded</DebugType>
+        <PublishSingleFile>true</PublishSingleFile>
+        <SelfContained>true</SelfContained>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+        <UseAppHost>true</UseAppHost>
+        <DebugType>none</DebugType>
+        <DebugSymbols>false</DebugSymbols>
     </PropertyGroup>
 
     <ItemGroup>

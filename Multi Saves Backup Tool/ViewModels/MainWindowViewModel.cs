@@ -14,7 +14,6 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public MonitoringViewModel MonitoringViewModel { get; }
     public GamesViewModel GamesViewModel { get; }
-    public ArchivesViewModel ArchivesViewModel { get; }
     public SettingsViewModel SettingsViewModel { get; }
 
     public override string Title => "Multi Saves Backup Tool";
@@ -24,7 +23,6 @@ public partial class MainWindowViewModel : ViewModelBase
         var window = new Window();
         MonitoringViewModel = new MonitoringViewModel();
         GamesViewModel = new GamesViewModel();
-        ArchivesViewModel = new ArchivesViewModel();
         SettingsViewModel = new SettingsViewModel(window.StorageProvider);
         CurrentViewModel = MonitoringViewModel;
     }
@@ -33,7 +31,6 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         MonitoringViewModel = new MonitoringViewModel();
         GamesViewModel = new GamesViewModel();
-        ArchivesViewModel = new ArchivesViewModel();
         SettingsViewModel = new SettingsViewModel(mainWindow.StorageProvider);
         CurrentViewModel = MonitoringViewModel;
     }
@@ -46,7 +43,6 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             "monitoring" => MonitoringViewModel,
             "games" => GamesViewModel,
-            "archives" => ArchivesViewModel,
             "settings" => SettingsViewModel,
             _ => CurrentViewModel
         };

@@ -37,9 +37,6 @@
                     <ui:NavigationViewItem Content="Игры" 
                                           IconSource="Games" 
                                           Tag="games"/>
-                    <ui:NavigationViewItem Content="Архивы" 
-                                          IconSource="Library" 
-                                          Tag="archives"/>
                 </ui:NavigationView.MenuItems>
 
                 <ui:NavigationView.FooterMenuItems>
@@ -63,16 +60,6 @@
                         
                         <DataTemplate DataType="{x:Type vm:GamesViewModel}">
                             <views:GamesView />
-                        </DataTemplate>
-
-                        <DataTemplate DataType="{x:Type vm:ArchivesViewModel}">
-                            <StackPanel Margin="20">
-                                <TextBlock Text="{Binding Title}" 
-                                          FontSize="24" 
-                                          FontWeight="Bold"/>
-                                <TextBlock Text="{Binding ArchiveCount, StringFormat='Архивов: {0}'}" 
-                                          Margin="0,10"/>
-                            </StackPanel>
                         </DataTemplate>
 
                         <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
