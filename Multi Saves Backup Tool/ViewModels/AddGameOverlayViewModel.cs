@@ -13,6 +13,13 @@ namespace Multi_Saves_Backup_Tool.ViewModels;
 
 public partial class AddGameOverlayViewModel : ViewModelBase
 {
+    private readonly GamesViewModel _gamesViewModel;
+
+    public AddGameOverlayViewModel(GamesViewModel gamesViewModel)
+    {
+        _gamesViewModel = gamesViewModel;
+    }
+
     [ObservableProperty]
     private string _gameName = string.Empty;
 
@@ -147,22 +154,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
             SetOldFilesStatus = OldFilesStatus
         };
 
-        var gamesFilePath = Path.Combine(Directory.GetCurrentDirectory(), "games.json");
-        List<GameModel> games;
-
-        if (File.Exists(gamesFilePath))
-        {
-            var json = File.ReadAllText(gamesFilePath);
-            games = JsonSerializer.Deserialize<List<GameModel>>(json) ?? new List<GameModel>();
-        }
-        else
-        {
-            games = new List<GameModel>();
-        }
-
-        games.Add(game);
-        var options = new JsonSerializerOptions { WriteIndented = true };
-        File.WriteAllText(gamesFilePath, JsonSerializer.Serialize(games, options));
+        AddGame(game);
 
         CloseRequested?.Invoke(this, EventArgs.Empty);
     }
@@ -204,6 +196,19 @@ public partial class AddGameOverlayViewModel : ViewModelBase
             return files.Count > 0 ? files[0].Path.LocalPath : string.Empty;
         }
         return string.Empty;
+    }
+
+    private void AddGame(GameModel newGame)
+    {
+        var jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "games.json");
+        var games = File.Exists(jsonPath)
+            ? JsonSerializer.Deserialize<List<GameModel>>(File.ReadAllText(jsonPath)) ?? new List<GameModel>()
+            : new List<GameModel>();
+
+        games.Add(newGame);
+        File.WriteAllText(jsonPath, JsonSerializer.Serialize(games));
+
+        _gamesViewModel.LoadGames();
     }
 
     public void ClearForm()

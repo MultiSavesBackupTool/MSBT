@@ -24,6 +24,16 @@ public class CompressionLevelConverter : IValueConverter
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        throw new NotImplementedException();
+        if (value is string stringValue)
+        {
+            return stringValue switch
+            {
+                "Быстрый" => CompressionLevel.Fastest,
+                "Оптимальный" => CompressionLevel.Optimal,
+                "Максимальный" => CompressionLevel.SmallestSize,
+                _ => Enum.TryParse<CompressionLevel>(stringValue, out var level) ? level : null
+            };
+        }
+        return null;
     }
 }
