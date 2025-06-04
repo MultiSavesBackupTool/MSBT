@@ -4,6 +4,11 @@ on:
   push:
     branches: [master]
 
+permissions:
+  contents: write
+  packages: write
+  actions: read
+
 jobs:
   build:
     runs-on: windows-latest
@@ -41,6 +46,13 @@ jobs:
         run: |
           "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
         shell: cmd
+
+      - name: Verify installer exists
+        run: |
+          if not exist "installer/MultiSavesBackupSetup.exe" (
+            echo "Installer file not found!"
+            exit 1
+          )
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
