@@ -44,7 +44,7 @@
                                       Binding="{Binding LastBackupTime}"
                                       Width="2*"/>
                     <DataGridTextColumn Header="Следующий бэкап" 
-                                      Binding="{Binding NextBackupTime}"
+                                      Binding="{Binding NextBackupScheduled}"
                                       Width="2*"/>
                 </DataGrid.Columns>
             </DataGrid>

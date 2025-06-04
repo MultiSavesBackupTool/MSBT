@@ -29,6 +29,7 @@ public class LocalGameState
     public string GameName { get; set; } = "";
     public DateTime? LastBackupTime { get; set; }
     public string Status { get; set; } = "Waiting";
+    public DateTime? NextBackupScheduled { get; set; }
 }
 
 public class GameMonitoringInfo
@@ -36,7 +37,7 @@ public class GameMonitoringInfo
     public string GameName { get; set; } = "";
     public string LastBackupTime { get; set; } = "Нет данных";
     public string Status { get; set; } = "Ожидание";
-    public string NextBackupTime { get; set; } = "Не запланировано";
+    public string NextBackupScheduled { get; set; } = "Не запланировано";
 }
 
 public partial class MonitoringViewModel : ViewModelBase
@@ -114,7 +115,7 @@ public partial class MonitoringViewModel : ViewModelBase
                         _ => gameState.Status
                     },
                     LastBackupTime = gameState.LastBackupTime?.ToString("g") ?? "Нет данных",
-                    NextBackupTime = "Не запланировано"
+                    NextBackupScheduled = gameState.NextBackupScheduled?.ToString("g") ?? "Не запланировано"
                 });
             }
         }
