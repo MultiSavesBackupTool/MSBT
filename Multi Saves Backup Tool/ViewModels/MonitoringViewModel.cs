@@ -125,11 +125,14 @@ public class MonitoringViewModel : ViewModelBase, IDisposable
                     GameName = gameState.GameName,
                     Status = gameState.Status switch
                     {
-                        var s when s == Resources.StatusServiceSuccess => Resources.StatusSuccess,
-                        var s when s == Resources.StatusServiceRunning => Resources.StatusRunning,
-                        var s when s == Resources.StatusServiceBackingUp => Resources.StatusBackingUp,
-                        var s when s == Resources.StatusServiceCleaning => Resources.StatusCleaning,
-                        var s when s == Resources.StatusServiceWaiting => Resources.StatusWaiting,
+                        "Success" => Resources.StatusSuccess,
+                        "Running" => Resources.StatusRunning,
+                        "Processing" => Resources.StatusBackingUp,
+                        "Cleaning" => Resources.StatusCleaning,
+                        "Waiting" => Resources.StatusWaiting,
+                        "Disabled" => Resources.StatusDisabled,
+                        "Error" => Resources.StatusError,
+                        "Path Error" => Resources.StatusPathError,
                         _ => gameState.Status
                     },
                     LastBackupTime = gameState.LastBackupTime?.ToString("g") ?? Resources.NoData,

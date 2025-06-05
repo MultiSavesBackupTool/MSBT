@@ -225,6 +225,12 @@
     <data name="StatusServiceCleaning" xml:space="preserve">
     <value>Очистка</value>
   </data>
+    <data name="StatusError" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+    <data name="StatusPathError" xml:space="preserve">
+    <value>Ошибка пути</value>
+  </data>
 
     <!-- Error messages -->
     <data name="ErrorGameNameRequired" xml:space="preserve">

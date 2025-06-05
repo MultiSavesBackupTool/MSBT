@@ -40,7 +40,7 @@ namespace Properties
             }
         }
 
-        // MainWindow strings
+        #region MainWindow strings
         public static string MainWindow_Title
         {
             get
@@ -72,8 +72,59 @@ namespace Properties
                 return ResourceManager.GetString("MainWindow_Settings", resourceCulture);
             }
         }
+        #endregion
 
-        // GamesView strings
+        #region MonitoringView strings
+        public static string MonitoringView_ServiceStatus
+        {
+            get
+            {
+                return ResourceManager.GetString("MonitoringView_ServiceStatus", resourceCulture);
+            }
+        }
+
+        public static string MonitoringView_LastUpdate
+        {
+            get
+            {
+                return ResourceManager.GetString("MonitoringView_LastUpdate", resourceCulture);
+            }
+        }
+
+        public static string MonitoringView_GameName
+        {
+            get
+            {
+                return ResourceManager.GetString("MonitoringView_GameName", resourceCulture);
+            }
+        }
+
+        public static string MonitoringView_Status
+        {
+            get
+            {
+                return ResourceManager.GetString("MonitoringView_Status", resourceCulture);
+            }
+        }
+
+        public static string MonitoringView_LastBackup
+        {
+            get
+            {
+                return ResourceManager.GetString("MonitoringView_LastBackup", resourceCulture);
+            }
+        }
+
+        public static string MonitoringView_NextBackup
+        {
+            get
+            {
+                return ResourceManager.GetString("MonitoringView_NextBackup", resourceCulture);
+            }
+        }
+        #endregion
+
+        #region GamesView strings
         public static string GamesView_AddGame
         {
             get
@@ -89,8 +140,9 @@ namespace Properties
                 return ResourceManager.GetString("GamesView_Delete", resourceCulture);
             }
         }
+        #endregion
 
-        // AddGameOverlay strings
+        #region AddGameOverlay strings
         public static string AddGameOverlay_Title
         {
             get
@@ -250,57 +302,9 @@ namespace Properties
                 return ResourceManager.GetString("AddGameOverlay_Cancel", resourceCulture);
             }
         }
+        #endregion
 
-        // MonitoringView strings
-        public static string MonitoringView_ServiceStatus
-        {
-            get
-            {
-                return ResourceManager.GetString("MonitoringView_ServiceStatus", resourceCulture);
-            }
-        }
-
-        public static string MonitoringView_LastUpdate
-        {
-            get
-            {
-                return ResourceManager.GetString("MonitoringView_LastUpdate", resourceCulture);
-            }
-        }
-
-        public static string MonitoringView_GameName
-        {
-            get
-            {
-                return ResourceManager.GetString("MonitoringView_GameName", resourceCulture);
-            }
-        }
-
-        public static string MonitoringView_Status
-        {
-            get
-            {
-                return ResourceManager.GetString("MonitoringView_Status", resourceCulture);
-            }
-        }
-
-        public static string MonitoringView_LastBackup
-        {
-            get
-            {
-                return ResourceManager.GetString("MonitoringView_LastBackup", resourceCulture);
-            }
-        }
-
-        public static string MonitoringView_NextBackup
-        {
-            get
-            {
-                return ResourceManager.GetString("MonitoringView_NextBackup", resourceCulture);
-            }
-        }
-
-        // SettingsView strings
+        #region SettingsView strings
         public static string SettingsView_BackupSettings
         {
             get
@@ -372,8 +376,9 @@ namespace Properties
                 return ResourceManager.GetString("SettingsView_Save", resourceCulture);
             }
         }
+        #endregion
 
-        // Status strings
+        #region Status strings
         public static string StatusSuccess
         {
             get
@@ -453,7 +458,7 @@ namespace Properties
                 return ResourceManager.GetString("StatusServiceRunning", resourceCulture);
             }
         }
-        
+
         public static string StatusServiceWaiting
         {
             get
@@ -461,7 +466,7 @@ namespace Properties
                 return ResourceManager.GetString("StatusServiceWaiting", resourceCulture);
             }
         }
-        
+
         public static string StatusServiceStopped
         {
             get
@@ -494,6 +499,22 @@ namespace Properties
             }
         }
 
+        public static string StatusError
+        {
+            get
+            {
+                return ResourceManager.GetString("StatusError", resourceCulture);
+            }
+        }
+
+        public static string StatusPathError
+        {
+            get
+            {
+                return ResourceManager.GetString("StatusPathError", resourceCulture);
+            }
+        }
+
         public static string StatusConnectionError
         {
             get
@@ -517,8 +538,9 @@ namespace Properties
                 return ResourceManager.GetString("NotScheduled", resourceCulture);
             }
         }
+        #endregion
 
-        // Error messages
+        #region Error messages
         public static string ErrorGameNameRequired
         {
             get
@@ -558,8 +580,9 @@ namespace Properties
                 return ResourceManager.GetString("ErrorSavingSettings", resourceCulture);
             }
         }
+        #endregion
 
-        // Dialog strings
+        #region Dialog strings
         public static string DialogSelectGameExe
         {
             get
@@ -591,8 +614,9 @@ namespace Properties
                 return ResourceManager.GetString("DialogSelectBackupFolder", resourceCulture);
             }
         }
+        #endregion
 
-        // Compression level strings
+        #region Compression level strings
         public static string CompressionLevel_Fast
         {
             get
@@ -616,5 +640,6 @@ namespace Properties
                 return ResourceManager.GetString("CompressionLevel_SmallestSize", resourceCulture);
             }
         }
+        #endregion
     }
 } 
