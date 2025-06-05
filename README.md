@@ -20,8 +20,7 @@ A tool for backing up game saves with support for multiple games and automatic s
 ## Installation
 
 1. Download the latest release from the Releases page
-2. Extract the archive to your preferred location
-3. Run MultiSavesBackupTool.exe
+2. Run MultiSavesBackupSetup.exe
 
 ## Usage
 
