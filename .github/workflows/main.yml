@@ -14,6 +14,11 @@ jobs:
     runs-on: lukiwin
 
     steps:
+      - name: Clean previous build artifacts
+        shell: powershell
+        run: |
+          Remove-Item -Recurse -Force publish, installer -ErrorAction SilentlyContinue
+
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -23,43 +28,39 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: Publish MultiSavesBackup.Service
+        shell: pwsh
         run: |
           dotnet publish "MultiSavesBackup.Service/MultiSavesBackup.Service.csproj" `
             -c Release -r win-x64 --self-contained true `
             -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false `
-            -o "publish/release"
+            -o "publish/release/service"
 
       - name: Publish Multi Saves Backup Tool
+        shell: pwsh
         run: |
           dotnet publish ".\Multi Saves Backup Tool\Multi Saves Backup Tool.csproj" `
             -c Release -r win-x64 --self-contained true `
             -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false `
-            -o "publish/release"
+            -o "publish/release/tool"
 
       - name: Install Inno Setup
+        shell: powershell
         run: |
           Invoke-WebRequest https://jrsoftware.org/download.php/is.exe -OutFile is.exe
           Start-Process -FilePath .\is.exe -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-' -Wait
-        shell: powershell
 
       - name: Build installer with Inno Setup
+        shell: cmd
         run: |
           "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
-        shell: cmd
-        
+
       - name: Verify installer exists
+        shell: cmd
         run: |
           if not exist "installer/MultiSavesBackupSetup.exe" (
             echo Installer file not found!
             exit 1
           )
-        shell: cmd
-
-      - name: Upload installer artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: MultiSavesBackupInstaller
-          path: installer/MultiSavesBackupSetup.exe
 
       - name: Create GitHub Release
         id: create_release
