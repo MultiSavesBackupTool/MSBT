@@ -110,8 +110,8 @@ public class MonitoringViewModel : ViewModelBase, IDisposable
 
             ServiceStatus = state.ServiceStatus switch
             {
-                var s when s == Resources.StatusServiceRunning => Resources.StatusRunning,
-                var s when s == Resources.StatusServiceStopped => Resources.StatusStopped,
+                "Running" => Resources.StatusRunning,
+                "Stopped" => Resources.StatusStopped,
                 _ => Resources.StatusUnknown
             };
 
