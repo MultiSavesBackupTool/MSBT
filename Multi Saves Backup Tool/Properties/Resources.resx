@@ -76,6 +76,27 @@
     <data name="MainWindow_Settings" xml:space="preserve">
     <value>Settings</value>
   </data>
+    <data name="MainWindow_UpdateError_General" xml:space="preserve">
+    <value>Error checking for updates.</value>
+  </data>
+  <data name="MainWindow_DownloadingUpdate" xml:space="preserve">
+    <value>Downloading update...</value>
+  </data>
+  <data name="MainWindow_UpdateError_Install" xml:space="preserve">
+    <value>Failed to install update.</value>
+  </data>
+  <data name="MainWindow_CheckForUpdates" xml:space="preserve">
+    <value>Checking for updates...</value>
+  </data>
+  <data name="MainWindow_UpdateAvailable" xml:space="preserve">
+    <value>Update v{0} is available.</value>
+  </data>
+  <data name="MainWindow_NoUpdates" xml:space="preserve">
+    <value>You have the latest version.</value>
+  </data>
+  <data name="MainWindow_UpdateError" xml:space="preserve">
+    <value>Update check failed for v{0}.</value>
+  </data>
 
     <!-- GamesView strings -->
     <data name="GamesView_AddGame" xml:space="preserve">

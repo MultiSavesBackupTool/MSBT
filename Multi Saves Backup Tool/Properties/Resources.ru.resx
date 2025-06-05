@@ -76,6 +76,27 @@
     <data name="MainWindow_Settings" xml:space="preserve">
     <value>Настройки</value>
   </data>
+    <data name="MainWindow_UpdateError_General" xml:space="preserve">
+    <value>Ошибка проверки обновлений.</value>
+  </data>
+  <data name="MainWindow_DownloadingUpdate" xml:space="preserve">
+    <value>Загрузка обновления...</value>
+  </data>
+  <data name="MainWindow_UpdateError_Install" xml:space="preserve">
+    <value>Не удалось установить обновление.</value>
+  </data>
+  <data name="MainWindow_CheckForUpdates" xml:space="preserve">
+    <value>Проверка обновлений...</value>
+  </data>
+  <data name="MainWindow_UpdateAvailable" xml:space="preserve">
+    <value>Доступно обновление v{0}.</value>
+  </data>
+  <data name="MainWindow_NoUpdates" xml:space="preserve">
+    <value>У вас установлена последняя версия.</value>
+  </data>
+  <data name="MainWindow_UpdateError" xml:space="preserve">
+    <value>Ошибка проверки обновлений для v{0}.</value>
+  </data>
 
     <!-- GamesView strings -->
     <data name="GamesView_AddGame" xml:space="preserve">

@@ -72,6 +72,62 @@ namespace Properties
                 return ResourceManager.GetString("MainWindow_Settings", resourceCulture);
             }
         }
+
+        public static string MainWindow_UpdateError_General
+        {
+            get
+            {
+                return ResourceManager.GetString("MainWindow_UpdateError_General", resourceCulture);
+            }
+        }
+
+        public static string MainWindow_DownloadingUpdate
+        {
+            get
+            {
+                return ResourceManager.GetString("MainWindow_DownloadingUpdate", resourceCulture);
+            }
+        }
+
+        public static string MainWindow_UpdateError_Install
+        {
+            get
+            {
+                return ResourceManager.GetString("MainWindow_UpdateError_Install", resourceCulture);
+            }
+        }
+
+        public static string MainWindow_CheckForUpdates
+        {
+            get
+            {
+                return ResourceManager.GetString("MainWindow_CheckForUpdates", resourceCulture);
+            }
+        }
+
+        public static string MainWindow_UpdateAvailable
+        {
+            get
+            {
+                return ResourceManager.GetString("MainWindow_UpdateAvailable", resourceCulture);
+            }
+        }
+
+        public static string MainWindow_NoUpdates
+        {
+            get
+            {
+                return ResourceManager.GetString("MainWindow_NoUpdates", resourceCulture);
+            }
+        }
+
+        public static string MainWindow_UpdateError
+        {
+            get
+            {
+                return ResourceManager.GetString("MainWindow_UpdateError", resourceCulture);
+            }
+        }
         #endregion
 
         #region MonitoringView strings
@@ -382,6 +438,30 @@ namespace Properties
             get
             {
                 return ResourceManager.GetString("SettingsView_Save", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_UpdateSettings
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_UpdateSettings", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_CheckForUpdates
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_CheckForUpdates", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_CurrentVersion
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_CurrentVersion", resourceCulture);
             }
         }
         #endregion
