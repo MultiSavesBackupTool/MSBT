@@ -71,10 +71,16 @@ public class BackupWorker : BackgroundService
             
             _logger.LogInformation("Found {Count} enabled games for backup", enabledGames.Count);
 
-            var gameNames = games.Select(g => g.GameName).ToHashSet();
-            var removedGames = _serviceState.GamesState.Keys
-                .Where(gameName => !gameNames.Contains(gameName))
-                .ToList();
+            // Check for removed games using GetGameByNameAsync
+            var removedGames = new List<string>();
+            foreach (var gameName in _serviceState.GamesState.Keys)
+            {
+                var game = await _gamesService.GetGameByNameAsync(gameName);
+                if (game == null)
+                {
+                    removedGames.Add(gameName);
+                }
+            }
 
             foreach (var gameName in removedGames)
             {
@@ -109,6 +115,14 @@ public class BackupWorker : BackgroundService
                     continue;
                 }
 
+                if (!_gamesService.IsGameRunning(game))
+                {
+                    _logger.LogInformation("Skipping backup for {GameName} as the game is not running", game.GameName);
+                    gameState.Status = "Game Not Running";
+                    SaveServiceState();
+                    continue;
+                }
+
                 await semaphore.WaitAsync(stoppingToken);
 
                 tasks.Add(Task.Run(async () =>
@@ -137,6 +151,14 @@ public class BackupWorker : BackgroundService
 
     private async Task ProcessGameBackupAsync(GameModel game)
     {
+        // Verify that the game still exists in configuration
+        var existingGame = await _gamesService.GetGameByNameAsync(game.GameName);
+        if (existingGame == null)
+        {
+            _logger.LogWarning("Game {GameName} no longer exists in configuration, skipping backup", game.GameName);
+            return;
+        }
+
         var gameState = _serviceState.GamesState[game.GameName];
         try
         {

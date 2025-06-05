@@ -6,16 +6,41 @@ using Microsoft.Extensions.Logging;
 
 namespace MultiSavesBackup.Service.Services;
 
-public class GamesService : IGamesService
+public class GamesService : IGamesService, IDisposable
 {
     private readonly ISettingsService _settingsService;
     private readonly ILogger<GamesService> _logger;
     private IReadOnlyList<GameModel>? _cachedGames;
+    private readonly FileSystemWatcher? _watcher;
 
     public GamesService(ISettingsService settingsService, ILogger<GamesService> logger)
     {
         _settingsService = settingsService;
         _logger = logger;
+
+        var gamesPath = _settingsService.CurrentSettings.BackupSettings.GetAbsoluteGamesConfigPath();
+        var directory = Path.GetDirectoryName(gamesPath);
+        var fileName = Path.GetFileName(gamesPath);
+
+        if (directory != null)
+        {
+            _watcher = new FileSystemWatcher(directory)
+            {
+                Filter = fileName,
+                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime,
+                EnableRaisingEvents = true
+            };
+
+            _watcher.Changed += (_, _) =>
+            {
+                _logger.LogInformation("Games configuration file changed, clearing cache");
+                _cachedGames = null;
+            };
+        }
+        else
+        {
+            _logger.LogWarning("Could not create FileSystemWatcher for games configuration: directory is null");
+        }
     }
 
     public async Task<IReadOnlyList<GameModel>> LoadGamesAsync()
@@ -89,5 +114,10 @@ public class GamesService : IGamesService
             _logger.LogError(ex, "Error checking if game is running");
             return false;
         }
+    }
+
+    public void Dispose()
+    {
+        _watcher?.Dispose();
     }
 }
