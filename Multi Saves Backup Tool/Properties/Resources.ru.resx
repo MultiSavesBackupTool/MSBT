@@ -257,6 +257,9 @@
     <data name="NotScheduled" xml:space="preserve">
     <value>Не запланировано</value>
   </data>
+    <data name="StatusGameNotRunning" xml:space="preserve">
+    <value>Игра не запущена</value>
+  </data>
 
     <!-- Error messages -->
     <data name="ErrorGameNameRequired" xml:space="preserve">

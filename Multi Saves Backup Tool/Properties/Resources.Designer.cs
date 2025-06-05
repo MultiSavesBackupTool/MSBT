@@ -515,6 +515,14 @@ namespace Properties
             }
         }
 
+        public static string StatusGameNotRunning
+        {
+            get
+            {
+                return ResourceManager.GetString("StatusGameNotRunning", resourceCulture);
+            }
+        }
+
         public static string StatusConnectionError
         {
             get

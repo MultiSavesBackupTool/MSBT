@@ -257,6 +257,9 @@
     <data name="StatusPathError" xml:space="preserve">
     <value>Path Error</value>
   </data>
+    <data name="StatusGameNotRunning" xml:space="preserve">
+    <value>Game Not Running</value>
+  </data>
 
     <!-- Error messages -->
     <data name="ErrorGameNameRequired" xml:space="preserve">

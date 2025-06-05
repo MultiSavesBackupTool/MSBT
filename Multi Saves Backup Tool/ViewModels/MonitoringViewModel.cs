@@ -131,6 +131,7 @@ public class MonitoringViewModel : ViewModelBase, IDisposable
                         "Cleaning" => Resources.StatusCleaning,
                         "Waiting" => Resources.StatusWaiting,
                         "Disabled" => Resources.StatusDisabled,
+                        "Game Not Running" => Resources.StatusGameNotRunning,
                         "Error" => Resources.StatusError,
                         "Path Error" => Resources.StatusPathError,
                         _ => gameState.Status
