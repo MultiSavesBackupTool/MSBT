@@ -78,7 +78,7 @@ public class SettingsService : ISettingsService, IDisposable
 
             _watcher.Error += (_, ex) =>
             {
-                _logger.LogError(ex, "Error in FileSystemWatcher for settings");
+                _logger.LogError("Error in FileSystemWatcher for settings: {Message}", ex.GetException().Message);
             };
         }
         catch (Exception ex)

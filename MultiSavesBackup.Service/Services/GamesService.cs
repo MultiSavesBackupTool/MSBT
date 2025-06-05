@@ -59,7 +59,7 @@ public class GamesService : IGamesService, IDisposable
 
                 _watcher.Error += (_, ex) =>
                 {
-                    _logger.LogError(ex, "Error in FileSystemWatcher for games configuration");
+                    _logger.LogError("Error in FileSystemWatcher for games configuration: {Message}", ex.GetException().Message);
                 };
             }
             catch (Exception ex)
