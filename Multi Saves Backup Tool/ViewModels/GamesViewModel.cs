@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
@@ -100,5 +101,34 @@ public class GamesViewModel : ViewModelBase
         game.PropertyChanged -= Game_PropertyChanged;
         Games.Remove(game);
         SaveGames();
+    }
+
+    public void UpdateBackupCount(GameModel game)
+    {
+        try
+        {
+            var settings = new ServiceSettings();
+            var backupDir = Path.Combine(settings.BackupSettings.BackupRootFolder, GetSafeDirectoryName(game.GameName));
+            if (Directory.Exists(backupDir))
+            {
+                var count = Directory.GetFiles(backupDir, "*.zip").Length;
+                game.BackupCount = count;
+            }
+            else
+            {
+                game.BackupCount = 0;
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error updating backup count: {e.Message}");
+            game.BackupCount = 0;
+        }
+    }
+
+    private string GetSafeDirectoryName(string name)
+    {
+        var invalid = Path.GetInvalidFileNameChars().Concat(Path.GetInvalidPathChars()).ToArray();
+        return string.Join("_", name.Split(invalid));
     }
 }

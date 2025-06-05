@@ -84,6 +84,9 @@
     <data name="GamesView_Delete" xml:space="preserve">
     <value>Delete</value>
   </data>
+    <data name="GamesView_BackupCount" xml:space="preserve">
+    <value>Backups: {0}</value>
+  </data>
 
     <!-- AddGameOverlay strings -->
     <data name="AddGameOverlay_Title" xml:space="preserve">

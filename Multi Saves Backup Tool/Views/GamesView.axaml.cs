@@ -13,6 +13,15 @@ public partial class GamesView : UserControl
         InitializeComponent();
         _viewModel = new GamesViewModel();
         DataContext = _viewModel;
+        Loaded += GamesView_Loaded;
+    }
+
+    private void GamesView_Loaded(object? sender, RoutedEventArgs e)
+    {
+        foreach (var game in _viewModel.Games)
+        {
+            _viewModel.UpdateBackupCount(game);
+        }
     }
 
     private void AddGameButton_Click(object sender, RoutedEventArgs e)

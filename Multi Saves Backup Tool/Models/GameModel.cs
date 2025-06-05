@@ -16,6 +16,7 @@ public class GameModel : INotifyPropertyChanged
     private string? _modPath;
     private string _savePath = string.Empty;
     private int _setOldFilesStatus;
+    private int _backupCount;
 
     public string GameName
     {
@@ -75,6 +76,12 @@ public class GameModel : INotifyPropertyChanged
     {
         get => _backupInterval;
         set => SetField(ref _backupInterval, value);
+    }
+
+    public int BackupCount
+    {
+        get => _backupCount;
+        set => SetField(ref _backupCount, value);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
