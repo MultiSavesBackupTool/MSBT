@@ -126,9 +126,10 @@ public class MonitoringViewModel : ViewModelBase, IDisposable
                     Status = gameState.Status switch
                     {
                         var s when s == Resources.StatusServiceSuccess => Resources.StatusSuccess,
-                        var s when s == Resources.StatusServiceRunning => Resources.StatusWaiting,
+                        var s when s == Resources.StatusServiceRunning => Resources.StatusRunning,
                         var s when s == Resources.StatusServiceBackingUp => Resources.StatusBackingUp,
                         var s when s == Resources.StatusServiceCleaning => Resources.StatusCleaning,
+                        var s when s == Resources.StatusServiceWaiting => Resources.StatusWaiting,
                         _ => gameState.Status
                     },
                     LastBackupTime = gameState.LastBackupTime?.ToString("g") ?? Resources.NoData,

@@ -210,6 +210,9 @@
     <data name="StatusServiceRunning" xml:space="preserve">
     <value>Выполняется</value>
   </data>
+    <data name="StatusServiceWaiting" xml:space="preserve">
+    <value>Ожидание</value>
+  </data>
     <data name="StatusServiceStopped" xml:space="preserve">
     <value>Остановлено</value>
   </data>

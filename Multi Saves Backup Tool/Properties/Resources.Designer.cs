@@ -453,7 +453,15 @@ namespace Properties
                 return ResourceManager.GetString("StatusServiceRunning", resourceCulture);
             }
         }
-
+        
+        public static string StatusServiceWaiting
+        {
+            get
+            {
+                return ResourceManager.GetString("StatusServiceWaiting", resourceCulture);
+            }
+        }
+        
         public static string StatusServiceStopped
         {
             get
