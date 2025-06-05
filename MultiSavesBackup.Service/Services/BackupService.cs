@@ -24,6 +24,9 @@ public class BackupService : IBackupService
 
     public async Task CreateBackupAsync(GameModel game)
     {
+        if (game == null)
+            throw new ArgumentNullException(nameof(game));
+
         try
         {
             var settings = _settingsService.CurrentSettings.BackupSettings;
@@ -38,22 +41,50 @@ public class BackupService : IBackupService
 
             using var archive = ZipFile.Open(archivePath, ZipArchiveMode.Create);
             
-            if (Directory.Exists(game.SavePath))
+            var backupSuccess = false;
+            try
             {
-                await AddToArchiveAsync(archive, game.SavePath, "saves");
-            }
+                if (Directory.Exists(game.SavePath))
+                {
+                    await AddToArchiveAsync(archive, game.SavePath, "saves");
+                    backupSuccess = true;
+                }
+                else
+                {
+                    _logger.LogWarning("Save path not found for game {GameName}: {Path}", game.GameName, game.SavePath);
+                }
 
-            if (!string.IsNullOrEmpty(game.ModPath) && Directory.Exists(game.ModPath))
+                if (!string.IsNullOrEmpty(game.ModPath) && Directory.Exists(game.ModPath))
+                {
+                    await AddToArchiveAsync(archive, game.ModPath, "mods");
+                }
+
+                if (!string.IsNullOrEmpty(game.AddPath) && Directory.Exists(game.AddPath))
+                {
+                    await AddToArchiveAsync(archive, game.AddPath, "additional");
+                }
+
+                if (!backupSuccess)
+                {
+                    _logger.LogWarning("No valid paths found for backup of game {GameName}", game.GameName);
+                    if (File.Exists(archivePath))
+                    {
+                        File.Delete(archivePath);
+                    }
+                }
+                else
+                {
+                    _logger.LogInformation("Backup created successfully for {GameName}", game.GameName);
+                }
+            }
+            catch (Exception)
             {
-                await AddToArchiveAsync(archive, game.ModPath, "mods");
+                if (File.Exists(archivePath))
+                {
+                    File.Delete(archivePath);
+                }
+                throw;
             }
-
-            if (!string.IsNullOrEmpty(game.AddPath) && Directory.Exists(game.AddPath))
-            {
-                await AddToArchiveAsync(archive, game.AddPath, "additional");
-            }
-
-            _logger.LogInformation("Backup created successfully for {GameName}", game.GameName);
         }
         catch (Exception ex)
         {
@@ -64,6 +95,9 @@ public class BackupService : IBackupService
 
     public void CleanupOldBackups(GameModel game)
     {
+        if (game == null)
+            throw new ArgumentNullException(nameof(game));
+
         try
         {
             if (game.DaysForKeep <= 0)
@@ -76,13 +110,24 @@ public class BackupService : IBackupService
             var safeName = GetSafeDirectoryName(game.GameName);
             var backupDir = Path.Combine(_settingsService.CurrentSettings.BackupSettings.BackupRootFolder, safeName);
             if (!Directory.Exists(backupDir))
+            {
+                _logger.LogInformation("No backup directory found for {GameName}", game.GameName);
                 return;
+            }
 
             var cutoffDate = DateTime.Now.AddDays(-game.DaysForKeep);
             var files = Directory.GetFiles(backupDir, "*.zip")
                                .Select(f => new FileInfo(f))
                                .Where(f => f.CreationTime < cutoffDate)
                                .ToList();
+
+            if (!files.Any())
+            {
+                _logger.LogInformation("No old backups found for {GameName}", game.GameName);
+                return;
+            }
+
+            _logger.LogInformation("Found {Count} old backups to delete for {GameName}", files.Count, game.GameName);
 
             foreach (var file in files)
             {
@@ -108,28 +153,42 @@ public class BackupService : IBackupService
 
     public bool VerifyBackupPaths(GameModel game)
     {
+        if (game == null)
+            throw new ArgumentNullException(nameof(game));
+
+        var hasValidPath = false;
+
         if (!Directory.Exists(game.SavePath))
         {
             _logger.LogWarning("Save path not found for game {GameName}: {Path}", 
                 game.GameName, game.SavePath);
-            return false;
+        }
+        else
+        {
+            hasValidPath = true;
         }
 
         if (!string.IsNullOrEmpty(game.ModPath) && !Directory.Exists(game.ModPath))
         {
             _logger.LogWarning("Mod path not found for game {GameName}: {Path}", 
                 game.GameName, game.ModPath);
-            return false;
+        }
+        else if (!string.IsNullOrEmpty(game.ModPath))
+        {
+            hasValidPath = true;
         }
 
         if (!string.IsNullOrEmpty(game.AddPath) && !Directory.Exists(game.AddPath))
         {
             _logger.LogWarning("Additional path not found for game {GameName}: {Path}", 
                 game.GameName, game.AddPath);
-            return false;
+        }
+        else if (!string.IsNullOrEmpty(game.AddPath))
+        {
+            hasValidPath = true;
         }
 
-        return true;
+        return hasValidPath;
     }
 
     private async Task AddToArchiveAsync(ZipArchive archive, string sourcePath, string entryPrefix)

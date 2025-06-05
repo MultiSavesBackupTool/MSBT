@@ -67,11 +67,15 @@ public class BackupWorker : BackgroundService
             _logger.LogInformation("Starting backup process at: {time}", DateTimeOffset.Now);
             
             var games = await _gamesService.LoadGamesAsync();
+            if (games == null || !games.Any())
+            {
+                _logger.LogWarning("No games found in configuration");
+                return;
+            }
+
             var enabledGames = games.Where(g => g.IsEnabled).ToList();
-            
             _logger.LogInformation("Found {Count} enabled games for backup", enabledGames.Count);
 
-            // Check for removed games using GetGameByNameAsync
             var removedGames = new List<string>();
             foreach (var gameName in _serviceState.GamesState.Keys)
             {
@@ -105,7 +109,10 @@ public class BackupWorker : BackgroundService
             foreach (var game in enabledGames)
             {
                 if (stoppingToken.IsCancellationRequested)
+                {
+                    _logger.LogInformation("Backup process cancelled");
                     break;
+                }
 
                 var gameState = _serviceState.GamesState[game.GameName];
                 if (gameState.NextBackupScheduled > DateTime.Now)
@@ -123,22 +130,49 @@ public class BackupWorker : BackgroundService
                     continue;
                 }
 
-                await semaphore.WaitAsync(stoppingToken);
-
-                tasks.Add(Task.Run(async () =>
+                try
                 {
-                    try
+                    await semaphore.WaitAsync(stoppingToken);
+
+                    tasks.Add(Task.Run(async () =>
                     {
-                        await ProcessGameBackupAsync(game);
-                    }
-                    finally
-                    {
-                        semaphore.Release();
-                    }
-                }, stoppingToken));
+                        try
+                        {
+                            await ProcessGameBackupAsync(game);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Error processing backup for game {GameName}", game.GameName);
+                            var state = _serviceState.GamesState[game.GameName];
+                            state.Status = "Error";
+                            state.LastError = ex.Message;
+                            SaveServiceState();
+                        }
+                        finally
+                        {
+                            semaphore.Release();
+                        }
+                    }, stoppingToken));
+                }
+                catch (OperationCanceledException)
+                {
+                    _logger.LogInformation("Backup operation cancelled for game {GameName}", game.GameName);
+                    break;
+                }
             }
 
-            await Task.WhenAll(tasks);
+            if (tasks.Any())
+            {
+                try
+                {
+                    await Task.WhenAll(tasks);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error during parallel backup execution");
+                }
+            }
+
             _serviceState.LastUpdateTime = DateTime.Now;
             SaveServiceState();
             _logger.LogInformation("Backup process completed");
@@ -146,12 +180,13 @@ public class BackupWorker : BackgroundService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during backup process");
+            _serviceState.ServiceStatus = $"Error: {ex.Message}";
+            SaveServiceState();
         }
     }
 
     private async Task ProcessGameBackupAsync(GameModel game)
     {
-        // Verify that the game still exists in configuration
         var existingGame = await _gamesService.GetGameByNameAsync(game.GameName);
         if (existingGame == null)
         {
@@ -177,11 +212,14 @@ public class BackupWorker : BackgroundService
                 
                 var interval = TimeSpan.FromMinutes(game.BackupInterval);
                 gameState.NextBackupScheduled = DateTime.Now.Add(interval);
+                
+                _logger.LogInformation("Backup completed successfully for game: {GameName}", game.GameName);
             }
             else
             {
                 gameState.Status = "Path Error";
                 gameState.LastError = "Invalid backup paths";
+                _logger.LogWarning("Backup paths verification failed for game: {GameName}", game.GameName);
             }
         }
         catch (Exception ex)
@@ -189,6 +227,7 @@ public class BackupWorker : BackgroundService
             _logger.LogError(ex, "Error processing backup for game: {GameName}", game.GameName);
             gameState.Status = "Error";
             gameState.LastError = ex.Message;
+            throw; // Rethrow to be handled by the caller
         }
         finally
         {
