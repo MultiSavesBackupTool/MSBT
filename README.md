@@ -1,64 +1,81 @@
-[English](README.md) | [Русский](README.ru.md)
-
 # Multi Saves Backup Tool
 
-A tool for automatic backup of game saves with support for multiple games and customizable backup settings.
+[English](README.md) | [Русский](README.ru.md)
+
+A tool for backing up game saves with support for multiple games and automatic scheduling.
 
 ## Features
 
-- Monitor multiple games simultaneously
+- Monitor and backup saves for multiple games
 - Automatic backup scheduling
-- Customizable backup intervals
-- Compression options for backup files
-- Support for mod folders backup
-- Cleanup of old backups
-- Service-based architecture for reliable operation
+- Support for mods and additional backup paths
+- Configurable backup retention
+- Localization support (English and Russian)
 
 ## Requirements
 
 - Windows 10 or later
 - .NET 7.0 or later
-- Administrator privileges for service installation
 
 ## Installation
 
-1. Download the latest release from the releases page
-2. Extract the archive to a desired location
-3. Run the application as administrator
-4. The application will install itself as a Windows service
+1. Download the latest release from the Releases page
+2. Extract the archive to your preferred location
+3. Run MultiSavesBackupTool.exe
 
 ## Usage
 
-1. Launch the application
-2. Add games using the "Games" tab:
-   - Specify the game executable
-   - Set the save files location
-   - Configure backup settings
-3. Monitor backup status in the "Monitoring" tab
-4. Configure global settings in the "Settings" tab
+### Adding a Game
 
-## Configuration
+1. Click "Add Game" in the Games tab
+2. Fill in the required information:
+   - Game Name: A unique identifier for your game
+   - Game Executable: Path to the game's .exe file
+   - Save Location: Path to the game's save files
+3. Optional settings:
+   - Alternative Executable: Secondary .exe file if needed
+   - Mods Folder: Path to game mods
+   - Additional Backup Path: Any other folders you want to backup
+4. Configure backup settings:
+   - Backup Interval: How often to backup (1-1440 minutes)
+   - Days to Keep: How long to retain backups (0 = keep all)
+   - Old Files Action: Choose between keeping all files, moving to archive, or deleting
+   - Include Timestamp: Add date/time to backup names
+   - Backup Mode: Choose between backing up all files or only changed files
 
-### Game Settings
+### Monitoring
 
-- **Game Name**: Display name for the game
-- **Game Executable**: Path to the game's executable file
-- **Save Location**: Path to the game's save files
-- **Backup Interval**: How often to create backups
-- **Backup Settings**:
-  - Days to keep backups
-  - Compression level
-  - Include timestamps
-  - Backup all files or only changed ones
+The Monitoring tab shows:
+- Service Status: Current state of the backup service
+- Last Update: When the status was last refreshed
+- Game Status: Current state of each game's backup
+- Last Backup: When the game was last backed up
+- Next Backup: When the next backup is scheduled
 
-### Global Settings
+### Settings
 
-- **Backup Root Folder**: Where to store all backups
-- **Scan Interval**: How often to check for new saves
-- **Max Parallel Operations**: Number of simultaneous backups
-- **Compression Level**: Global compression setting
-- **Logging**: Enable/disable logging
+Global settings in the Settings tab:
+- Backup Folder: Root directory for all backups
+- Scan Interval: How often to check for needed backups
+- Max Parallel Operations: Number of simultaneous backups
+- Compression Level: Choose between Fast, Optimal, or Smallest Size
+- Enable Logging: Toggle logging functionality
+
+## Reporting Issues
+
+If you encounter any issues or have suggestions for improvements, please report them on the GitHub Issues page. Include the following information:
+
+- Description of the issue
+- Steps to reproduce
+- Expected behavior
+- Actual behavior
+- System information (OS version, .NET version)
+- Any relevant error messages or logs
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is open source. Please report any issues on GitHub Issues. 
