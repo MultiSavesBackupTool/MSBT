@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root"
-                xmlns="">
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
         <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
         <xsd:element name="root" msdata:IsDataSet="true">
             <xsd:complexType>
@@ -38,6 +37,11 @@
                     <xsd:element name="resheader">
                         <xsd:complexType>
                             <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required" />
+                        </xsd:complexType>
+                    </xsd:element>
                 </xsd:choice>
             </xsd:complexType>
         </xsd:element>
@@ -86,34 +90,34 @@
     <value>Add New Game</value>
   </data>
     <data name="AddGameOverlay_GameName" xml:space="preserve">
-    <value>Game Name</value>
+    <value>Game Name:</value>
   </data>
     <data name="AddGameOverlay_GameExe" xml:space="preserve">
-    <value>Game executable file (e.g., NMS.exe)</value>
+    <value>Game Executable:</value>
   </data>
     <data name="AddGameOverlay_Browse" xml:space="preserve">
     <value>Browse</value>
   </data>
     <data name="AddGameOverlay_GameExeAlt" xml:space="preserve">
-    <value>Alternative executable file (optional)</value>
+    <value>Alternative Game Executable:</value>
   </data>
     <data name="AddGameOverlay_SaveLocation" xml:space="preserve">
-    <value>Save files location</value>
+    <value>Save Location:</value>
   </data>
     <data name="AddGameOverlay_ModPath" xml:space="preserve">
-    <value>Mods folder (optional)</value>
+    <value>Mod Path:</value>
   </data>
     <data name="AddGameOverlay_AddPath" xml:space="preserve">
-    <value>Additional backup path (optional)</value>
+    <value>Add Path</value>
   </data>
     <data name="AddGameOverlay_BackupInterval" xml:space="preserve">
-    <value>Backup interval (in minutes):</value>
+    <value>Backup Interval (minutes):</value>
   </data>
     <data name="AddGameOverlay_BackupIntervalHint" xml:space="preserve">
-    <value>From 1 minute to 24 hours (1440 minutes)</value>
+    <value>How often to check for changes and create backups</value>
   </data>
     <data name="AddGameOverlay_BackupSettings" xml:space="preserve">
-    <value>Backup settings:</value>
+    <value>Backup Settings</value>
   </data>
     <data name="AddGameOverlay_DaysToKeep" xml:space="preserve">
     <value>Days to keep backups (0 - keep all)</value>
