@@ -28,7 +28,7 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: Publish MultiSavesBackup.Service
-        shell: pwsh
+        shell: powershell
         run: |
           dotnet publish "MultiSavesBackup.Service/MultiSavesBackup.Service.csproj" `
             -c Release -r win-x64 --self-contained true `
@@ -36,7 +36,7 @@ jobs:
             -o "publish/release/service"
 
       - name: Publish Multi Saves Backup Tool
-        shell: pwsh
+        shell: powershell
         run: |
           dotnet publish ".\Multi Saves Backup Tool\Multi Saves Backup Tool.csproj" `
             -c Release -r win-x64 --self-contained true `
