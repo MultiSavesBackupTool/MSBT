@@ -4,37 +4,38 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:Multi_Saves_Backup_Tool.ViewModels"
              xmlns:models="using:Multi_Saves_Backup_Tool.Models"
+             xmlns:properties="clr-namespace:Properties"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Multi_Saves_Backup_Tool.Views.SettingsView"
              x:DataType="vm:SettingsViewModel">
     <ScrollViewer>
         <StackPanel Spacing="10" Margin="20">
-            <TextBlock Text="Backup Settings" Classes="h2" />
+            <TextBlock Text="{x:Static properties:Resources.SettingsView_BackupSettings}" Classes="h2" />
 
             <StackPanel Margin="0,10">
-                <TextBlock Text="Backup folder:" Margin="0,0,0,5" />
+                <TextBlock Text="{x:Static properties:Resources.SettingsView_BackupFolder}" Margin="0,0,0,5" />
                 <Grid ColumnDefinitions="*, Auto">
                     <TextBox Text="{Binding Settings.BackupSettings.BackupRootFolder}"
                              Margin="0,0,10,0" />
-                    <Button Grid.Column="1" Content="Browse"
+                    <Button Grid.Column="1" Content="{x:Static properties:Resources.SettingsView_Browse}"
                             Command="{Binding BrowseBackupFolderCommand}" />
                 </Grid>
 
-                <TextBlock Text="Scan interval (minutes):" Margin="0,10,0,5" />
+                <TextBlock Text="{x:Static properties:Resources.SettingsView_ScanInterval}" Margin="0,10,0,5" />
                 <NumericUpDown Value="{Binding Settings.BackupSettings.ScanIntervalMinutes, Mode=TwoWay}"
                                Minimum="1"
                                Maximum="1440"
                                Increment="1"
                                FormatString="0" />
 
-                <TextBlock Text="Maximum parallel operations:" Margin="0,10,0,5" />
+                <TextBlock Text="{x:Static properties:Resources.SettingsView_MaxParallelOperations}" Margin="0,10,0,5" />
                 <NumericUpDown Value="{Binding Settings.BackupSettings.MaxParallelBackups, Mode=TwoWay}"
                                Minimum="1"
                                Maximum="10"
                                Increment="1"
                                FormatString="0" />
 
-                <TextBlock Text="Compression level:" Margin="0,10,0,5" />
+                <TextBlock Text="{x:Static properties:Resources.SettingsView_CompressionLevel}" Margin="0,10,0,5" />
                 <ComboBox SelectedItem="{Binding Settings.BackupSettings.CompressionLevel}"
                           HorizontalAlignment="Stretch">
                     <ComboBox.ItemTemplate>
@@ -50,28 +51,15 @@
             </StackPanel>
 
             <StackPanel Margin="0,10">
-                <TextBlock Text="Logging Settings" Classes="h3" />
-                <CheckBox Content="Enable logging"
+                <TextBlock Text="{x:Static properties:Resources.SettingsView_LoggingSettings}" Classes="h3" />
+                <CheckBox Content="{x:Static properties:Resources.SettingsView_EnableLogging}"
                           IsChecked="{Binding Settings.BackupSettings.EnableLogging}" />
             </StackPanel>
 
-            <!-- <StackPanel Margin="0,10">
-                <TextBlock Text="Notification Settings" Classes="h3"/>
-                <CheckBox Content="Enable notifications"
-                          IsChecked="{Binding Settings.BackupSettings.NotificationSettings.EnableNotifications}"/>
-
-                <StackPanel Margin="20,5"
-                           IsEnabled="{Binding Settings.BackupSettings.NotificationSettings.EnableNotifications}">
-                    <CheckBox Content="Show error notifications"
-                              IsChecked="{Binding Settings.BackupSettings.NotificationSettings.ShowErrorNotifications}"/>
-                    <CheckBox Content="Show success notifications"
-                              IsChecked="{Binding Settings.BackupSettings.NotificationSettings.ShowSuccessNotifications}"/>
-                </StackPanel>
-            </StackPanel> -->
-
             <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0"
                         HorizontalAlignment="Right">
-                <Button Content="Save" Command="{Binding SaveCurrentSettingsCommand}" />
+                <Button Content="{x:Static properties:Resources.SettingsView_Save}"
+                        Command="{Binding SaveCurrentSettingsCommand}" />
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

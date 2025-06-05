@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root"
+                xmlns="">
+        <xsd:element name="root" msdata:IsDataSet="true">
+            <xsd:complexType>
+                <xsd:choice maxOccurs="unbounded">
+                    <xsd:element name="data">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1"/>
+                            <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+                            <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:choice>
+            </xsd:complexType>
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>2.0</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+
+    <!-- MainWindow strings -->
+    <data name="MainWindow_Title" xml:space="preserve">
+    <value>Multi Saves Backup Tool</value>
+  </data>
+    <data name="MainWindow_Monitoring" xml:space="preserve">
+    <value>Monitoring</value>
+  </data>
+    <data name="MainWindow_Games" xml:space="preserve">
+    <value>Games</value>
+  </data>
+    <data name="MainWindow_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+
+    <!-- GamesView strings -->
+    <data name="GamesView_AddGame" xml:space="preserve">
+    <value>Add Game</value>
+  </data>
+    <data name="GamesView_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+
+    <!-- AddGameOverlay strings -->
+    <data name="AddGameOverlay_Title" xml:space="preserve">
+    <value>Add New Game</value>
+  </data>
+    <data name="AddGameOverlay_GameName" xml:space="preserve">
+    <value>Game Name</value>
+  </data>
+    <data name="AddGameOverlay_GameExe" xml:space="preserve">
+    <value>Game executable file (e.g., NMS.exe)</value>
+  </data>
+    <data name="AddGameOverlay_Browse" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+    <data name="AddGameOverlay_GameExeAlt" xml:space="preserve">
+    <value>Alternative executable file (optional)</value>
+  </data>
+    <data name="AddGameOverlay_SaveLocation" xml:space="preserve">
+    <value>Save files location</value>
+  </data>
+    <data name="AddGameOverlay_ModPath" xml:space="preserve">
+    <value>Mods folder (optional)</value>
+  </data>
+    <data name="AddGameOverlay_AddPath" xml:space="preserve">
+    <value>Additional backup path (optional)</value>
+  </data>
+    <data name="AddGameOverlay_BackupInterval" xml:space="preserve">
+    <value>Backup interval (in minutes):</value>
+  </data>
+    <data name="AddGameOverlay_BackupIntervalHint" xml:space="preserve">
+    <value>From 1 minute to 24 hours (1440 minutes)</value>
+  </data>
+    <data name="AddGameOverlay_BackupSettings" xml:space="preserve">
+    <value>Backup settings:</value>
+  </data>
+    <data name="AddGameOverlay_DaysToKeep" xml:space="preserve">
+    <value>Days to keep backups (0 - keep all)</value>
+  </data>
+    <data name="AddGameOverlay_KeepAllFiles" xml:space="preserve">
+    <value>Keep all files</value>
+  </data>
+    <data name="AddGameOverlay_MoveToArchive" xml:space="preserve">
+    <value>Move to archive</value>
+  </data>
+    <data name="AddGameOverlay_DeletePermanently" xml:space="preserve">
+    <value>Delete permanently</value>
+  </data>
+    <data name="AddGameOverlay_IncludeTimestamp" xml:space="preserve">
+    <value>Include timestamp in archive name</value>
+  </data>
+    <data name="AddGameOverlay_BackupAllFiles" xml:space="preserve">
+    <value>Backup all files</value>
+  </data>
+    <data name="AddGameOverlay_BackupChangedFiles" xml:space="preserve">
+    <value>Backup only changed files</value>
+  </data>
+    <data name="AddGameOverlay_Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+    <data name="AddGameOverlay_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+
+    <!-- MonitoringView strings -->
+    <data name="MonitoringView_ServiceStatus" xml:space="preserve">
+    <value>Service Status:</value>
+  </data>
+    <data name="MonitoringView_LastUpdate" xml:space="preserve">
+    <value>Last Update:</value>
+  </data>
+    <data name="MonitoringView_GameName" xml:space="preserve">
+    <value>Game Name</value>
+  </data>
+    <data name="MonitoringView_Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+    <data name="MonitoringView_LastBackup" xml:space="preserve">
+    <value>Last Backup</value>
+  </data>
+    <data name="MonitoringView_NextBackup" xml:space="preserve">
+    <value>Next Backup</value>
+  </data>
+
+    <!-- SettingsView strings -->
+    <data name="SettingsView_BackupSettings" xml:space="preserve">
+    <value>Backup Settings</value>
+  </data>
+    <data name="SettingsView_BackupFolder" xml:space="preserve">
+    <value>Backup folder:</value>
+  </data>
+    <data name="SettingsView_Browse" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+    <data name="SettingsView_ScanInterval" xml:space="preserve">
+    <value>Scan interval (minutes):</value>
+  </data>
+    <data name="SettingsView_MaxParallelOperations" xml:space="preserve">
+    <value>Maximum parallel operations:</value>
+  </data>
+    <data name="SettingsView_CompressionLevel" xml:space="preserve">
+    <value>Compression level:</value>
+  </data>
+    <data name="SettingsView_LoggingSettings" xml:space="preserve">
+    <value>Logging Settings</value>
+  </data>
+    <data name="SettingsView_EnableLogging" xml:space="preserve">
+    <value>Enable logging</value>
+  </data>
+    <data name="SettingsView_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+
+    <!-- Status strings -->
+    <data name="StatusSuccess" xml:space="preserve">
+    <value>Success</value>
+  </data>
+    <data name="StatusWaiting" xml:space="preserve">
+    <value>Waiting</value>
+  </data>
+    <data name="StatusBackingUp" xml:space="preserve">
+    <value>Backing up</value>
+  </data>
+    <data name="StatusCleaning" xml:space="preserve">
+    <value>Cleaning old backups</value>
+  </data>
+    <data name="StatusDisabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+    <data name="StatusRunning" xml:space="preserve">
+    <value>Running</value>
+  </data>
+    <data name="StatusStopped" xml:space="preserve">
+    <value>Stopped</value>
+  </data>
+    <data name="StatusUnknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+    <data name="StatusServiceNotRunning" xml:space="preserve">
+    <value>Service Not Running</value>
+  </data>
+    <data name="StatusConnectionError" xml:space="preserve">
+    <value>Connection error: {0}</value>
+  </data>
+    <data name="NoData" xml:space="preserve">
+    <value>No data</value>
+  </data>
+    <data name="NotScheduled" xml:space="preserve">
+    <value>Not scheduled</value>
+  </data>
+    <data name="StatusServiceRunning" xml:space="preserve">
+    <value>Running</value>
+  </data>
+    <data name="StatusServiceStopped" xml:space="preserve">
+    <value>Stopped</value>
+  </data>
+    <data name="StatusServiceSuccess" xml:space="preserve">
+    <value>Success</value>
+  </data>
+    <data name="StatusServiceBackingUp" xml:space="preserve">
+    <value>Backing up</value>
+  </data>
+    <data name="StatusServiceCleaning" xml:space="preserve">
+    <value>Cleaning</value>
+  </data>
+
+    <!-- Error messages -->
+    <data name="ErrorGameNameRequired" xml:space="preserve">
+    <value>Game name is required</value>
+  </data>
+    <data name="ErrorGameExeRequired" xml:space="preserve">
+    <value>Game executable path is required</value>
+  </data>
+    <data name="ErrorSaveLocationRequired" xml:space="preserve">
+    <value>Save location is required</value>
+  </data>
+    <data name="ErrorLoadingSettings" xml:space="preserve">
+    <value>Error loading settings</value>
+  </data>
+    <data name="ErrorSavingSettings" xml:space="preserve">
+    <value>Error saving settings</value>
+  </data>
+
+    <!-- Dialog strings -->
+    <data name="DialogSelectGameExe" xml:space="preserve">
+    <value>Select Game Executable</value>
+  </data>
+    <data name="DialogExecutableFiles" xml:space="preserve">
+    <value>Executable Files (*.exe)|*.exe|All Files (*.*)|*.*</value>
+  </data>
+    <data name="DialogSelectFolder" xml:space="preserve">
+    <value>Select Folder</value>
+  </data>
+    <data name="DialogSelectBackupFolder" xml:space="preserve">
+    <value>Select Backup Folder</value>
+  </data>
+
+    <!-- Compression level strings -->
+    <data name="CompressionLevel_Fast" xml:space="preserve">
+    <value>Fast</value>
+  </data>
+    <data name="CompressionLevel_Optimal" xml:space="preserve">
+    <value>Optimal</value>
+  </data>
+    <data name="CompressionLevel_SmallestSize" xml:space="preserve">
+    <value>Smallest Size</value>
+  </data>
+</root> 

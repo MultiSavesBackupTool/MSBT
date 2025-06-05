@@ -5,11 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ui="using:FluentAvalonia.UI.Controls"
         xmlns:views="clr-namespace:Multi_Saves_Backup_Tool.Views"
+        xmlns:properties="clr-namespace:Properties"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Multi_Saves_Backup_Tool.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Multi Saves Backup Tool"
+        Title="{x:Static properties:Resources.MainWindow_Title}"
         MinHeight="600"
         MinWidth="860"
         WindowStartupLocation="CenterScreen"
@@ -31,16 +32,16 @@
                                IsSettingsVisible="False">
 
                 <ui:NavigationView.MenuItems>
-                    <ui:NavigationViewItem Content="Monitoring"
+                    <ui:NavigationViewItem Content="{x:Static properties:Resources.MainWindow_Monitoring}"
                                            IconSource="Home"
                                            Tag="monitoring" />
-                    <ui:NavigationViewItem Content="Games"
+                    <ui:NavigationViewItem Content="{x:Static properties:Resources.MainWindow_Games}"
                                            IconSource="Games"
                                            Tag="games" />
                 </ui:NavigationView.MenuItems>
 
                 <ui:NavigationView.FooterMenuItems>
-                    <ui:NavigationViewItem Content="Settings"
+                    <ui:NavigationViewItem Content="{x:Static properties:Resources.MainWindow_Settings}"
                                            IconSource="Settings"
                                            Tag="settings" />
                 </ui:NavigationView.FooterMenuItems>

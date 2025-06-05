@@ -1,58 +1,64 @@
+[English](README.md) | [Русский](README.ru.md)
+
 # Multi Saves Backup Tool
 
-A tool for automatic game save backup with flexible settings and real-time monitoring.
+A tool for automatic backup of game saves with support for multiple games and customizable backup settings.
 
 ## Features
 
-- 🎮 Support for multiple games
-- 🔄 Automatic background backup
-- ⚙️ Customizable backup intervals for each game
-- 📂 Ability to backup multiple folders for a single game:
-  - Saves
-  - Mods
-  - Additional files
-- ⏱️ Configurable backup retention period
-- 💾 Backup compression to save space
-- 🖥️ Modern user interface using Avalonia UI
+- Monitor multiple games simultaneously
+- Automatic backup scheduling
+- Customizable backup intervals
+- Compression options for backup files
+- Support for mod folders backup
+- Cleanup of old backups
+- Service-based architecture for reliable operation
 
-## System Requirements
+## Requirements
 
-- Windows
-- .NET 9.0 or higher
+- Windows 10 or later
+- .NET 7.0 or later
+- Administrator privileges for service installation
 
 ## Installation
 
-1. Download the latest version of the installer (`MultiSavesBackupSetup.exe`)
-2. Run the installer and follow the instructions
-3. After installation, the program will start automatically
+1. Download the latest release from the releases page
+2. Extract the archive to a desired location
+3. Run the application as administrator
+4. The application will install itself as a Windows service
 
 ## Usage
-### Adding a Game
 
-1. Go to the "Games" tab
-2. Click the add new game button
-3. Specify:
-   - Game name
-   - Path to game executable
-   - Path to saves folder
-   - (Optional) Path to mods folder
-   - (Optional) Additional backup folder
-   - Backup interval
-   - Backup retention period
+1. Launch the application
+2. Add games using the "Games" tab:
+   - Specify the game executable
+   - Set the save files location
+   - Configure backup settings
+3. Monitor backup status in the "Monitoring" tab
+4. Configure global settings in the "Settings" tab
 
-### Monitoring
+## Configuration
 
-In the "Monitoring" tab, you can track:
-- Backup status for each game
-- Time of the last backup
-- Number of saved copies
+### Game Settings
 
-### Settings
+- **Game Name**: Display name for the game
+- **Game Executable**: Path to the game's executable file
+- **Save Location**: Path to the game's save files
+- **Backup Interval**: How often to create backups
+- **Backup Settings**:
+  - Days to keep backups
+  - Compression level
+  - Include timestamps
+  - Backup all files or only changed ones
 
-In the settings section, you can configure:
-- Backup compression level
-- General application parameters
+### Global Settings
 
-## Technical Support
+- **Backup Root Folder**: Where to store all backups
+- **Scan Interval**: How often to check for new saves
+- **Max Parallel Operations**: Number of simultaneous backups
+- **Compression Level**: Global compression setting
+- **Logging**: Enable/disable logging
 
-If you encounter any issues or have questions, create an issue in the project repository.
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details. 

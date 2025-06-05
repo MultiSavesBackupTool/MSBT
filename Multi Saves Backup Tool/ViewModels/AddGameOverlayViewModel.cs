@@ -4,6 +4,7 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Multi_Saves_Backup_Tool.Models;
+using Properties;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
 
@@ -38,6 +39,8 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     [ObservableProperty] private string _saveLocation = string.Empty;
 
     [ObservableProperty] private string _saveLocationError = string.Empty;
+
+    [ObservableProperty] private string _errorMessage = string.Empty;
 
     public AddGameOverlayViewModel(GamesViewModel gamesViewModel)
     {
@@ -96,34 +99,35 @@ public partial class AddGameOverlayViewModel : ViewModelBase
 
     private bool ValidateForm()
     {
-        ClearErrors();
-        var isValid = true;
-
         if (string.IsNullOrWhiteSpace(GameName))
         {
-            GameNameError = "Game name is required";
-            isValid = false;
+            ErrorMessage = Resources.ErrorGameNameRequired;
+            return false;
         }
 
         if (string.IsNullOrWhiteSpace(GameExe))
         {
-            GameExeError = "Game executable path is required";
-            isValid = false;
+            ErrorMessage = Resources.ErrorGameExeRequired;
+            return false;
         }
 
         if (string.IsNullOrWhiteSpace(SaveLocation))
         {
-            SaveLocationError = "Save location is required";
-            isValid = false;
+            ErrorMessage = Resources.ErrorSaveLocationRequired;
+            return false;
         }
 
-        return isValid;
+        ErrorMessage = string.Empty;
+        return true;
     }
 
     [RelayCommand]
-    private void Add()
+    private void AddGame()
     {
-        if (!ValidateForm()) return;
+        if (!ValidateForm())
+        {
+            return;
+        }
 
         var newGame = new GameModel
         {

@@ -5,6 +5,7 @@ using System.IO;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Properties;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
 
@@ -12,7 +13,7 @@ public class LocalServiceState
 {
     public DateTime LastUpdateTime { get; set; }
     public Dictionary<string, LocalGameState> GamesState { get; set; } = new();
-    public string ServiceStatus { get; set; } = "Running";
+    public string ServiceStatus { get; set; } = Resources.StatusServiceRunning;
 
     public static LocalServiceState LoadFromFile(string path)
     {
@@ -28,28 +29,29 @@ public class LocalGameState
 {
     public string GameName { get; set; } = "";
     public DateTime? LastBackupTime { get; set; }
-    public string Status { get; set; } = "Waiting";
+    public string Status { get; set; } = Resources.StatusServiceRunning;
     public DateTime? NextBackupScheduled { get; set; }
 }
 
 public class GameMonitoringInfo
 {
     public string GameName { get; set; } = "";
-    public string LastBackupTime { get; set; } = "No data";
-    public string Status { get; set; } = "Waiting";
-    public string NextBackupScheduled { get; set; } = "Not scheduled";
+    public string LastBackupTime { get; set; } = Resources.NoData;
+    public string Status { get; set; } = Resources.StatusWaiting;
+    public string NextBackupScheduled { get; set; } = Resources.NotScheduled;
 }
 
-public class MonitoringViewModel : ViewModelBase
+public class MonitoringViewModel : ViewModelBase, IDisposable
 {
     private readonly CancellationTokenSource _cancellationTokenSource;
+    private readonly Task _monitoringTask;
     private DateTime _lastUpdateTime;
-    private string _serviceStatus = "Unknown";
+    private string _serviceStatus = Resources.StatusUnknown;
 
     public MonitoringViewModel()
     {
         _cancellationTokenSource = new CancellationTokenSource();
-        _ = StartMonitoring(_cancellationTokenSource.Token);
+        _monitoringTask = StartMonitoring(_cancellationTokenSource.Token);
     }
 
     public ObservableCollection<GameMonitoringInfo> Games { get; } = new();
@@ -61,6 +63,20 @@ public class MonitoringViewModel : ViewModelBase
     }
 
     public string LastUpdateTime => _lastUpdateTime.ToString("g");
+
+    public void Dispose()
+    {
+        _cancellationTokenSource.Cancel();
+        try
+        {
+            _monitoringTask.Wait(TimeSpan.FromSeconds(5));
+        }
+        catch (AggregateException)
+        {
+            // Task was canceled, which is expected
+        }
+        _cancellationTokenSource.Dispose();
+    }
 
     private async Task StartMonitoring(CancellationToken cancellationToken)
     {
@@ -85,7 +101,7 @@ public class MonitoringViewModel : ViewModelBase
             var statePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "service_state.json");
             if (!File.Exists(statePath))
             {
-                ServiceStatus = "Service not running";
+                ServiceStatus = Resources.StatusServiceNotRunning;
                 return;
             }
 
@@ -94,9 +110,9 @@ public class MonitoringViewModel : ViewModelBase
 
             ServiceStatus = state.ServiceStatus switch
             {
-                "Running" => "Running",
-                "Stopped" => "Stopped",
-                _ => "Unknown"
+                var s when s == Resources.StatusServiceRunning => Resources.StatusRunning,
+                var s when s == Resources.StatusServiceStopped => Resources.StatusStopped,
+                _ => Resources.StatusUnknown
             };
 
             _lastUpdateTime = state.LastUpdateTime;
@@ -109,26 +125,20 @@ public class MonitoringViewModel : ViewModelBase
                     GameName = gameState.GameName,
                     Status = gameState.Status switch
                     {
-                        "Success" => "Success",
-                        "Waiting" => "Waiting",
-                        "Backing up" => "Backing up",
-                        "Cleaning" => "Cleaning old backups",
+                        var s when s == Resources.StatusServiceSuccess => Resources.StatusSuccess,
+                        var s when s == Resources.StatusServiceRunning => Resources.StatusWaiting,
+                        var s when s == Resources.StatusServiceBackingUp => Resources.StatusBackingUp,
+                        var s when s == Resources.StatusServiceCleaning => Resources.StatusCleaning,
                         _ => gameState.Status
                     },
-                    LastBackupTime = gameState.LastBackupTime?.ToString("g") ?? "No data",
-                    NextBackupScheduled = gameState.NextBackupScheduled?.ToString("g") ?? "Not scheduled"
+                    LastBackupTime = gameState.LastBackupTime?.ToString("g") ?? Resources.NoData,
+                    NextBackupScheduled = gameState.NextBackupScheduled?.ToString("g") ?? Resources.NotScheduled
                 });
         }
         catch (Exception ex)
         {
-            ServiceStatus = $"Connection error: {ex.Message}";
+            ServiceStatus = string.Format(Resources.StatusConnectionError, ex.Message);
             Console.WriteLine($"Error updating state: {ex}");
         }
-    }
-
-    public void Dispose()
-    {
-        _cancellationTokenSource.Cancel();
-        _cancellationTokenSource.Dispose();
     }
 }

@@ -66,10 +66,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Services\"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <EmbeddedResource Update="Resources\Resources.resx">
             <LastGenOutput>Resources.Designer.cs</LastGenOutput>
         </EmbeddedResource>

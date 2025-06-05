@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
 using Multi_Saves_Backup_Tool.Models;
+using Properties;
 
 namespace Multi_Saves_Backup_Tool.Converters;
 
@@ -12,9 +13,9 @@ public class CompressionLevelConverter : IValueConverter
         if (value is CompressionLevel level)
             return level switch
             {
-                CompressionLevel.Fastest => "Fast",
-                CompressionLevel.Optimal => "Optimal",
-                CompressionLevel.SmallestSize => "Smallest Size",
+                CompressionLevel.Fastest => Resources.CompressionLevel_Fast,
+                CompressionLevel.Optimal => Resources.CompressionLevel_Optimal,
+                CompressionLevel.SmallestSize => Resources.CompressionLevel_SmallestSize,
                 _ => level.ToString()
             };
         return null;
@@ -25,9 +26,9 @@ public class CompressionLevelConverter : IValueConverter
         if (value is string stringValue)
             return stringValue switch
             {
-                "Fast" => CompressionLevel.Fastest,
-                "Optimal" => CompressionLevel.Optimal,
-                "Smallest Size" => CompressionLevel.SmallestSize,
+                var s when s == Resources.CompressionLevel_Fast => CompressionLevel.Fastest,
+                var s when s == Resources.CompressionLevel_Optimal => CompressionLevel.Optimal,
+                var s when s == Resources.CompressionLevel_SmallestSize => CompressionLevel.SmallestSize,
                 _ => Enum.TryParse<CompressionLevel>(stringValue, out var level) ? level : null
             };
         return null;

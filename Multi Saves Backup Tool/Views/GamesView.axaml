@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:Multi_Saves_Backup_Tool.ViewModels"
              xmlns:models="using:Multi_Saves_Backup_Tool.Models"
+             xmlns:properties="clr-namespace:Properties"
              x:DataType="vm:GamesViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Multi_Saves_Backup_Tool.Views.GamesView">
@@ -13,7 +14,7 @@
     </Design.DataContext>
 
     <DockPanel>
-        <Button Content="Add Game"
+        <Button Content="{x:Static properties:Resources.GamesView_AddGame}"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Click="AddGameButton_Click"
@@ -39,7 +40,7 @@
                                                Opacity="0.7" />
                                 </StackPanel>
                                 <Button Grid.Column="2"
-                                        Content="Delete"
+                                        Content="{x:Static properties:Resources.GamesView_Delete}"
                                         Command="{Binding ((vm:GamesViewModel)DataContext).DeleteGameCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                         CommandParameter="{Binding}"
                                         Padding="8,4" />
