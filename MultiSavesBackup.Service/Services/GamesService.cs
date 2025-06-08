@@ -92,17 +92,18 @@ public class GamesService : IGamesService, IDisposable
                 }
 
                 var json = await File.ReadAllTextAsync(gamesPath);
-                var games = JsonSerializer.Deserialize<List<GameModel>>(json, new JsonSerializerOptions
+                var gameDict = JsonSerializer.Deserialize<Dictionary<string, GameModel>>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });
 
-                if (games == null)
+                if (gameDict == null)
                 {
                     _logger.LogError("Failed to deserialize games from {Path}", gamesPath);
                     return Array.Empty<GameModel>();
                 }
 
+                var games = gameDict.Values.ToList();
                 _cachedGames = games;
                 _logger.LogInformation("Successfully loaded {Count} games from configuration", games.Count);
                 return games;
