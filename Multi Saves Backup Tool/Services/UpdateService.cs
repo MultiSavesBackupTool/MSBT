@@ -8,7 +8,9 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
+using FluentAvalonia.UI.Controls;
 using Microsoft.Win32;
+using Properties;
 
 namespace Multi_Saves_Backup_Tool.Services
 {
@@ -144,6 +146,12 @@ namespace Multi_Saves_Backup_Tool.Services
 
         public async Task<bool> DownloadAndInstallUpdateAsync(string downloadUrl)
         {
+            var dialog = new ContentDialog
+            {
+                Title = Resources.UpdateWarningTitle,
+                Content = Resources.UpdateWarningContent,
+            };
+            
             if (string.IsNullOrWhiteSpace(downloadUrl))
             {
                 Debug.WriteLine("Download URL is empty. Cannot download update.");
@@ -166,6 +174,9 @@ namespace Multi_Saves_Backup_Tool.Services
                 var tempFile = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}_{fileName}");
                 
                 Debug.WriteLine($"Downloading update from {downloadUrl} to {tempFile}");
+
+                await dialog.ShowAsync();
+                
                 var response = await _httpClient.GetAsync(downloadUrl);
                 response.EnsureSuccessStatusCode();
                 Debug.WriteLine($"Download response status: {response.StatusCode}");
@@ -192,6 +203,7 @@ namespace Multi_Saves_Backup_Tool.Services
                     if (process == null)
                     {
                         Debug.WriteLine("Failed to start the installer process");
+                        dialog.Hide();
                         return false;
                     }
                     
@@ -205,6 +217,7 @@ namespace Multi_Saves_Backup_Tool.Services
                     Debug.WriteLine($"Failed to start installer (possibly due to UAC): {ex.Message}");
                     Debug.WriteLine($"Error code: {ex.NativeErrorCode}");
                     Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+                    dialog.Hide();
                     return false;
                 }
             }
@@ -212,18 +225,21 @@ namespace Multi_Saves_Backup_Tool.Services
             {
                 Debug.WriteLine($"HTTP error downloading update: {ex.Message}");
                 Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+                dialog.Hide();
                 return false;
             }
             catch (IOException ex)
             {
                 Debug.WriteLine($"IO error saving update: {ex.Message}");
                 Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+                dialog.Hide();
                 return false;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error downloading or installing update: {ex.Message}");
                 Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+                dialog.Hide();
                 return false;
             }
         }

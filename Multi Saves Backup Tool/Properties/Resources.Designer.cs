@@ -72,62 +72,6 @@ namespace Properties
                 return ResourceManager.GetString("MainWindow_Settings", resourceCulture);
             }
         }
-
-        public static string MainWindow_UpdateError_General
-        {
-            get
-            {
-                return ResourceManager.GetString("MainWindow_UpdateError_General", resourceCulture);
-            }
-        }
-
-        public static string MainWindow_DownloadingUpdate
-        {
-            get
-            {
-                return ResourceManager.GetString("MainWindow_DownloadingUpdate", resourceCulture);
-            }
-        }
-
-        public static string MainWindow_UpdateError_Install
-        {
-            get
-            {
-                return ResourceManager.GetString("MainWindow_UpdateError_Install", resourceCulture);
-            }
-        }
-
-        public static string MainWindow_CheckForUpdates
-        {
-            get
-            {
-                return ResourceManager.GetString("MainWindow_CheckForUpdates", resourceCulture);
-            }
-        }
-
-        public static string MainWindow_UpdateAvailable
-        {
-            get
-            {
-                return ResourceManager.GetString("MainWindow_UpdateAvailable", resourceCulture);
-            }
-        }
-
-        public static string MainWindow_NoUpdates
-        {
-            get
-            {
-                return ResourceManager.GetString("MainWindow_NoUpdates", resourceCulture);
-            }
-        }
-
-        public static string MainWindow_UpdateError
-        {
-            get
-            {
-                return ResourceManager.GetString("MainWindow_UpdateError", resourceCulture);
-            }
-        }
         #endregion
 
         #region MonitoringView strings
@@ -449,14 +393,6 @@ namespace Properties
             }
         }
 
-        public static string SettingsView_CheckForUpdates
-        {
-            get
-            {
-                return ResourceManager.GetString("SettingsView_CheckForUpdates", resourceCulture);
-            }
-        }
-
         public static string SettingsView_CurrentVersion
         {
             get
@@ -768,6 +704,24 @@ namespace Properties
             get
             {
                 return ResourceManager.GetString("DeleteConfirmation_Cancel", resourceCulture);
+            }
+        }
+        #endregion
+        
+        #region Update
+        public static string UpdateWarningTitle
+        {
+            get
+            {
+                return ResourceManager.GetString("UpdateWarningTitle", resourceCulture);
+            }
+        }
+
+        public static string UpdateWarningContent
+        {
+            get
+            {
+                return ResourceManager.GetString("UpdateWarningContent", resourceCulture);
             }
         }
         #endregion
