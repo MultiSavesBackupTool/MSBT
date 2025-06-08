@@ -64,6 +64,8 @@ public partial class MainWindowViewModel : ViewModelBase
             _updateDownloadUrl = downloadUrl;
             UpdateMessage = string.Format(Resources.MainWindow_UpdateAvailable, latestVersion);
             Debug.WriteLine($"Update available: {latestVersion}, URL: {downloadUrl}");
+            
+            await DownloadAndInstallUpdateAsync();
         }
         else if (hasUpdate)
         {
@@ -95,9 +97,19 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Debug.WriteLine("DownloadAndInstallUpdateCommand executed.");
         UpdateMessage = Resources.MainWindow_DownloadingUpdate;
-        bool success = await _updateService.DownloadAndInstallUpdateAsync(_updateDownloadUrl);
-        if (!success)
+        try 
         {
+            bool success = await _updateService.DownloadAndInstallUpdateAsync(_updateDownloadUrl);
+            if (!success)
+            {
+                UpdateMessage = Resources.MainWindow_UpdateError_Install;
+                IsUpdateAvailable = true;
+                Debug.WriteLine("Update installation failed. Please try running the application as administrator.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error during update installation: {ex.Message}");
             UpdateMessage = Resources.MainWindow_UpdateError_Install;
             IsUpdateAvailable = true;
         }
