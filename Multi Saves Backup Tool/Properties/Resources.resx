@@ -198,6 +198,15 @@
     <data name="SettingsView_Save" xml:space="preserve">
     <value>Save</value>
   </data>
+    <data name="BrowseBackupFolderTitle" xml:space="preserve">
+    <value>Select backup folder</value>
+  </data>
+    <data name="ExportTitle" xml:space="preserve">
+    <value>Export Settings</value>
+  </data>
+    <data name="ImportTitle" xml:space="preserve">
+    <value>Import Settings</value>
+  </data>
 
     <!-- Status strings -->
     <data name="StatusSuccess" xml:space="preserve">

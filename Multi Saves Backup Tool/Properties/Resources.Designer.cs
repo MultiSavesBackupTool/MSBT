@@ -400,6 +400,30 @@ namespace Properties
                 return ResourceManager.GetString("SettingsView_CurrentVersion", resourceCulture);
             }
         }
+        
+        public static string BrowseBackupFolderTitle
+        {
+            get
+            {
+                return ResourceManager.GetString("BrowseBackupFolderTitle", resourceCulture);
+            }
+        }
+
+        public static string ExportTitle
+        {
+            get
+            {
+                return ResourceManager.GetString("ExportTitle", resourceCulture);
+            }
+        }
+
+        public static string ImportTitle
+        {
+            get
+            {
+                return ResourceManager.GetString("ImportTitle", resourceCulture);
+            }
+        }
         #endregion
 
         #region Status strings

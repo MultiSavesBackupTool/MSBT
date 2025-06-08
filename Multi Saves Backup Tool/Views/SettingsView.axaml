@@ -58,6 +58,10 @@
 
             <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0"
                         HorizontalAlignment="Right">
+                <Button Content="{x:Static properties:Resources.ExportTitle}"
+                        Command="{Binding ExportSettingsCommand}" />
+                <Button Content="{x:Static properties:Resources.ImportTitle}"
+                        Command="{Binding ImportSettingsCommand}" />
                 <Button Content="{x:Static properties:Resources.SettingsView_Save}"
                         Command="{Binding SaveCurrentSettingsCommand}" />
             </StackPanel>

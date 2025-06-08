@@ -196,7 +196,13 @@
     <value>Включить журналирование</value>
   </data>
     <data name="SettingsView_Save" xml:space="preserve">
-    <value>Сохранить</value>
+    <value>Выберите папку резервного копирования</value>
+  </data>
+    <data name="ExportTitle" xml:space="preserve">
+    <value>Экспортировать настройки</value>
+  </data>
+    <data name="ImportTitle" xml:space="preserve">
+    <value>Импортировать настройки</value>
   </data>
 
     <!-- Status strings -->
