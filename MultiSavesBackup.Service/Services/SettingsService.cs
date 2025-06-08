@@ -18,8 +18,6 @@ public class SettingsService : ISettingsService, IDisposable
     private readonly ILogger<SettingsService> _logger;
     private readonly FileSystemWatcher? _watcher;
     private readonly SemaphoreSlim _settingsLock = new(1, 1);
-    private DateTime _lastSettingsUpdate = DateTime.MinValue;
-    private static readonly TimeSpan SettingsExpiration = TimeSpan.FromMinutes(5);
 
     public ServiceSettings CurrentSettings => _currentSettings;
 
@@ -59,14 +57,14 @@ public class SettingsService : ISettingsService, IDisposable
             {
                 if (args.ChangeType == WatcherChangeTypes.Changed)
                 {
-                    _logger.LogInformation("Settings file changed, reloading settings");
+                    _logger.LogInformation("Settings file changed, reloading immediately");
                     await ReloadSettingsAsync();
                 }
             };
 
             _watcher.Created += async (_, _) =>
             {
-                _logger.LogInformation("Settings file created, reloading settings");
+                _logger.LogInformation("Settings file created, reloading immediately");
                 await ReloadSettingsAsync();
             };
 
@@ -98,7 +96,6 @@ public class SettingsService : ISettingsService, IDisposable
             var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
             await File.WriteAllTextAsync(_settingsPath, json);
             _currentSettings = settings;
-            _lastSettingsUpdate = DateTime.Now;
             _logger.LogInformation("Settings successfully saved to {Path}", _settingsPath);
         }
         catch (Exception ex)
@@ -117,13 +114,12 @@ public class SettingsService : ISettingsService, IDisposable
         await _settingsLock.WaitAsync();
         try
         {
-            await Task.Delay(100); // Wait for file to be fully written
+            await Task.Delay(100);
 
             if (!File.Exists(_settingsPath))
             {
                 _logger.LogWarning("Settings file not found at {Path}, using defaults", _settingsPath);
                 _currentSettings = new ServiceSettings();
-                _lastSettingsUpdate = DateTime.Now;
                 return;
             }
 
@@ -132,7 +128,6 @@ public class SettingsService : ISettingsService, IDisposable
                 ?? throw new InvalidOperationException("Failed to deserialize settings");
             
             _currentSettings = newSettings;
-            _lastSettingsUpdate = DateTime.Now;
             _logger.LogInformation("Settings successfully reloaded from {Path}", _settingsPath);
         }
         catch (Exception ex)

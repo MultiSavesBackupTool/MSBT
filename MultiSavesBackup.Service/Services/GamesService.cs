@@ -13,8 +13,6 @@ public class GamesService : IGamesService, IDisposable
     private IReadOnlyList<GameModel>? _cachedGames;
     private readonly FileSystemWatcher? _watcher;
     private readonly SemaphoreSlim _cacheLock = new(1, 1);
-    private DateTime _lastCacheUpdate = DateTime.MinValue;
-    private static readonly TimeSpan CacheExpiration = TimeSpan.FromMinutes(5);
 
     public GamesService(ISettingsService settingsService, ILogger<GamesService> logger)
     {
@@ -40,15 +38,17 @@ public class GamesService : IGamesService, IDisposable
                 {
                     if (args.ChangeType == WatcherChangeTypes.Changed)
                     {
-                        _logger.LogInformation("Games configuration file changed, clearing cache");
+                        _logger.LogInformation("Games configuration file changed, reloading immediately");
                         await ClearCacheAsync();
+                        await LoadGamesAsync();
                     }
                 };
 
                 _watcher.Created += async (_, _) =>
                 {
-                    _logger.LogInformation("Games configuration file created, clearing cache");
+                    _logger.LogInformation("Games configuration file created, reloading immediately");
                     await ClearCacheAsync();
+                    await LoadGamesAsync();
                 };
 
                 _watcher.Deleted += async (_, _) =>
@@ -79,7 +79,6 @@ public class GamesService : IGamesService, IDisposable
         try
         {
             _cachedGames = null;
-            _lastCacheUpdate = DateTime.MinValue;
         }
         finally
         {
@@ -94,7 +93,7 @@ public class GamesService : IGamesService, IDisposable
             await _cacheLock.WaitAsync();
             try
             {
-                if (_cachedGames != null && DateTime.Now - _lastCacheUpdate < CacheExpiration)
+                if (_cachedGames != null)
                 {
                     return _cachedGames;
                 }
@@ -120,7 +119,6 @@ public class GamesService : IGamesService, IDisposable
                 }
 
                 _cachedGames = games;
-                _lastCacheUpdate = DateTime.Now;
                 _logger.LogInformation("Successfully loaded {Count} games from configuration", games.Count);
                 return games;
             }
