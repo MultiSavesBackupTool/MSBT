@@ -12,8 +12,8 @@ public class BackupWorker : BackgroundService
     private readonly IBackupService _backupService;
     private readonly IGamesService _gamesService;
     private readonly ILogger<BackupWorker> _logger;
-    private readonly ISettingsService _settingsService;
     private readonly ServiceState _serviceState;
+    private readonly ISettingsService _settingsService;
 
     public BackupWorker(
         ILogger<BackupWorker> logger,

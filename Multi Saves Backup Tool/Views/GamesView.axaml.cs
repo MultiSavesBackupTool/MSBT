@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Multi_Saves_Backup_Tool.Models;
 using Multi_Saves_Backup_Tool.ViewModels;
 
 namespace Multi_Saves_Backup_Tool.Views;
@@ -13,19 +14,19 @@ public partial class GamesView : UserControl
         InitializeComponent();
         _viewModel = new GamesViewModel();
         DataContext = _viewModel;
-        
+
         _viewModel.EditGameRequested += OnEditGameRequested;
-        
+
         Loaded += GamesView_Loaded;
     }
 
     private void GamesView_Loaded(object? sender, RoutedEventArgs e)
     {
-        foreach (var game in _viewModel.Games) 
+        foreach (var game in _viewModel.Games)
             _viewModel.UpdateBackupCount(game);
     }
 
-    private void OnEditGameRequested(object? sender, Models.GameModel game)
+    private void OnEditGameRequested(object? sender, GameModel game)
     {
         if (TopLevel.GetTopLevel(this) is MainWindow mainWindow && mainWindow.AddGameOverlay != null)
         {

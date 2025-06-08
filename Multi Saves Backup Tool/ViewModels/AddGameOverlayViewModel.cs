@@ -12,12 +12,12 @@ namespace Multi_Saves_Backup_Tool.ViewModels;
 public partial class AddGameOverlayViewModel : ViewModelBase
 {
     private readonly GamesViewModel _gamesViewModel;
-    private GameModel? _editingGame;
 
     [ObservableProperty] private string _addPath = string.Empty;
     [ObservableProperty] private int _backupInterval = 60;
     [ObservableProperty] private int _backupMode;
     [ObservableProperty] private int _daysForKeep;
+    private GameModel? _editingGame;
     [ObservableProperty] private string _errorMessage = string.Empty;
     [ObservableProperty] private string _gameExe = string.Empty;
     [ObservableProperty] private string _gameExeAlt = string.Empty;
@@ -25,12 +25,12 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     [ObservableProperty] private string _gameName = string.Empty;
     [ObservableProperty] private string _gameNameError = string.Empty;
     [ObservableProperty] private bool _includeTimestamp = true;
+    [ObservableProperty] private bool _isEditMode;
     [ObservableProperty] private string _modPath = string.Empty;
     [ObservableProperty] private int _oldFilesStatus;
+    [ObservableProperty] private string _overlayTitle = string.Empty;
     [ObservableProperty] private string _saveLocation = string.Empty;
     [ObservableProperty] private string _saveLocationError = string.Empty;
-    [ObservableProperty] private bool _isEditMode;
-    [ObservableProperty] private string _overlayTitle = string.Empty;
 
     public AddGameOverlayViewModel(GamesViewModel gamesViewModel)
     {
@@ -56,7 +56,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     {
         _editingGame = gameToEdit;
         IsEditMode = true;
-        
+
         GameName = gameToEdit.GameName;
         GameExe = gameToEdit.GameExe;
         GameExeAlt = gameToEdit.GameExeAlt ?? string.Empty;
@@ -136,13 +136,11 @@ public partial class AddGameOverlayViewModel : ViewModelBase
         }
 
         if (!IsEditMode || (_editingGame != null && _editingGame.GameName != GameName))
-        {
             if (_gamesViewModel.Games.Any(g => g.GameName.Equals(GameName, StringComparison.OrdinalIgnoreCase)))
             {
                 ErrorMessage = "Игра с таким названием уже существует";
                 return false;
             }
-        }
 
         ErrorMessage = string.Empty;
         return true;

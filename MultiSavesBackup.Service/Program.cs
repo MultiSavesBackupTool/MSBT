@@ -24,7 +24,7 @@ if (!File.Exists(settingsPath))
 
     var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
 
-    string json = JsonSerializer.Serialize(defaultSettings, jsonOptions);
+    var json = JsonSerializer.Serialize(defaultSettings, jsonOptions);
 
     File.WriteAllText(settingsPath, json);
 }

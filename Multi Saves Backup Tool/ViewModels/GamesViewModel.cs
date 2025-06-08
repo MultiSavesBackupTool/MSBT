@@ -57,17 +57,15 @@ public class GamesViewModel : ViewModelBase
             {
                 var json = File.ReadAllText(jsonPath);
                 List<GameModel>? gamesList = null;
-            
+
                 try
                 {
-                    var gamesDict = JsonSerializer.Deserialize<Dictionary<string, GameModel>>(json, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-                    if (gamesDict != null)
-                    {
-                        gamesList = gamesDict.Values.ToList();
-                    }
+                    var gamesDict = JsonSerializer.Deserialize<Dictionary<string, GameModel>>(json,
+                        new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
+                    if (gamesDict != null) gamesList = gamesDict.Values.ToList();
                 }
                 catch
                 {
@@ -118,9 +116,9 @@ public class GamesViewModel : ViewModelBase
         try
         {
             var jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "games.json");
-        
+
             var gamesDict = Games.ToDictionary(game => game.GameName, game => game);
-        
+
             var json = JsonSerializer.Serialize(gamesDict, new JsonSerializerOptions
             {
                 WriteIndented = true
@@ -145,21 +143,18 @@ public class GamesViewModel : ViewModelBase
         if (index >= 0)
         {
             originalGame.PropertyChanged -= Game_PropertyChanged;
-            
+
             Games[index] = updatedGame;
-            
+
             updatedGame.PropertyChanged += Game_PropertyChanged;
-            
+
             SaveGames();
         }
     }
 
     private void EditGame(GameModel? game)
     {
-        if (game != null)
-        {
-            EditGameRequested?.Invoke(this, game);
-        }
+        if (game != null) EditGameRequested?.Invoke(this, game);
     }
 
     private async Task DeleteGameAsync(GameModel? game)
