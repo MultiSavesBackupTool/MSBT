@@ -326,4 +326,19 @@
     <data name="CompressionLevel_SmallestSize" xml:space="preserve">
     <value>Smallest Size</value>
   </data>
+    
+    <!-- Delete Confirmation -->
+    <data name="DeleteConfirmation_Title" xml:space="preserve">
+    <value>Confirming deletion</value>
+  </data>
+    <data name="DeleteConfirmation_Message" xml:space="preserve">
+    <value>Are you sure you want to uninstall the game '{0}'?
+This action cannot be undone.</value>
+  </data>
+    <data name="DeleteConfirmation_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+    <data name="DeleteConfirmation_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
 </root> 

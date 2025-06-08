@@ -737,5 +737,39 @@ namespace Properties
             }
         }
         #endregion
+        
+        #region Delete Confirmation
+        public static string DeleteConfirmation_Title
+        {
+            get
+            {
+                return ResourceManager.GetString("DeleteConfirmation_Title", resourceCulture);
+            }
+        }
+
+        public static string DeleteConfirmation_Message
+        {
+            get
+            {
+                return ResourceManager.GetString("DeleteConfirmation_Message", resourceCulture);
+            }
+        }
+
+        public static string DeleteConfirmation_Delete
+        {
+            get
+            {
+                return ResourceManager.GetString("DeleteConfirmation_Delete", resourceCulture);
+            }
+        }
+        
+        public static string DeleteConfirmation_Cancel
+        {
+            get
+            {
+                return ResourceManager.GetString("DeleteConfirmation_Cancel", resourceCulture);
+            }
+        }
+        #endregion
     }
 } 

@@ -326,4 +326,19 @@
     <data name="CompressionLevel_SmallestSize" xml:space="preserve">
     <value>Минимальный размер</value>
   </data>
+    
+    <!-- Delete Confirmation -->
+    <data name="DeleteConfirmation_Title" xml:space="preserve">
+    <value>Подтверждение удаления</value>
+  </data>
+    <data name="DeleteConfirmation_Message" xml:space="preserve">
+    <value>Вы уверены, что хотите удалить игру '{0}'?
+Это действие нельзя отменить.</value>
+  </data>
+    <data name="DeleteConfirmation_Delete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+    <data name="DeleteConfirmation_Cancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
 </root> 

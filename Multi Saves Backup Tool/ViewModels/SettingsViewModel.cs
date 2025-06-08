@@ -16,6 +16,19 @@ public partial class SettingsViewModel : ViewModelBase
 
     [ObservableProperty] private ServiceSettings _settings;
 
+    public string BackupRootFolder
+    {
+        get => Settings?.BackupSettings?.BackupRootFolder ?? string.Empty;
+        set
+        {
+            if (Settings?.BackupSettings != null && Settings.BackupSettings.BackupRootFolder != value)
+            {
+                Settings.BackupSettings.BackupRootFolder = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    
     public SettingsViewModel()
     {
         _settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
@@ -40,7 +53,7 @@ public partial class SettingsViewModel : ViewModelBase
 
         if (folder.Count > 0)
         {
-            Settings.BackupSettings.BackupRootFolder = folder[0].Path.LocalPath;
+            BackupRootFolder = folder[0].Path.LocalPath;
             await SaveCurrentSettingsAsync();
         }
     }

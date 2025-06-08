@@ -6,9 +6,12 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
+using FluentAvalonia.UI.Controls;
 using Multi_Saves_Backup_Tool.Models;
+using Properties;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
 
@@ -19,7 +22,7 @@ public class GamesViewModel : ViewModelBase
     public GamesViewModel()
     {
         _games = new ObservableCollection<GameModel>();
-        DeleteGameCommand = new RelayCommand<GameModel?>(DeleteGame);
+        DeleteGameCommand = new AsyncRelayCommand<GameModel?>(DeleteGameAsync);
         LoadGames();
     }
 
@@ -94,13 +97,27 @@ public class GamesViewModel : ViewModelBase
         game.PropertyChanged += Game_PropertyChanged;
     }
 
-    private void DeleteGame(GameModel? game)
+    private async Task DeleteGameAsync(GameModel? game)
     {
         if (game is null) return;
 
-        game.PropertyChanged -= Game_PropertyChanged;
-        Games.Remove(game);
-        SaveGames();
+        var dialog = new ContentDialog
+        {
+            Title = Resources.DeleteConfirmation_Title,
+            Content = string.Format(Resources.DeleteConfirmation_Message, game.GameName),
+            PrimaryButtonText = Resources.DeleteConfirmation_Delete,
+            SecondaryButtonText = Resources.DeleteConfirmation_Cancel,
+            DefaultButton = ContentDialogButton.Secondary
+        };
+
+        var result = await dialog.ShowAsync();
+        
+        if (result == ContentDialogResult.Primary)
+        {
+            game.PropertyChanged -= Game_PropertyChanged;
+            Games.Remove(game);
+            SaveGames();
+        }
     }
 
     public void UpdateBackupCount(GameModel game)
