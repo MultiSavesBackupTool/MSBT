@@ -111,7 +111,7 @@ public class GamesViewModel : ViewModelBase
         };
 
         var result = await dialog.ShowAsync();
-        
+
         if (result == ContentDialogResult.Primary)
         {
             game.PropertyChanged -= Game_PropertyChanged;

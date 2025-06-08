@@ -1,25 +1,24 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.UI.Controls;
 using Multi_Saves_Backup_Tool.Services;
-using System.Threading.Tasks;
-using Properties;
-using System.Diagnostics;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly UpdateService _updateService;
-    private string? _updateDownloadUrl;
 
     [ObservableProperty] private ViewModelBase? _currentViewModel;
 
-    [ObservableProperty] private NavigationViewItem? _selectedMenuItem;
-
     [ObservableProperty] private bool _isUpdateAvailable;
+
+    [ObservableProperty] private NavigationViewItem? _selectedMenuItem;
+    private string? _updateDownloadUrl;
 
     [ObservableProperty] private string _updateMessage = string.Empty;
 
@@ -27,7 +26,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var window = new Window();
         _updateService = new UpdateService();
-        
+
         MonitoringViewModel = new MonitoringViewModel();
         GamesViewModel = new GamesViewModel();
         SettingsViewModel = new SettingsViewModel(window.StorageProvider);
@@ -62,7 +61,7 @@ public partial class MainWindowViewModel : ViewModelBase
             IsUpdateAvailable = true;
             _updateDownloadUrl = downloadUrl;
             Debug.WriteLine($"Update available: {latestVersion}, URL: {downloadUrl}");
-            
+
             await DownloadAndInstallUpdateAsync();
         }
         else if (hasUpdate)
@@ -71,7 +70,8 @@ public partial class MainWindowViewModel : ViewModelBase
             _updateDownloadUrl = null;
             Debug.WriteLine($"Update available: {latestVersion}, but no download URL.");
         }
-        else if (downloadUrl == null && latestVersion == (_updateServiceGetType().Assembly.GetName().Version?.ToString() ?? "1.0.0"))
+        else if (downloadUrl == null &&
+                 latestVersion == (_updateServiceGetType().Assembly.GetName().Version?.ToString() ?? "1.0.0"))
         {
             IsUpdateAvailable = false;
             _updateDownloadUrl = null;
@@ -91,9 +91,9 @@ public partial class MainWindowViewModel : ViewModelBase
         if (!IsUpdateAvailable || string.IsNullOrEmpty(_updateDownloadUrl)) return;
 
         Debug.WriteLine("DownloadAndInstallUpdateCommand executed.");
-        try 
+        try
         {
-            bool success = await _updateService.DownloadAndInstallUpdateAsync(_updateDownloadUrl);
+            var success = await _updateService.DownloadAndInstallUpdateAsync(_updateDownloadUrl);
             if (!success)
             {
                 IsUpdateAvailable = true;
@@ -125,5 +125,8 @@ public partial class MainWindowViewModel : ViewModelBase
         };
     }
 
-    private Type _updateServiceGetType() => _updateService.GetType();
+    private Type _updateServiceGetType()
+    {
+        return _updateService.GetType();
+    }
 }

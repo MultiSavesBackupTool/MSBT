@@ -7,6 +7,7 @@ namespace Multi_Saves_Backup_Tool.Models;
 public class GameModel : INotifyPropertyChanged
 {
     private string? _addPath;
+    private int _backupCount;
     private int _backupInterval = 60;
     private int _daysForKeep;
     private string _gameExe = string.Empty;
@@ -16,7 +17,6 @@ public class GameModel : INotifyPropertyChanged
     private string? _modPath;
     private string _savePath = string.Empty;
     private int _setOldFilesStatus;
-    private int _backupCount;
 
     public string GameName
     {

@@ -15,4 +15,4 @@ public class StringToBoolConverter : IValueConverter
     {
         throw new NotImplementedException();
     }
-} 
+}

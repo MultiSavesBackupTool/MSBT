@@ -13,25 +13,12 @@ namespace Multi_Saves_Backup_Tool.ViewModels;
 
 public partial class SettingsViewModel : ViewModelBase
 {
-    private readonly string _settingsPath;
     private readonly string _gamesPath;
     private readonly string _serviceStatePath;
+    private readonly string _settingsPath;
     private readonly IStorageProvider? _storageProvider;
 
     [ObservableProperty] private ServiceSettings _settings;
-
-    public string BackupRootFolder
-    {
-        get => Settings?.BackupSettings?.BackupRootFolder ?? string.Empty;
-        set
-        {
-            if (Settings?.BackupSettings != null && Settings.BackupSettings.BackupRootFolder != value)
-            {
-                Settings.BackupSettings.BackupRootFolder = value;
-                OnPropertyChanged();
-            }
-        }
-    }
 
     public SettingsViewModel()
     {
@@ -45,6 +32,19 @@ public partial class SettingsViewModel : ViewModelBase
     public SettingsViewModel(IStorageProvider storageProvider) : this()
     {
         _storageProvider = storageProvider;
+    }
+
+    public string BackupRootFolder
+    {
+        get => Settings?.BackupSettings?.BackupRootFolder ?? string.Empty;
+        set
+        {
+            if (Settings?.BackupSettings != null && Settings.BackupSettings.BackupRootFolder != value)
+            {
+                Settings.BackupSettings.BackupRootFolder = value;
+                OnPropertyChanged();
+            }
+        }
     }
 
     [RelayCommand]
@@ -106,7 +106,7 @@ public partial class SettingsViewModel : ViewModelBase
                     await using var gamesFile = File.OpenRead(_gamesPath);
                     await gamesFile.CopyToAsync(gamesStream);
                 }
-                
+
                 if (File.Exists(_serviceStatePath))
                 {
                     var serviceStateEntry = archive.CreateEntry("service_state.json");
@@ -179,7 +179,7 @@ public partial class SettingsViewModel : ViewModelBase
 
                 if (importedFiles > 0)
                 {
-                    _settings = LoadSettings();
+                    Settings = LoadSettings();
                     OnPropertyChanged(nameof(Settings));
                     OnPropertyChanged(nameof(BackupRootFolder));
 

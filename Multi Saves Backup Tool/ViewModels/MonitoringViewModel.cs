@@ -75,6 +75,7 @@ public class MonitoringViewModel : ViewModelBase, IDisposable
         {
             // Task was canceled, which is expected
         }
+
         _cancellationTokenSource.Dispose();
     }
 

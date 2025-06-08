@@ -40,8 +40,9 @@
                                                Opacity="0.7" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10">
-                                    <TextBlock Text="{Binding BackupCount, StringFormat={x:Static properties:Resources.GamesView_BackupCount}}"
-                                               VerticalAlignment="Center" />
+                                    <TextBlock
+                                        Text="{Binding BackupCount, StringFormat={x:Static properties:Resources.GamesView_BackupCount}}"
+                                        VerticalAlignment="Center" />
                                     <Button Content="{x:Static properties:Resources.GamesView_Delete}"
                                             Command="{Binding ((vm:GamesViewModel)DataContext).DeleteGameCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                             CommandParameter="{Binding}"

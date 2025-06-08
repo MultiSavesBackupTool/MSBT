@@ -20,6 +20,8 @@ public partial class AddGameOverlayViewModel : ViewModelBase
 
     [ObservableProperty] private int _daysForKeep;
 
+    [ObservableProperty] private string _errorMessage = string.Empty;
+
     [ObservableProperty] private string _gameExe = string.Empty;
 
     [ObservableProperty] private string _gameExeAlt = string.Empty;
@@ -39,8 +41,6 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     [ObservableProperty] private string _saveLocation = string.Empty;
 
     [ObservableProperty] private string _saveLocationError = string.Empty;
-
-    [ObservableProperty] private string _errorMessage = string.Empty;
 
     public AddGameOverlayViewModel(GamesViewModel gamesViewModel)
     {
@@ -124,10 +124,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     [RelayCommand]
     private void AddGame()
     {
-        if (!ValidateForm())
-        {
-            return;
-        }
+        if (!ValidateForm()) return;
 
         var newGame = new GameModel
         {
