@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multi Saves Backup Tool", "Multi Saves Backup Tool\Multi Saves Backup Tool.csproj", "{5C987D44-9B8E-40BF-9B61-639C6A2A26A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiSavesBackup.Service", "MultiSavesBackup.Service\MultiSavesBackup.Service.csproj", "{C7FAA944-732B-4759-BFB4-F16F18EC5137}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{5C987D44-9B8E-40BF-9B61-639C6A2A26A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C987D44-9B8E-40BF-9B61-639C6A2A26A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C987D44-9B8E-40BF-9B61-639C6A2A26A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7FAA944-732B-4759-BFB4-F16F18EC5137}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7FAA944-732B-4759-BFB4-F16F18EC5137}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7FAA944-732B-4759-BFB4-F16F18EC5137}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7FAA944-732B-4759-BFB4-F16F18EC5137}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

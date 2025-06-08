@@ -23,6 +23,7 @@ public class GamesViewModel : ViewModelBase
     {
         _games = new ObservableCollection<GameModel>();
         DeleteGameCommand = new AsyncRelayCommand<GameModel?>(DeleteGameAsync);
+        EditGameCommand = new RelayCommand<GameModel?>(EditGame);
         LoadGames();
     }
 
@@ -38,6 +39,9 @@ public class GamesViewModel : ViewModelBase
     }
 
     public ICommand DeleteGameCommand { get; }
+    public ICommand EditGameCommand { get; }
+
+    public event EventHandler<GameModel>? EditGameRequested;
 
     private void Games_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
@@ -52,14 +56,49 @@ public class GamesViewModel : ViewModelBase
             if (File.Exists(jsonPath))
             {
                 var json = File.ReadAllText(jsonPath);
-                var games = JsonSerializer.Deserialize<List<GameModel>>(json, new JsonSerializerOptions
+                List<GameModel>? gamesList = null;
+            
+                try
                 {
-                    PropertyNameCaseInsensitive = true
-                });
-                if (games != null)
+                    var gamesDict = JsonSerializer.Deserialize<Dictionary<string, GameModel>>(json, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    if (gamesDict != null)
+                    {
+                        gamesList = gamesDict.Values.ToList();
+                    }
+                }
+                catch
                 {
-                    Games = new ObservableCollection<GameModel>(games);
-                    foreach (var game in Games) game.PropertyChanged += Game_PropertyChanged;
+                    try
+                    {
+                        var gamesArray = JsonSerializer.Deserialize<List<GameModel>>(json, new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
+                        if (gamesArray != null)
+                        {
+                            gamesList = gamesArray;
+                            Games = new ObservableCollection<GameModel>(gamesList);
+                            foreach (var game in Games)
+                                game.PropertyChanged += Game_PropertyChanged;
+                            SaveGames();
+                            return;
+                        }
+                    }
+                    catch
+                    {
+                        Games = new ObservableCollection<GameModel>();
+                        return;
+                    }
+                }
+
+                if (gamesList != null)
+                {
+                    Games = new ObservableCollection<GameModel>(gamesList);
+                    foreach (var game in Games)
+                        game.PropertyChanged += Game_PropertyChanged;
                 }
             }
         }
@@ -79,7 +118,10 @@ public class GamesViewModel : ViewModelBase
         try
         {
             var jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "games.json");
-            var json = JsonSerializer.Serialize(Games, new JsonSerializerOptions
+        
+            var gamesDict = Games.ToDictionary(game => game.GameName, game => game);
+        
+            var json = JsonSerializer.Serialize(gamesDict, new JsonSerializerOptions
             {
                 WriteIndented = true
             });
@@ -95,6 +137,29 @@ public class GamesViewModel : ViewModelBase
     {
         Games.Add(game);
         game.PropertyChanged += Game_PropertyChanged;
+    }
+
+    public void UpdateGame(GameModel originalGame, GameModel updatedGame)
+    {
+        var index = Games.IndexOf(originalGame);
+        if (index >= 0)
+        {
+            originalGame.PropertyChanged -= Game_PropertyChanged;
+            
+            Games[index] = updatedGame;
+            
+            updatedGame.PropertyChanged += Game_PropertyChanged;
+            
+            SaveGames();
+        }
+    }
+
+    private void EditGame(GameModel? game)
+    {
+        if (game != null)
+        {
+            EditGameRequested?.Invoke(this, game);
+        }
     }
 
     private async Task DeleteGameAsync(GameModel? game)

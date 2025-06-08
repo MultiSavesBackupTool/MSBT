@@ -13,12 +13,25 @@ public partial class GamesView : UserControl
         InitializeComponent();
         _viewModel = new GamesViewModel();
         DataContext = _viewModel;
+        
+        _viewModel.EditGameRequested += OnEditGameRequested;
+        
         Loaded += GamesView_Loaded;
     }
 
     private void GamesView_Loaded(object? sender, RoutedEventArgs e)
     {
-        foreach (var game in _viewModel.Games) _viewModel.UpdateBackupCount(game);
+        foreach (var game in _viewModel.Games) 
+            _viewModel.UpdateBackupCount(game);
+    }
+
+    private void OnEditGameRequested(object? sender, Models.GameModel game)
+    {
+        if (TopLevel.GetTopLevel(this) is MainWindow mainWindow && mainWindow.AddGameOverlay != null)
+        {
+            var overlay = mainWindow.AddGameOverlay;
+            overlay.ShowForEdit(_viewModel, game);
+        }
     }
 
     private void AddGameButton_Click(object sender, RoutedEventArgs e)
@@ -26,8 +39,7 @@ public partial class GamesView : UserControl
         if (TopLevel.GetTopLevel(this) is MainWindow mainWindow && mainWindow.AddGameOverlay != null)
         {
             var overlay = mainWindow.AddGameOverlay;
-            overlay.Initialize(_viewModel);
-            overlay.Show();
+            overlay.ShowForAdd(_viewModel);
         }
     }
 }

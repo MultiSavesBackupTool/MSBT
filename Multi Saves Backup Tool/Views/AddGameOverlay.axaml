@@ -4,10 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Multi_Saves_Backup_Tool.ViewModels"
              xmlns:properties="clr-namespace:Properties"
+             xmlns:converters="clr-namespace:Multi_Saves_Backup_Tool.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Multi_Saves_Backup_Tool.Views.AddGameOverlay"
              x:CompileBindings="True"
              x:DataType="vm:AddGameOverlayViewModel">
+    <UserControl.Resources>
+        <converters:BooleanToStringConverter x:Key="BooleanToStringConverter" />
+    </UserControl.Resources>
     <Grid>
         <Rectangle Fill="Black" Opacity="0.5" />
 
@@ -25,11 +29,18 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="{x:Static properties:Resources.AddGameOverlay_Title}"
+                <TextBlock Text="{Binding OverlayTitle}"
                            FontSize="24"
                            FontWeight="Bold"
                            HorizontalAlignment="Center"
                            Margin="0,0,0,20" />
+
+                <TextBlock Grid.Row="0" Text="{Binding ErrorMessage}"
+                           Foreground="Red"
+                           IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                           FontSize="14"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,10" />
 
                 <ScrollViewer Grid.Row="1"
                               VerticalScrollBarVisibility="Auto">
@@ -167,8 +178,8 @@
                             HorizontalAlignment="Right"
                             Spacing="10"
                             Margin="0,20,0,0">
-                    <Button Content="{x:Static properties:Resources.AddGameOverlay_Add}"
-                            Command="{Binding AddGameCommand}" />
+                    <Button Content="{Binding IsEditMode, Converter={StaticResource BooleanToStringConverter}, ConverterParameter='Сохранить|Добавить'}"
+                            Command="{Binding SaveGameCommand}" />
                     <Button Content="{x:Static properties:Resources.AddGameOverlay_Cancel}"
                             Click="Close" />
                 </StackPanel>

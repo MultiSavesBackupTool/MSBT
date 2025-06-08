@@ -148,6 +148,14 @@ namespace Properties
                 return ResourceManager.GetString("GamesView_BackupCount", resourceCulture);
             }
         }
+        
+        public static string GamesView_EditGame
+        {
+            get
+            {
+                return ResourceManager.GetString("GamesView_EditGame", resourceCulture);
+            }
+        }
         #endregion
 
         #region AddGameOverlay strings

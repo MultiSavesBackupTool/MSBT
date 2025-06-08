@@ -43,6 +43,10 @@
                                     <TextBlock
                                         Text="{Binding BackupCount, StringFormat={x:Static properties:Resources.GamesView_BackupCount}}"
                                         VerticalAlignment="Center" />
+                                    <Button Content="{x:Static properties:Resources.GamesView_EditGame}"
+                                            Command="{Binding ((vm:GamesViewModel)DataContext).EditGameCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            CommandParameter="{Binding}"
+                                            Padding="8,4" />
                                     <Button Content="{x:Static properties:Resources.GamesView_Delete}"
                                             Command="{Binding ((vm:GamesViewModel)DataContext).DeleteGameCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                             CommandParameter="{Binding}"

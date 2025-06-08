@@ -1,6 +1,7 @@
 ﻿using System;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Multi_Saves_Backup_Tool.Models;
 using Multi_Saves_Backup_Tool.ViewModels;
 
 namespace Multi_Saves_Backup_Tool.Views;
@@ -23,10 +24,18 @@ public partial class AddGameOverlay : UserControl
         DataContext = viewModel;
     }
 
-    public void Show()
+    public void ShowForAdd(GamesViewModel gamesViewModel)
     {
+        Initialize(gamesViewModel);
+        ViewModel.SetAddMode();
         IsVisible = true;
-        ViewModel.ClearForm();
+    }
+
+    public void ShowForEdit(GamesViewModel gamesViewModel, GameModel gameToEdit)
+    {
+        Initialize(gamesViewModel);
+        ViewModel.SetEditMode(gameToEdit);
+        IsVisible = true;
     }
 
     private void Close(object? sender, RoutedEventArgs e)

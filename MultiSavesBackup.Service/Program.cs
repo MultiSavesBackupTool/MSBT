@@ -1,3 +1,4 @@
+using System.Text.Json;
 using MultiSavesBackup.Service;
 using MultiSavesBackup.Service.Models;
 using MultiSavesBackup.Service.Services;
@@ -5,6 +6,28 @@ using Serilog;
 
 var mainAppDir = AppDomain.CurrentDomain.BaseDirectory;
 var settingsPath = Path.Combine(mainAppDir, "settings.json");
+
+if (!File.Exists(settingsPath))
+{
+    var defaultSettings = new ServiceSettings
+    {
+        BackupSettings = new BackupSettings
+        {
+            BackupRootFolder = @"C:\Backups",
+            ScanIntervalMinutes = 5,
+            MaxParallelBackups = 2,
+            CompressionLevel = CompressionLevel.Optimal,
+            GamesConfigPath = "games.json",
+            EnableLogging = true
+        }
+    };
+
+    var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+
+    string json = JsonSerializer.Serialize(defaultSettings, jsonOptions);
+
+    File.WriteAllText(settingsPath, json);
+}
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.File(

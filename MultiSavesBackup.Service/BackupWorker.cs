@@ -221,7 +221,7 @@ public class BackupWorker : BackgroundService
             _logger.LogError(ex, "Error processing backup for game: {GameName}", game.GameName);
             gameState.Status = "Error";
             gameState.LastError = ex.Message;
-            throw; // Rethrow to be handled by the caller
+            throw;
         }
         finally
         {

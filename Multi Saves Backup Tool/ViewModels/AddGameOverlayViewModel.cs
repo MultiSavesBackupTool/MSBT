@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -11,44 +12,68 @@ namespace Multi_Saves_Backup_Tool.ViewModels;
 public partial class AddGameOverlayViewModel : ViewModelBase
 {
     private readonly GamesViewModel _gamesViewModel;
+    private GameModel? _editingGame;
 
     [ObservableProperty] private string _addPath = string.Empty;
-
     [ObservableProperty] private int _backupInterval = 60;
-
     [ObservableProperty] private int _backupMode;
-
     [ObservableProperty] private int _daysForKeep;
-
     [ObservableProperty] private string _errorMessage = string.Empty;
-
     [ObservableProperty] private string _gameExe = string.Empty;
-
     [ObservableProperty] private string _gameExeAlt = string.Empty;
-
     [ObservableProperty] private string _gameExeError = string.Empty;
-
     [ObservableProperty] private string _gameName = string.Empty;
-
     [ObservableProperty] private string _gameNameError = string.Empty;
-
     [ObservableProperty] private bool _includeTimestamp = true;
-
     [ObservableProperty] private string _modPath = string.Empty;
-
     [ObservableProperty] private int _oldFilesStatus;
-
     [ObservableProperty] private string _saveLocation = string.Empty;
-
     [ObservableProperty] private string _saveLocationError = string.Empty;
+    [ObservableProperty] private bool _isEditMode;
+    [ObservableProperty] private string _overlayTitle = string.Empty;
 
     public AddGameOverlayViewModel(GamesViewModel gamesViewModel)
     {
         _gamesViewModel = gamesViewModel;
+        UpdateOverlayTitle();
     }
 
     public event EventHandler? CloseRequested;
     public event EventHandler<GameModel>? GameAdded;
+    public event EventHandler<GameModel>? GameUpdated;
+
+    partial void OnIsEditModeChanged(bool value)
+    {
+        UpdateOverlayTitle();
+    }
+
+    private void UpdateOverlayTitle()
+    {
+        OverlayTitle = IsEditMode ? "Редактировать игру" : "Добавить игру";
+    }
+
+    public void SetEditMode(GameModel gameToEdit)
+    {
+        _editingGame = gameToEdit;
+        IsEditMode = true;
+        
+        GameName = gameToEdit.GameName;
+        GameExe = gameToEdit.GameExe;
+        GameExeAlt = gameToEdit.GameExeAlt ?? string.Empty;
+        SaveLocation = gameToEdit.SavePath;
+        ModPath = gameToEdit.ModPath ?? string.Empty;
+        AddPath = gameToEdit.AddPath ?? string.Empty;
+        DaysForKeep = gameToEdit.DaysForKeep;
+        OldFilesStatus = gameToEdit.SetOldFilesStatus;
+        BackupInterval = gameToEdit.BackupInterval;
+    }
+
+    public void SetAddMode()
+    {
+        _editingGame = null;
+        IsEditMode = false;
+        ClearForm();
+    }
 
     [RelayCommand]
     private async Task BrowseSaveLocation(IStorageProvider? storageProvider)
@@ -110,16 +135,25 @@ public partial class AddGameOverlayViewModel : ViewModelBase
             return false;
         }
 
+        if (!IsEditMode || (_editingGame != null && _editingGame.GameName != GameName))
+        {
+            if (_gamesViewModel.Games.Any(g => g.GameName.Equals(GameName, StringComparison.OrdinalIgnoreCase)))
+            {
+                ErrorMessage = "Игра с таким названием уже существует";
+                return false;
+            }
+        }
+
         ErrorMessage = string.Empty;
         return true;
     }
 
     [RelayCommand]
-    private void AddGame()
+    private void SaveGame()
     {
         if (!ValidateForm()) return;
 
-        var newGame = new GameModel
+        var gameData = new GameModel
         {
             GameName = GameName,
             GameExe = GameExe,
@@ -130,11 +164,21 @@ public partial class AddGameOverlayViewModel : ViewModelBase
             DaysForKeep = DaysForKeep,
             SetOldFilesStatus = OldFilesStatus,
             BackupInterval = BackupInterval,
-            IsEnabled = true
+            IsEnabled = IsEditMode ? _editingGame?.IsEnabled ?? true : true,
+            BackupCount = IsEditMode ? _editingGame?.BackupCount ?? 0 : 0
         };
 
-        AddGame(newGame);
-        GameAdded?.Invoke(this, newGame);
+        if (IsEditMode && _editingGame != null)
+        {
+            _gamesViewModel.UpdateGame(_editingGame, gameData);
+            GameUpdated?.Invoke(this, gameData);
+        }
+        else
+        {
+            _gamesViewModel.AddGame(gameData);
+            GameAdded?.Invoke(this, gameData);
+        }
+
         CloseRequested?.Invoke(this, EventArgs.Empty);
     }
 
@@ -179,11 +223,6 @@ public partial class AddGameOverlayViewModel : ViewModelBase
         return string.Empty;
     }
 
-    private void AddGame(GameModel newGame)
-    {
-        _gamesViewModel.AddGame(newGame);
-    }
-
     public void ClearForm()
     {
         GameName = string.Empty;
@@ -197,5 +236,6 @@ public partial class AddGameOverlayViewModel : ViewModelBase
         IncludeTimestamp = true;
         BackupMode = 0;
         BackupInterval = 60;
+        ErrorMessage = string.Empty;
     }
 }
