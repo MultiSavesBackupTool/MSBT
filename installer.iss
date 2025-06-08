@@ -29,7 +29,6 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "publish\release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "publish\release\{#MyServiceExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "publish\release\*.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "publish\release\settings.json"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
