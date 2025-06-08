@@ -90,13 +90,6 @@ public partial class AddGameOverlayViewModel : ViewModelBase
             GameExeAlt = filePath;
     }
 
-    private void ClearErrors()
-    {
-        GameNameError = string.Empty;
-        GameExeError = string.Empty;
-        SaveLocationError = string.Empty;
-    }
-
     private bool ValidateForm()
     {
         if (string.IsNullOrWhiteSpace(GameName))

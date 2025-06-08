@@ -36,10 +36,10 @@ public partial class SettingsViewModel : ViewModelBase
 
     public string BackupRootFolder
     {
-        get => Settings?.BackupSettings?.BackupRootFolder ?? string.Empty;
+        get => Settings.BackupSettings.BackupRootFolder;
         set
         {
-            if (Settings?.BackupSettings != null && Settings.BackupSettings.BackupRootFolder != value)
+            if (Settings.BackupSettings.BackupRootFolder != value)
             {
                 Settings.BackupSettings.BackupRootFolder = value;
                 OnPropertyChanged();

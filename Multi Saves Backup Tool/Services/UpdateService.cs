@@ -18,9 +18,9 @@ namespace Multi_Saves_Backup_Tool.Services;
 
 public class UpdateService
 {
-    private const string GITHUB_API_URL = "https://api.github.com/repos/{owner}/{repo}/releases/latest";
-    private const string OWNER = "TheNightlyGod";
-    private const string REPO = "MSBT";
+    private const string GithubApiUrl = "https://api.github.com/repos/{owner}/{repo}/releases/latest";
+    private const string Owner = "TheNightlyGod";
+    private const string Repo = "MSBT";
     private readonly string _currentVersion;
 
     private readonly HttpClient _httpClient;
@@ -63,7 +63,7 @@ public class UpdateService
     {
         try
         {
-            var apiUrl = GITHUB_API_URL.Replace("{owner}", OWNER).Replace("{repo}", REPO);
+            var apiUrl = GithubApiUrl.Replace("{owner}", Owner).Replace("{repo}", Repo);
             Debug.WriteLine($"Checking for updates at: {apiUrl}");
 
             var response = await _httpClient.GetStringAsync(apiUrl);

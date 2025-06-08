@@ -1,19 +1,19 @@
 using Multi_Saves_Backup_Tool.Models;
 using MultiSavesBackup.Service.Models;
 using MultiSavesBackup.Service.Services;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace MultiSavesBackup.Service;
 
 public class BackupWorker : BackgroundService
 {
+    private static readonly string StateFilePath =
+        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "service_state.json");
+
+    private readonly IBackupService _backupService;
+    private readonly IGamesService _gamesService;
     private readonly ILogger<BackupWorker> _logger;
     private readonly ISettingsService _settingsService;
-    private readonly IGamesService _gamesService;
-    private readonly IBackupService _backupService;
-    private ServiceState _serviceState;
-    private static readonly string StateFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "service_state.json");
+    private readonly ServiceState _serviceState;
 
     public BackupWorker(
         ILogger<BackupWorker> logger,
@@ -65,9 +65,9 @@ public class BackupWorker : BackgroundService
         try
         {
             _logger.LogInformation("Starting backup process at: {time}", DateTimeOffset.Now);
-            
+
             var games = await _gamesService.LoadGamesAsync();
-            if (games == null || !games.Any())
+            if (!games.Any())
             {
                 _logger.LogWarning("No games found in configuration");
                 return;
@@ -80,10 +80,7 @@ public class BackupWorker : BackgroundService
             foreach (var gameName in _serviceState.GamesState.Keys)
             {
                 var game = await _gamesService.GetGameByNameAsync(gameName);
-                if (game == null)
-                {
-                    removedGames.Add(gameName);
-                }
+                if (game == null) removedGames.Add(gameName);
             }
 
             foreach (var gameName in removedGames)
@@ -95,10 +92,8 @@ public class BackupWorker : BackgroundService
             foreach (var game in games)
             {
                 if (!_serviceState.GamesState.ContainsKey(game.GameName))
-                {
                     _serviceState.GamesState[game.GameName] = new GameState { GameName = game.GameName };
-                }
-                
+
                 _serviceState.GamesState[game.GameName].Status = game.IsEnabled ? "Waiting" : "Disabled";
             }
 
@@ -117,7 +112,8 @@ public class BackupWorker : BackgroundService
                 var gameState = _serviceState.GamesState[game.GameName];
                 if (gameState.NextBackupScheduled > DateTime.Now)
                 {
-                    _logger.LogInformation("Skipping backup for {GameName} as it's not time yet. Next backup scheduled at {NextBackup}", 
+                    _logger.LogInformation(
+                        "Skipping backup for {GameName} as it's not time yet. Next backup scheduled at {NextBackup}",
                         game.GameName, gameState.NextBackupScheduled);
                     continue;
                 }
@@ -162,7 +158,6 @@ public class BackupWorker : BackgroundService
             }
 
             if (tasks.Any())
-            {
                 try
                 {
                     await Task.WhenAll(tasks);
@@ -171,7 +166,6 @@ public class BackupWorker : BackgroundService
                 {
                     _logger.LogError(ex, "Error during parallel backup execution");
                 }
-            }
 
             _serviceState.LastUpdateTime = DateTime.Now;
             SaveServiceState();
@@ -205,14 +199,14 @@ public class BackupWorker : BackgroundService
             {
                 await _backupService.CreateBackupAsync(game);
                 _backupService.CleanupOldBackups(game);
-                
+
                 gameState.LastBackupTime = DateTime.Now;
                 gameState.Status = "Success";
                 gameState.LastError = "";
-                
+
                 var interval = TimeSpan.FromMinutes(game.BackupInterval);
                 gameState.NextBackupScheduled = DateTime.Now.Add(interval);
-                
+
                 _logger.LogInformation("Backup completed successfully for game: {GameName}", game.GameName);
             }
             else

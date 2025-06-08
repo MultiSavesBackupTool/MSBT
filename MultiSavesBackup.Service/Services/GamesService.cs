@@ -1,18 +1,16 @@
 using System.Diagnostics;
 using System.Text.Json;
 using Multi_Saves_Backup_Tool.Models;
-using MultiSavesBackup.Service.Models;
-using Microsoft.Extensions.Logging;
 
 namespace MultiSavesBackup.Service.Services;
 
 public class GamesService : IGamesService, IDisposable
 {
-    private readonly ISettingsService _settingsService;
-    private readonly ILogger<GamesService> _logger;
-    private IReadOnlyList<GameModel>? _cachedGames;
-    private readonly FileSystemWatcher? _watcher;
     private readonly SemaphoreSlim _cacheLock = new(1, 1);
+    private readonly ILogger<GamesService> _logger;
+    private readonly ISettingsService _settingsService;
+    private readonly FileSystemWatcher? _watcher;
+    private IReadOnlyList<GameModel>? _cachedGames;
 
     public GamesService(ISettingsService settingsService, ILogger<GamesService> logger)
     {
@@ -24,7 +22,6 @@ public class GamesService : IGamesService, IDisposable
         var fileName = Path.GetFileName(gamesPath);
 
         if (directory != null)
-        {
             try
             {
                 _watcher = new FileSystemWatcher(directory)
@@ -59,31 +56,22 @@ public class GamesService : IGamesService, IDisposable
 
                 _watcher.Error += (_, ex) =>
                 {
-                    _logger.LogError("Error in FileSystemWatcher for games configuration: {Message}", ex.GetException().Message);
+                    _logger.LogError("Error in FileSystemWatcher for games configuration: {Message}",
+                        ex.GetException().Message);
                 };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to initialize FileSystemWatcher for games configuration");
             }
-        }
         else
-        {
             _logger.LogWarning("Could not create FileSystemWatcher for games configuration: directory is null");
-        }
     }
 
-    private async Task ClearCacheAsync()
+    public void Dispose()
     {
-        await _cacheLock.WaitAsync();
-        try
-        {
-            _cachedGames = null;
-        }
-        finally
-        {
-            _cacheLock.Release();
-        }
+        _watcher?.Dispose();
+        _cacheLock.Dispose();
     }
 
     public async Task<IReadOnlyList<GameModel>> LoadGamesAsync()
@@ -93,13 +81,10 @@ public class GamesService : IGamesService, IDisposable
             await _cacheLock.WaitAsync();
             try
             {
-                if (_cachedGames != null)
-                {
-                    return _cachedGames;
-                }
+                if (_cachedGames != null) return _cachedGames;
 
                 var gamesPath = _settingsService.CurrentSettings.BackupSettings.GetAbsoluteGamesConfigPath();
-                
+
                 if (!File.Exists(gamesPath))
                 {
                     _logger.LogWarning("Games configuration file not found at {Path}", gamesPath);
@@ -111,7 +96,7 @@ public class GamesService : IGamesService, IDisposable
                 {
                     PropertyNameCaseInsensitive = true
                 });
-                
+
                 if (games == null)
                 {
                     _logger.LogError("Failed to deserialize games from {Path}", gamesPath);
@@ -152,8 +137,8 @@ public class GamesService : IGamesService, IDisposable
         {
             var processes = Process.GetProcesses();
             var gameExeName = Path.GetFileNameWithoutExtension(game.GameExe);
-            
-            var isMainExeRunning = processes.Any(p => 
+
+            var isMainExeRunning = processes.Any(p =>
             {
                 try
                 {
@@ -165,16 +150,13 @@ public class GamesService : IGamesService, IDisposable
                     return false;
                 }
             });
-            
-            if (isMainExeRunning)
-            {
-                return true;
-            }
+
+            if (isMainExeRunning) return true;
 
             if (!string.IsNullOrEmpty(game.GameExeAlt))
             {
                 var altExeName = Path.GetFileNameWithoutExtension(game.GameExeAlt);
-                return processes.Any(p => 
+                return processes.Any(p =>
                 {
                     try
                     {
@@ -197,9 +179,16 @@ public class GamesService : IGamesService, IDisposable
         }
     }
 
-    public void Dispose()
+    private async Task ClearCacheAsync()
     {
-        _watcher?.Dispose();
-        _cacheLock.Dispose();
+        await _cacheLock.WaitAsync();
+        try
+        {
+            _cachedGames = null;
+        }
+        finally
+        {
+            _cacheLock.Release();
+        }
     }
 }

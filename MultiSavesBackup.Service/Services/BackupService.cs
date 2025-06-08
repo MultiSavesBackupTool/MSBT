@@ -1,25 +1,18 @@
-using Multi_Saves_Backup_Tool.Models;
-using MultiSavesBackup.Service.Models;
 using System.IO.Compression;
-using Microsoft.Extensions.Logging;
+using Multi_Saves_Backup_Tool.Models;
+using CompressionLevel = System.IO.Compression.CompressionLevel;
 
 namespace MultiSavesBackup.Service.Services;
 
 public class BackupService : IBackupService
 {
-    private readonly ISettingsService _settingsService;
     private readonly ILogger<BackupService> _logger;
+    private readonly ISettingsService _settingsService;
 
     public BackupService(ISettingsService settingsService, ILogger<BackupService> logger)
     {
         _settingsService = settingsService;
         _logger = logger;
-    }
-
-    private string GetSafeDirectoryName(string name)
-    {
-        var invalid = Path.GetInvalidFileNameChars().Concat(Path.GetInvalidPathChars()).ToArray();
-        return string.Join("_", name.Split(invalid));
     }
 
     public async Task CreateBackupAsync(GameModel game)
@@ -40,7 +33,7 @@ public class BackupService : IBackupService
             _logger.LogInformation("Creating backup for game {GameName} at {Path}", game.GameName, archivePath);
 
             using var archive = ZipFile.Open(archivePath, ZipArchiveMode.Create);
-            
+
             var backupSuccess = false;
             try
             {
@@ -55,22 +48,15 @@ public class BackupService : IBackupService
                 }
 
                 if (!string.IsNullOrEmpty(game.ModPath) && Directory.Exists(game.ModPath))
-                {
                     await AddToArchiveAsync(archive, game.ModPath, "mods");
-                }
 
                 if (!string.IsNullOrEmpty(game.AddPath) && Directory.Exists(game.AddPath))
-                {
                     await AddToArchiveAsync(archive, game.AddPath, "additional");
-                }
 
                 if (!backupSuccess)
                 {
                     _logger.LogWarning("No valid paths found for backup of game {GameName}", game.GameName);
-                    if (File.Exists(archivePath))
-                    {
-                        File.Delete(archivePath);
-                    }
+                    if (File.Exists(archivePath)) File.Delete(archivePath);
                 }
                 else
                 {
@@ -79,10 +65,7 @@ public class BackupService : IBackupService
             }
             catch (Exception)
             {
-                if (File.Exists(archivePath))
-                {
-                    File.Delete(archivePath);
-                }
+                if (File.Exists(archivePath)) File.Delete(archivePath);
                 throw;
             }
         }
@@ -102,7 +85,7 @@ public class BackupService : IBackupService
         {
             if (game.DaysForKeep <= 0)
             {
-                _logger.LogInformation("Cleanup skipped for {GameName} as DaysForKeep is {Days}", 
+                _logger.LogInformation("Cleanup skipped for {GameName} as DaysForKeep is {Days}",
                     game.GameName, game.DaysForKeep);
                 return;
             }
@@ -117,9 +100,9 @@ public class BackupService : IBackupService
 
             var cutoffDate = DateTime.Now.AddDays(-game.DaysForKeep);
             var files = Directory.GetFiles(backupDir, "*.zip")
-                               .Select(f => new FileInfo(f))
-                               .Where(f => f.CreationTime < cutoffDate)
-                               .ToList();
+                .Select(f => new FileInfo(f))
+                .Where(f => f.CreationTime < cutoffDate)
+                .ToList();
 
             if (!files.Any())
             {
@@ -130,19 +113,17 @@ public class BackupService : IBackupService
             _logger.LogInformation("Found {Count} old backups to delete for {GameName}", files.Count, game.GameName);
 
             foreach (var file in files)
-            {
                 try
                 {
                     file.Delete();
-                    _logger.LogInformation("Deleted old backup {FileName} for {GameName}", 
+                    _logger.LogInformation("Deleted old backup {FileName} for {GameName}",
                         file.Name, game.GameName);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to delete old backup {FileName} for {GameName}", 
+                    _logger.LogError(ex, "Failed to delete old backup {FileName} for {GameName}",
                         file.Name, game.GameName);
                 }
-            }
         }
         catch (Exception ex)
         {
@@ -159,36 +140,28 @@ public class BackupService : IBackupService
         var hasValidPath = false;
 
         if (!Directory.Exists(game.SavePath))
-        {
-            _logger.LogWarning("Save path not found for game {GameName}: {Path}", 
+            _logger.LogWarning("Save path not found for game {GameName}: {Path}",
                 game.GameName, game.SavePath);
-        }
         else
-        {
             hasValidPath = true;
-        }
 
         if (!string.IsNullOrEmpty(game.ModPath) && !Directory.Exists(game.ModPath))
-        {
-            _logger.LogWarning("Mod path not found for game {GameName}: {Path}", 
+            _logger.LogWarning("Mod path not found for game {GameName}: {Path}",
                 game.GameName, game.ModPath);
-        }
-        else if (!string.IsNullOrEmpty(game.ModPath))
-        {
-            hasValidPath = true;
-        }
+        else if (!string.IsNullOrEmpty(game.ModPath)) hasValidPath = true;
 
         if (!string.IsNullOrEmpty(game.AddPath) && !Directory.Exists(game.AddPath))
-        {
-            _logger.LogWarning("Additional path not found for game {GameName}: {Path}", 
+            _logger.LogWarning("Additional path not found for game {GameName}: {Path}",
                 game.GameName, game.AddPath);
-        }
-        else if (!string.IsNullOrEmpty(game.AddPath))
-        {
-            hasValidPath = true;
-        }
+        else if (!string.IsNullOrEmpty(game.AddPath)) hasValidPath = true;
 
         return hasValidPath;
+    }
+
+    private string GetSafeDirectoryName(string name)
+    {
+        var invalid = Path.GetInvalidFileNameChars().Concat(Path.GetInvalidPathChars()).ToArray();
+        return string.Join("_", name.Split(invalid));
     }
 
     private async Task AddToArchiveAsync(ZipArchive archive, string sourcePath, string entryPrefix)
@@ -205,14 +178,18 @@ public class BackupService : IBackupService
         });
     }
 
-    private System.IO.Compression.CompressionLevel GetCompressionLevel()
+    private CompressionLevel GetCompressionLevel()
     {
-        var compressionLevel = (Multi_Saves_Backup_Tool.Models.CompressionLevel)_settingsService.CurrentSettings.BackupSettings.CompressionLevel;
+        var compressionLevel =
+            (Multi_Saves_Backup_Tool.Models.CompressionLevel)_settingsService.CurrentSettings.BackupSettings
+                .CompressionLevel;
         return compressionLevel switch
         {
-            Multi_Saves_Backup_Tool.Models.CompressionLevel.Fastest => System.IO.Compression.CompressionLevel.NoCompression,
-            Multi_Saves_Backup_Tool.Models.CompressionLevel.SmallestSize => System.IO.Compression.CompressionLevel.Optimal,
-            _ => System.IO.Compression.CompressionLevel.NoCompression
+            Multi_Saves_Backup_Tool.Models.CompressionLevel.Fastest => CompressionLevel
+                .NoCompression,
+            Multi_Saves_Backup_Tool.Models.CompressionLevel.SmallestSize => CompressionLevel
+                .Optimal,
+            _ => CompressionLevel.NoCompression
         };
     }
 }

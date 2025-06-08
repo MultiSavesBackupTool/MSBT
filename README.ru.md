@@ -1,9 +1,7 @@
 # Multi Saves Backup Tool
 
 <p align="center">
-  <a href="https://count.lukiuwu.xyz" target="_blank">
     <img alt="MSBT" src="https://count.lukiuwu.xyz/@MSBT?name=MSBT&theme=rule34&padding=7&offset=0&align=top&scale=1&pixelated=1&darkmode=auto">
-  </a>
 </p>
 
 [English](README.md) | [Русский](README.ru.md)
@@ -84,3 +82,5 @@
 ## Лицензия
 
 Этот проект с открытым исходным кодом. Пожалуйста, сообщайте о любых проблемах на GitHub Issues. 
+
+[![Star History Chart](https://api.star-history.com/svg?repos=TheNightlyGod/MSBT&type=Date)](https://www.star-history.com/?repos=journey-ad/Moe-Counter&type=Date#TheNightlyGod/MSBT&Date)
