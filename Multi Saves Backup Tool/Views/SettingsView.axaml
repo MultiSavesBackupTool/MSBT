@@ -56,15 +56,24 @@
                           IsChecked="{Binding Settings.BackupSettings.EnableLogging}" />
             </StackPanel>
 
-            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0"
-                        HorizontalAlignment="Right">
-                <Button Content="{x:Static properties:Resources.ExportTitle}"
-                        Command="{Binding ExportSettingsCommand}" />
-                <Button Content="{x:Static properties:Resources.ImportTitle}"
-                        Command="{Binding ImportSettingsCommand}" />
-                <Button Content="{x:Static properties:Resources.SettingsView_Save}"
-                        Command="{Binding SaveCurrentSettingsCommand}" />
-            </StackPanel>
+            <Grid Margin="0,20,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="{Binding CurrentVersion}"
+                           VerticalAlignment="Center" Margin="0,0,0,0" Grid.Column="0" />
+
+                <StackPanel Orientation="Horizontal" Spacing="10" Grid.Column="1">
+                    <Button Content="{x:Static properties:Resources.ExportTitle}"
+                            Command="{Binding ExportSettingsCommand}" />
+                    <Button Content="{x:Static properties:Resources.ImportTitle}"
+                            Command="{Binding ImportSettingsCommand}" />
+                    <Button Content="{x:Static properties:Resources.SettingsView_Save}"
+                            Command="{Binding SaveCurrentSettingsCommand}" />
+                </StackPanel>
+            </Grid>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

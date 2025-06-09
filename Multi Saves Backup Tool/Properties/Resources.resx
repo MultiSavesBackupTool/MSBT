@@ -154,6 +154,9 @@
     <data name="AddGameOverlay_Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+    <data name="AddGameOverlay_SpecialBackupMark" xml:space="preserve">
+    <value>Special Backup</value>
+  </data>
 
     <!-- MonitoringView strings -->
     <data name="MonitoringView_ServiceStatus" xml:space="preserve">

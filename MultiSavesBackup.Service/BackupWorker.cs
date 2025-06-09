@@ -197,6 +197,7 @@ public class BackupWorker : BackgroundService
 
             if (_backupService.VerifyBackupPaths(game))
             {
+                await _backupService.ProcessSpecialBackup(game);
                 await _backupService.CreateBackupAsync(game);
                 _backupService.CleanupOldBackups(game);
 

@@ -169,6 +169,10 @@
                                 <ComboBoxItem
                                     Content="{x:Static properties:Resources.AddGameOverlay_BackupChangedFiles}" />
                             </ComboBox>
+
+                            <CheckBox Content="{x:Static properties:Resources.AddGameOverlay_SpecialBackupMark}"
+                                      IsChecked="{Binding SpecialBackupMark}"
+                                      Margin="0,5,0,0" />
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>

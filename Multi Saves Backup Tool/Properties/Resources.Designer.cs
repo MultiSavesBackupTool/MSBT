@@ -318,6 +318,14 @@ namespace Properties
                 return ResourceManager.GetString("AddGameOverlay_Cancel", resourceCulture);
             }
         }
+
+        public static string AddGameOverlay_SpecialBackupMark
+        {
+            get
+            {
+                return ResourceManager.GetString("AddGameOverlay_SpecialBackupMark", resourceCulture);
+            }
+        }
         #endregion
 
         #region SettingsView strings

@@ -154,6 +154,9 @@
     <data name="AddGameOverlay_Cancel" xml:space="preserve">
     <value>Отмена</value>
   </data>
+    <data name="AddGameOverlay_SpecialBackupMark" xml:space="preserve">
+    <value>Специальный бэкап</value>
+  </data>
 
     <!-- MonitoringView strings -->
     <data name="MonitoringView_ServiceStatus" xml:space="preserve">
@@ -201,7 +204,7 @@
     <value>Включить журналирование</value>
   </data>
     <data name="SettingsView_Save" xml:space="preserve">
-    <value>Выберите папку резервного копирования</value>
+    <value>Сохранить</value>
   </data>
     <data name="ExportTitle" xml:space="preserve">
     <value>Экспортировать настройки</value>

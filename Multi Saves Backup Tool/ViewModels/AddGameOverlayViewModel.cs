@@ -31,6 +31,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     [ObservableProperty] private string _overlayTitle = string.Empty;
     [ObservableProperty] private string _saveLocation = string.Empty;
     [ObservableProperty] private string _saveLocationError = string.Empty;
+    [ObservableProperty] private bool _specialBackupMark;
 
     public AddGameOverlayViewModel(GamesViewModel gamesViewModel)
     {
@@ -66,6 +67,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
         DaysForKeep = gameToEdit.DaysForKeep;
         OldFilesStatus = gameToEdit.SetOldFilesStatus;
         BackupInterval = gameToEdit.BackupInterval;
+        SpecialBackupMark = gameToEdit.SpecialBackupMark;
     }
 
     public void SetAddMode()
@@ -162,6 +164,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
             DaysForKeep = DaysForKeep,
             SetOldFilesStatus = OldFilesStatus,
             BackupInterval = BackupInterval,
+            SpecialBackupMark = SpecialBackupMark,
             IsEnabled = IsEditMode ? _editingGame?.IsEnabled ?? true : true,
             BackupCount = IsEditMode ? _editingGame?.BackupCount ?? 0 : 0
         };
@@ -234,6 +237,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
         IncludeTimestamp = true;
         BackupMode = 0;
         BackupInterval = 60;
+        SpecialBackupMark = false;
         ErrorMessage = string.Empty;
     }
 }

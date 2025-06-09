@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
@@ -33,6 +34,9 @@ public partial class SettingsViewModel : ViewModelBase
     {
         _storageProvider = storageProvider;
     }
+
+    public string CurrentVersion =>
+        "Version: " + Assembly.GetExecutingAssembly().GetName().Version;
 
     public string BackupRootFolder
     {

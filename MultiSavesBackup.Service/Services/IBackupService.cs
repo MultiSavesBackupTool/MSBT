@@ -4,6 +4,7 @@ namespace MultiSavesBackup.Service.Services;
 
 public interface IBackupService
 {
+    Task ProcessSpecialBackup(GameModel game);
     Task CreateBackupAsync(GameModel game);
     void CleanupOldBackups(GameModel game);
     bool VerifyBackupPaths(GameModel game);

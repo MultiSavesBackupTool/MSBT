@@ -1,5 +1,5 @@
 #define MyAppName "Multi Saves Backup Tool"
-#define MyAppVersion "1.0"
+#define MyAppVersion "42.0.0.0"
 #define MyAppPublisher "Luki"
 #define MyAppExeName "Multi Saves Backup Tool.exe"
 #define MyServiceExeName "MultiSavesBackup.Service.exe"
@@ -35,12 +35,11 @@ Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 Filename: "sc.exe"; Parameters: "delete MultiSavesBackup"; Flags: runhidden;
 Filename: "sc.exe"; Parameters: "create ""MultiSavesBackup"" binPath= ""{app}\{#MyServiceExeName}"" start= auto DisplayName= ""Multi Saves Backup Service"""; Flags: runhidden;
 Filename: "sc.exe"; Parameters: "description MultiSavesBackup ""Service for automatic backup of game saves"""; Flags: runhidden;
 Filename: "net.exe"; Parameters: "start MultiSavesBackup"; Flags: runhidden waituntilterminated;
 
 [UninstallRun]
-Filename: "net.exe"; Parameters: "stop MultiSavesBackup"; Flags: runhidden
-Filename: "sc.exe"; Parameters: "delete MultiSavesBackup"; Flags: runhidden
+Filename: "net.exe"; Parameters: "stop MultiSavesBackup"; Flags: runhidden; RunOnceId: "StopService"
+Filename: "sc.exe"; Parameters: "delete MultiSavesBackup"; Flags: runhidden; RunOnceId: "DeleteService"

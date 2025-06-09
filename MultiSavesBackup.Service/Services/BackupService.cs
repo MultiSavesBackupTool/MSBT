@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Text.RegularExpressions;
 using Multi_Saves_Backup_Tool.Models;
 using CompressionLevel = System.IO.Compression.CompressionLevel;
 
@@ -20,6 +21,7 @@ public class BackupService : IBackupService
         if (game == null)
             throw new ArgumentNullException(nameof(game));
 
+        ZipArchive? archive = null;
         try
         {
             var settings = _settingsService.CurrentSettings.BackupSettings;
@@ -32,11 +34,12 @@ public class BackupService : IBackupService
 
             _logger.LogInformation("Creating backup for game {GameName} at {Path}", game.GameName, archivePath);
 
-            using var archive = ZipFile.Open(archivePath, ZipArchiveMode.Create);
-
-            var backupSuccess = false;
             try
             {
+                archive = ZipFile.Open(archivePath, ZipArchiveMode.Create);
+
+                var backupSuccess = false;
+
                 if (Directory.Exists(game.SavePath))
                 {
                     await AddToArchiveAsync(archive, game.SavePath, "saves");
@@ -56,6 +59,8 @@ public class BackupService : IBackupService
                 if (!backupSuccess)
                 {
                     _logger.LogWarning("No valid paths found for backup of game {GameName}", game.GameName);
+                    archive.Dispose();
+                    archive = null;
                     if (File.Exists(archivePath)) File.Delete(archivePath);
                 }
                 else
@@ -65,8 +70,26 @@ public class BackupService : IBackupService
             }
             catch (Exception)
             {
-                if (File.Exists(archivePath)) File.Delete(archivePath);
+                archive?.Dispose();
+                archive = null;
+
+                await Task.Delay(100);
+
+                if (File.Exists(archivePath))
+                    try
+                    {
+                        File.Delete(archivePath);
+                    }
+                    catch (Exception deleteEx)
+                    {
+                        _logger.LogWarning(deleteEx, "Could not delete failed backup file {Path}", archivePath);
+                    }
+
                 throw;
+            }
+            finally
+            {
+                archive?.Dispose();
             }
         }
         catch (Exception ex)
@@ -132,6 +155,105 @@ public class BackupService : IBackupService
         }
     }
 
+    public async Task ProcessSpecialBackup(GameModel game)
+    {
+        if (game == null)
+            throw new ArgumentNullException(nameof(game));
+
+        if (!game.SpecialBackupMark)
+        {
+            _logger.LogDebug("Special backup skipped for {GameName} - SpecialBackupMark is false", game.GameName);
+            return;
+        }
+
+        try
+        {
+            _logger.LogInformation("Starting special backup process for {GameName}", game.GameName);
+
+            if (!Directory.Exists(game.SavePath))
+            {
+                _logger.LogWarning("Source directory not found for game {GameName}: {Path}",
+                    game.GameName, game.SavePath);
+                return;
+            }
+
+            var settings = _settingsService.CurrentSettings.BackupSettings;
+            var safeName = GetSafeDirectoryName(game.GameName);
+            var archiveDir = Path.Combine(settings.BackupRootFolder, safeName, "SpecialArchive");
+
+            Directory.CreateDirectory(archiveDir);
+
+            var cutoffDate = DateTime.Now.AddDays(-1).ToString("yyMMdd");
+            _logger.LogInformation("Processing special backup for {GameName} with cutoff date: {Date}",
+                game.GameName, cutoffDate);
+
+            var directories = Directory.GetDirectories(game.SavePath)
+                .Select(dir => new
+                {
+                    Path = dir,
+                    Name = Path.GetFileName(dir),
+                    Date = ExtractDateFromDirectoryName(Path.GetFileName(dir))
+                })
+                .Where(d => !string.IsNullOrEmpty(d.Date))
+                .ToList();
+
+            if (!directories.Any())
+            {
+                _logger.LogInformation("No directories with date patterns found for {GameName}", game.GameName);
+                return;
+            }
+
+            var uniqueDates = directories.Select(d => d.Date).Distinct().ToList();
+            _logger.LogInformation("Found {Count} unique dates for {GameName}: {Dates}",
+                uniqueDates.Count, game.GameName, string.Join(", ", uniqueDates));
+
+            if (uniqueDates.Count <= 1)
+            {
+                _logger.LogInformation("All directories belong to single date for {GameName}. No archiving needed.",
+                    game.GameName);
+                return;
+            }
+
+            var archivedCount = 0;
+            foreach (var dir in directories.Where(d =>
+                         string.Compare(d.Date, cutoffDate, StringComparison.Ordinal) < 0))
+                try
+                {
+                    var destinationPath = Path.Combine(archiveDir, dir.Name);
+
+                    if (Directory.Exists(destinationPath))
+                    {
+                        var counter = 1;
+                        var baseName = dir.Name;
+                        while (Directory.Exists(destinationPath))
+                        {
+                            destinationPath = Path.Combine(archiveDir, $"{baseName}_({counter})");
+                            counter++;
+                        }
+                    }
+
+                    await CopyDirectoryAsync(dir.Path, destinationPath);
+                    Directory.Delete(dir.Path, true);
+                    _logger.LogInformation("Archived directory for {GameName}: {Source} -> {Destination}",
+                        game.GameName, dir.Name, Path.GetFileName(destinationPath));
+                    archivedCount++;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to archive directory {Directory} for {GameName}",
+                        dir.Name, game.GameName);
+                }
+
+            _logger.LogInformation("Special backup completed for {GameName}. Archived {Count} directories",
+                game.GameName, archivedCount);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Special backup failed for game {GameName}", game.GameName);
+            throw;
+        }
+    }
+
     public bool VerifyBackupPaths(GameModel game)
     {
         if (game == null)
@@ -158,13 +280,81 @@ public class BackupService : IBackupService
         return hasValidPath;
     }
 
+    private string? ExtractDateFromDirectoryName(string directoryName)
+    {
+        var patterns = new[]
+        {
+            @"[-_.](\d{6})[-_.]",
+            @"^(\d{6})[-_.]",
+            @"[-_.](\d{6})$",
+            @"^(\d{6})$"
+        };
+
+        foreach (var pattern in patterns)
+        {
+            var match = Regex.Match(directoryName, pattern);
+            if (match.Success)
+            {
+                var dateStr = match.Groups[1].Value;
+
+                if (IsValidDate(dateStr)) return dateStr;
+            }
+        }
+
+        return null;
+    }
+
+    private async Task CopyDirectoryAsync(string sourceDir, string destinationDir)
+    {
+        await Task.Run(() =>
+        {
+            Directory.CreateDirectory(destinationDir);
+
+            foreach (var file in Directory.GetFiles(sourceDir, "*", SearchOption.AllDirectories))
+            {
+                var relativePath = Path.GetRelativePath(sourceDir, file);
+                var destFile = Path.Combine(destinationDir, relativePath);
+
+                Directory.CreateDirectory(Path.GetDirectoryName(destFile) ?? string.Empty);
+                File.Copy(file, destFile, true);
+            }
+        });
+    }
+
+    private bool IsValidDate(string? dateStr)
+    {
+        if (dateStr != null && dateStr.Length != 6)
+            return false;
+
+        if (!int.TryParse(dateStr, out _))
+            return false;
+
+        try
+        {
+            var year = 2000 + int.Parse(dateStr.Substring(0, 2));
+            var month = int.Parse(dateStr.Substring(2, 2));
+            var day = int.Parse(dateStr.Substring(4, 2));
+
+            if (year < 2020 || year > 2030) return false;
+            if (month < 1 || month > 12) return false;
+            if (day < 1 || day > 31) return false;
+
+            var date = new DateTime(year, month, day);  
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     private string GetSafeDirectoryName(string name)
     {
         var invalid = Path.GetInvalidFileNameChars().Concat(Path.GetInvalidPathChars()).ToArray();
         return string.Join("_", name.Split(invalid));
     }
 
-    private async Task AddToArchiveAsync(ZipArchive archive, string sourcePath, string entryPrefix)
+    private async Task AddToArchiveAsync(ZipArchive? archive, string sourcePath, string entryPrefix)
     {
         await Task.Run(() =>
         {
@@ -173,7 +363,7 @@ public class BackupService : IBackupService
             {
                 var relativePath = Path.GetRelativePath(sourcePath, file);
                 var entryPath = Path.Combine(entryPrefix, relativePath);
-                archive.CreateEntryFromFile(file, entryPath, GetCompressionLevel());
+                if (archive != null) archive.CreateEntryFromFile(file, entryPath, GetCompressionLevel());
             }
         });
     }
