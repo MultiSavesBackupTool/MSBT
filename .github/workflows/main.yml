@@ -100,11 +100,11 @@ jobs:
             --output appimage
 
           mkdir -p installer
-          mv *.AppImage installer/multisaves-linux.AppImage
+          mv *.AppImage installer/Multi_Saves_Backup-x86_64.AppImage
 
       - name: Verify AppImage
         run: |
-          if [ ! -f "installer/multisaves-linux.AppImage" ]; then
+          if [ ! -f "installer/Multi_Saves_Backup-x86_64.AppImage" ]; then
             echo "AppImage not found!" >&2
             exit 1
           fi
