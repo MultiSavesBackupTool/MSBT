@@ -235,7 +235,7 @@ jobs:
       - build-linux
       - build-macos
     steps:
-      - name: Upload Linux AppImage
+      - name: Upload MacOS AppImage
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ github.run_number }}.0.0.0

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -9,7 +8,9 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using FluentAvalonia.UI.Controls;
 using Properties;
 
@@ -249,7 +250,6 @@ public class UpdateService
 
             Debug.WriteLine($"DMG mounted at: {volumePath}");
 
-            // Open the mounted volume in Finder to let the user drag-and-drop
             var openFinderProcess = new ProcessStartInfo
             {
                 FileName = "open",
@@ -259,7 +259,6 @@ public class UpdateService
             };
             Process.Start(openFinderProcess);
 
-            // Shutdown the app to allow for manual replacement.
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
             {
                 lifetime.Shutdown();
@@ -271,10 +270,6 @@ public class UpdateService
         {
             Debug.WriteLine($"Failed to install DMG file: {ex.Message}");
             return false;
-        }
-        finally
-        {
-            // Unmounting is now the user's responsibility after they finish installing.
         }
     }
 
@@ -288,7 +283,6 @@ public class UpdateService
             };
             Process.Start(processStartInfo);
 
-            // Correctly request shutdown of the current application
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
             {
                 lifetime.Shutdown();
@@ -314,7 +308,6 @@ public class UpdateService
                 return false;
             }
 
-            // Make the new file executable
             var chmodProcess = new ProcessStartInfo
             {
                 FileName = "chmod",
@@ -324,17 +317,14 @@ public class UpdateService
             };
             using (var proc = Process.Start(chmodProcess))
             {
-                await proc.WaitForExitAsync();
+                await proc?.WaitForExitAsync()!;
             }
 
-            // Replace the old executable with the new one.
             File.Move(filePath, currentExecutable, true);
             Debug.WriteLine($"Replaced current executable at {currentExecutable}");
 
-            // Relaunch the application
             Process.Start(currentExecutable);
             
-            // Shutdown the old instance
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
             {
                 lifetime.Shutdown();
