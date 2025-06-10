@@ -75,7 +75,7 @@ jobs:
           cat > AppDir/usr/share/applications/multisavesbackup.desktop <<EOF
           [Desktop Entry]
           Name=Multi Saves Backup
-          Exec=MultiSavesBackupTool
+          Exec=Multi Saves Backup Tool
           Icon=multisavesbackup
           Type=Application
           Categories=Utility;
