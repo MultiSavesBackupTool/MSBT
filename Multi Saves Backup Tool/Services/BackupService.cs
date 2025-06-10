@@ -285,6 +285,25 @@ public class BackupService : IBackupService
         return hasValidPath;
     }
 
+    public int GetBackupCount(GameModel game)
+    {
+        if (game == null) return 0;
+        try
+        {
+            var safeName = GetSafeDirectoryName(game.GameName);
+            var backupDir = Path.Combine(_settingsService.CurrentSettings.BackupSettings.BackupRootFolder, safeName);
+
+            if (!Directory.Exists(backupDir)) return 0;
+
+            return Directory.GetFiles(backupDir, "*.zip").Length;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to get backup count for {GameName}", game.GameName);
+            return 0;
+        }
+    }
+
     private string? ExtractDateFromDirectoryName(string directoryName)
     {
         var patterns = new[]

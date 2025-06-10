@@ -10,7 +10,8 @@ public class ServiceSettings
 
 public class BackupSettings
 {
-    public string BackupRootFolder { get; set; } = "C:\\Backups";
+    public string BackupRootFolder { get; set; } =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "MultiSavesBackupTool", "Backups");
     public int ScanIntervalMinutes { get; set; } = 5;
     public int MaxParallelBackups { get; set; } = 2;
     public CompressionLevel CompressionLevel { get; set; } = CompressionLevel.Optimal;

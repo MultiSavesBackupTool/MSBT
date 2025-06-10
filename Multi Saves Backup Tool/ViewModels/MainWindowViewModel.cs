@@ -23,13 +23,14 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty] private string _updateMessage = string.Empty;
 
-    public MainWindowViewModel(Window mainWindow, ITrayService trayService)
+    public MainWindowViewModel(Window mainWindow, ITrayService trayService, IGamesService gamesService,
+        IBackupService backupService, BackupManager backupManager)
     {
         _trayService = trayService;
         _updateService = new UpdateService();
 
-        MonitoringViewModel = new MonitoringViewModel();
-        GamesViewModel = new GamesViewModel();
+        MonitoringViewModel = new MonitoringViewModel(backupManager);
+        GamesViewModel = new GamesViewModel(gamesService, backupService);
         SettingsViewModel = new SettingsViewModel(mainWindow.StorageProvider);
         CurrentViewModel = MonitoringViewModel;
 

@@ -13,9 +13,9 @@
         <RuntimeIdentifier>win-x64</RuntimeIdentifier>
         <DebugType>none</DebugType>
         <DebugSymbols>false</DebugSymbols>
-        <Version>63.0.0.0</Version>
-        <AssemblyVersion>63.0.0.0</AssemblyVersion>
-        <FileVersion>63.0.0.0</FileVersion>
+        <Version>64.0.0.0</Version>
+        <AssemblyVersion>64.0.0.0</AssemblyVersion>
+        <FileVersion>64.0.0.0</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -42,7 +42,6 @@
         <PackageReference Include="Serilog" Version="4.3.1-dev-02373"/>
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0"/>
         <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0"/>
-        <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0"/>
     </ItemGroup>
 
     <ItemGroup>

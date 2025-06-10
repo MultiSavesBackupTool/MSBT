@@ -1,38 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using Multi_Saves_Backup_Tool.Paths;
+using System.Linq;
+using Avalonia.Threading;
+using Multi_Saves_Backup_Tool.Models;
+using Multi_Saves_Backup_Tool.Services;
 using Properties;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
-
-public class LocalServiceState
-{
-    public DateTime LastUpdateTime { get; set; }
-    public Dictionary<string, LocalGameState> GamesState { get; set; } = new();
-    public string ServiceStatus { get; set; } = Resources.StatusServiceRunning;
-
-    public static LocalServiceState LoadFromFile(string path)
-    {
-        if (!File.Exists(path))
-            return new LocalServiceState();
-
-        var json = File.ReadAllText(path);
-        return JsonSerializer.Deserialize<LocalServiceState>(json) ?? new LocalServiceState();
-    }
-}
-
-public class LocalGameState
-{
-    public string GameName { get; set; } = "";
-    public DateTime? LastBackupTime { get; set; }
-    public string Status { get; set; } = Resources.StatusServiceRunning;
-    public DateTime? NextBackupScheduled { get; set; }
-}
 
 public class GameMonitoringInfo
 {
@@ -44,15 +18,15 @@ public class GameMonitoringInfo
 
 public class MonitoringViewModel : ViewModelBase, IDisposable
 {
-    private readonly CancellationTokenSource _cancellationTokenSource;
-    private readonly Task _monitoringTask;
+    private readonly BackupManager _backupManager;
     private DateTime _lastUpdateTime;
     private string _serviceStatus = Resources.StatusUnknown;
 
-    public MonitoringViewModel()
+    public MonitoringViewModel(BackupManager backupManager)
     {
-        _cancellationTokenSource = new CancellationTokenSource();
-        _monitoringTask = StartMonitoring(_cancellationTokenSource.Token);
+        _backupManager = backupManager;
+        _backupManager.StateChanged += OnStateChanged;
+        UpdateState();
     }
 
     public ObservableCollection<GameMonitoringInfo> Games { get; } = new();
@@ -67,48 +41,24 @@ public class MonitoringViewModel : ViewModelBase, IDisposable
 
     public void Dispose()
     {
-        _cancellationTokenSource.Cancel();
-        try
-        {
-            _monitoringTask.Wait(TimeSpan.FromSeconds(5));
-        }
-        catch (AggregateException)
-        {
-            // Task was canceled, which is expected
-        }
-
-        _cancellationTokenSource.Dispose();
+        _backupManager.StateChanged -= OnStateChanged;
     }
 
-    private async Task StartMonitoring(CancellationToken cancellationToken)
+    private void OnStateChanged()
     {
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            await UpdateServiceState();
-            try
-            {
-                await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
-            }
-            catch (TaskCanceledException)
-            {
-                break;
-            }
-        }
+        Dispatcher.UIThread.Post(UpdateState);
     }
 
-    private async Task UpdateServiceState()
+    private void UpdateState()
     {
         try
         {
-            var statePath = AppPaths.ServiceStateFilePath;
-            if (!File.Exists(statePath))
+            var state = _backupManager.State;
+            if (state == null)
             {
                 ServiceStatus = Resources.StatusServiceNotRunning;
                 return;
             }
-
-            var json = await File.ReadAllTextAsync(statePath);
-            var state = JsonSerializer.Deserialize<LocalServiceState>(json) ?? new LocalServiceState();
 
             ServiceStatus = state.ServiceStatus switch
             {
@@ -120,32 +70,55 @@ public class MonitoringViewModel : ViewModelBase, IDisposable
             _lastUpdateTime = state.LastUpdateTime;
             OnPropertyChanged(nameof(LastUpdateTime));
 
-            Games.Clear();
-            foreach (var (_, gameState) in state.GamesState)
-                Games.Add(new GameMonitoringInfo
+            var gamesFromState = state.GamesState.Values.ToList();
+            var gamesInVm = Games.ToList();
+
+            // Remove games that are no longer in the state
+            foreach (var gameInVm in gamesInVm.Where(gameInVm => gamesFromState.All(gfs => gfs.GameName != gameInVm.GameName)))
+            {
+                Games.Remove(gameInVm);
+            }
+            
+            // Update existing games and add new ones
+            foreach (var gameState in gamesFromState)
+            {
+                var existingGame = Games.FirstOrDefault(g => g.GameName == gameState.GameName);
+                if (existingGame != null)
                 {
-                    GameName = gameState.GameName,
-                    Status = gameState.Status switch
-                    {
-                        "Success" => Resources.StatusSuccess,
-                        "Running" => Resources.StatusRunning,
-                        "Processing" => Resources.StatusBackingUp,
-                        "Cleaning" => Resources.StatusCleaning,
-                        "Waiting" => Resources.StatusWaiting,
-                        "Disabled" => Resources.StatusDisabled,
-                        "Game Not Running" => Resources.StatusGameNotRunning,
-                        "Error" => Resources.StatusError,
-                        "Path Error" => Resources.StatusPathError,
-                        _ => gameState.Status
-                    },
-                    LastBackupTime = gameState.LastBackupTime?.ToString("g") ?? Resources.NoData,
-                    NextBackupScheduled = gameState.NextBackupScheduled?.ToString("g") ?? Resources.NotScheduled
-                });
+                    UpdateGameMonitoringInfo(existingGame, gameState);
+                }
+                else
+                {
+                    var newGameInfo = new GameMonitoringInfo();
+                    UpdateGameMonitoringInfo(newGameInfo, gameState);
+                    Games.Add(newGameInfo);
+                }
+            }
         }
         catch (Exception ex)
         {
             ServiceStatus = string.Format(Resources.StatusConnectionError, ex.Message);
             Console.WriteLine($"Error updating state: {ex}");
         }
+    }
+
+    private void UpdateGameMonitoringInfo(GameMonitoringInfo info, GameState state)
+    {
+        info.GameName = state.GameName;
+        info.Status = state.Status switch
+        {
+            "Success" => Resources.StatusSuccess,
+            "Running" => Resources.StatusRunning,
+            "Processing" => Resources.StatusBackingUp,
+            "Cleaning" => Resources.StatusCleaning,
+            "Waiting" => Resources.StatusWaiting,
+            "Disabled" => Resources.StatusDisabled,
+            "Game Not Running" => Resources.StatusGameNotRunning,
+            "Error" => Resources.StatusError,
+            "Path Error" => Resources.StatusPathError,
+            _ => state.Status
+        };
+        info.LastBackupTime = state.LastBackupTime?.ToString("g") ?? Resources.NoData;
+        info.NextBackupScheduled = state.NextBackupScheduled?.ToString("g") ?? Resources.NotScheduled;
     }
 }

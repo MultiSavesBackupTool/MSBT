@@ -44,16 +44,20 @@ public class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var trayService = _serviceProvider!.GetRequiredService<TrayService>();
+            if (_serviceProvider == null) return;
+            var trayService = _serviceProvider.GetRequiredService<TrayService>();
+            var gamesService = _serviceProvider.GetRequiredService<IGamesService>();
+            var backupService = _serviceProvider.GetRequiredService<IBackupService>();
+            _backupManager = _serviceProvider.GetRequiredService<BackupManager>();
+
             var mainWindow = new MainWindow();
-            var mainViewModel = new MainWindowViewModel(mainWindow, trayService);
+            var mainViewModel = new MainWindowViewModel(mainWindow, trayService, gamesService, backupService, _backupManager);
 
             mainWindow.DataContext = mainViewModel;
             desktop.MainWindow = mainWindow;
             trayService.Initialize();
 
-            if (_serviceProvider != null) _backupManager = _serviceProvider.GetRequiredService<BackupManager>();
-            await _backupManager?.StartAsync()!;
+            await _backupManager.StartAsync();
 
             desktop.ShutdownRequested += async (s, e) =>
             {

@@ -143,6 +143,29 @@ public class GamesService : IGamesService, IDisposable
         return games.FirstOrDefault(g => g.GameName.Equals(gameName, StringComparison.OrdinalIgnoreCase));
     }
 
+    public async Task SaveGamesAsync(IEnumerable<GameModel> games)
+    {
+        try
+        {
+            var gamesPath = AppPaths.GamesFilePath;
+            var gamesDict = games.ToDictionary(game => game.GameName, game => game);
+
+            var json = JsonSerializer.Serialize(gamesDict, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+            await File.WriteAllTextAsync(gamesPath, json);
+            _logger.LogInformation("Saved {Count} games to configuration", gamesDict.Count);
+
+            // Invalidate cache after saving
+            await ClearCacheAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error saving games configuration");
+        }
+    }
+
     public bool IsGameRunning(GameModel game)
     {
         if (game == null)

@@ -206,16 +206,21 @@ public partial class AddGameOverlayViewModel : ViewModelBase
             var options = new FilePickerOpenOptions
             {
                 Title = "Select Game Executable",
-                AllowMultiple = false,
-                FileTypeFilter = new[]
+                AllowMultiple = false
+            };
+
+            if (OperatingSystem.IsWindows())
+            {
+                options.FileTypeFilter = new[]
                 {
                     new FilePickerFileType("Executable Files")
                     {
                         Patterns = new[] { "*.exe" },
                         MimeTypes = new[] { "application/x-msdownload" }
                     }
-                }
-            };
+                };
+            }
+            // For macOS and Linux, executables don't have a standard extension, so we allow any file.
 
             var files = await storageProvider.OpenFilePickerAsync(options);
             return files.Count > 0 ? files[0].Path.LocalPath : string.Empty;

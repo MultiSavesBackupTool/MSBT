@@ -5,27 +5,30 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.UI.Controls;
 using Multi_Saves_Backup_Tool.Models;
-using Multi_Saves_Backup_Tool.Paths;
+using Multi_Saves_Backup_Tool.Services;
 using Properties;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
 
 public class GamesViewModel : ViewModelBase
 {
+    private readonly IBackupService _backupService;
+    private readonly IGamesService _gamesService;
     private ObservableCollection<GameModel> _games;
 
-    public GamesViewModel()
+    public GamesViewModel(IGamesService gamesService, IBackupService backupService)
     {
+        _gamesService = gamesService;
+        _backupService = backupService;
         _games = new ObservableCollection<GameModel>();
         DeleteGameCommand = new AsyncRelayCommand<GameModel?>(DeleteGameAsync);
         EditGameCommand = new RelayCommand<GameModel?>(EditGame);
-        LoadGames();
+        _ = LoadGames();
     }
 
     public ObservableCollection<GameModel> Games
@@ -33,9 +36,11 @@ public class GamesViewModel : ViewModelBase
         get => _games;
         set
         {
-            _games.CollectionChanged -= Games_CollectionChanged;
+            if (_games != null)
+                _games.CollectionChanged -= Games_CollectionChanged;
             SetProperty(ref _games, value);
-            _games.CollectionChanged += Games_CollectionChanged;
+            if (_games != null)
+                _games.CollectionChanged += Games_CollectionChanged;
         }
     }
 
@@ -44,98 +49,42 @@ public class GamesViewModel : ViewModelBase
 
     public event EventHandler<GameModel>? EditGameRequested;
 
-    private void Games_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private async void Games_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        SaveGames();
+        await SaveGames();
+        if (e.OldItems != null)
+            foreach (GameModel item in e.OldItems)
+                item.PropertyChanged -= Game_PropertyChanged;
+        if (e.NewItems != null)
+            foreach (GameModel item in e.NewItems)
+                item.PropertyChanged += Game_PropertyChanged;
     }
 
-    private void LoadGames()
+    private async Task LoadGames()
     {
-        try
+        var gamesList = await _gamesService.LoadGamesAsync();
+        Games = new ObservableCollection<GameModel>(gamesList);
+        foreach (var game in Games)
         {
-            var jsonPath = AppPaths.GamesFilePath;
-            if (File.Exists(jsonPath))
-            {
-                var json = File.ReadAllText(jsonPath);
-                List<GameModel>? gamesList = null;
-
-                try
-                {
-                    var gamesDict = JsonSerializer.Deserialize<Dictionary<string, GameModel>>(json,
-                        new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true
-                        });
-                    if (gamesDict != null) gamesList = gamesDict.Values.ToList();
-                }
-                catch
-                {
-                    try
-                    {
-                        var gamesArray = JsonSerializer.Deserialize<List<GameModel>>(json, new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true
-                        });
-                        if (gamesArray != null)
-                        {
-                            gamesList = gamesArray;
-                            Games = new ObservableCollection<GameModel>(gamesList);
-                            foreach (var game in Games)
-                                game.PropertyChanged += Game_PropertyChanged;
-                            SaveGames();
-                            return;
-                        }
-                    }
-                    catch
-                    {
-                        Games = new ObservableCollection<GameModel>();
-                        return;
-                    }
-                }
-
-                if (gamesList != null)
-                {
-                    Games = new ObservableCollection<GameModel>(gamesList);
-                    foreach (var game in Games)
-                        game.PropertyChanged += Game_PropertyChanged;
-                }
-            }
-        }
-        catch (Exception)
-        {
-            Games = new ObservableCollection<GameModel>();
+            game.PropertyChanged += Game_PropertyChanged;
+            UpdateBackupCount(game);
         }
     }
 
-    private void Game_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private async void Game_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(GameModel.IsEnabled)) SaveGames();
+        if (e.PropertyName == nameof(GameModel.IsEnabled)) await SaveGames();
     }
 
-    private void SaveGames()
+    private async Task SaveGames()
     {
-        try
-        {
-            var jsonPath = AppPaths.GamesFilePath;
-
-            var gamesDict = Games.ToDictionary(game => game.GameName, game => game);
-
-            var json = JsonSerializer.Serialize(gamesDict, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
-            File.WriteAllText(jsonPath, json);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"Error saving games: {e.Message}");
-        }
+        await _gamesService.SaveGamesAsync(Games);
     }
 
     public void AddGame(GameModel game)
     {
         Games.Add(game);
-        game.PropertyChanged += Game_PropertyChanged;
+        UpdateBackupCount(game);
     }
 
     public void UpdateGame(GameModel originalGame, GameModel updatedGame)
@@ -143,13 +92,9 @@ public class GamesViewModel : ViewModelBase
         var index = Games.IndexOf(originalGame);
         if (index >= 0)
         {
-            originalGame.PropertyChanged -= Game_PropertyChanged;
-
             Games[index] = updatedGame;
-
-            updatedGame.PropertyChanged += Game_PropertyChanged;
-
-            SaveGames();
+            UpdateBackupCount(updatedGame);
+            // Save is triggered by CollectionChanged
         }
     }
 
@@ -173,40 +118,19 @@ public class GamesViewModel : ViewModelBase
 
         var result = await dialog.ShowAsync();
 
-        if (result == ContentDialogResult.Primary)
-        {
-            game.PropertyChanged -= Game_PropertyChanged;
-            Games.Remove(game);
-            SaveGames();
-        }
+        if (result == ContentDialogResult.Primary) Games.Remove(game);
     }
 
     public void UpdateBackupCount(GameModel game)
     {
         try
         {
-            var settings = new ServiceSettings();
-            var backupDir = Path.Combine(settings.BackupSettings.BackupRootFolder, GetSafeDirectoryName(game.GameName));
-            if (Directory.Exists(backupDir))
-            {
-                var count = Directory.GetFiles(backupDir, "*.zip").Length;
-                game.BackupCount = count;
-            }
-            else
-            {
-                game.BackupCount = 0;
-            }
+            game.BackupCount = _backupService.GetBackupCount(game);
         }
         catch (Exception e)
         {
             Console.WriteLine($"Error updating backup count: {e.Message}");
             game.BackupCount = 0;
         }
-    }
-
-    private string GetSafeDirectoryName(string name)
-    {
-        var invalid = Path.GetInvalidFileNameChars().Concat(Path.GetInvalidPathChars()).ToArray();
-        return string.Join("_", name.Split(invalid));
     }
 }

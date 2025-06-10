@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Models;
 using Multi_Saves_Backup_Tool.Paths;
+using System.Text.Json;
 
 namespace Multi_Saves_Backup_Tool.Services;
 
@@ -17,10 +18,12 @@ public class BackupManager : IDisposable
     private readonly IBackupService _backupService;
     private readonly IGamesService _gamesService;
     private readonly ILogger<BackupManager> _logger;
-    private readonly ServiceState _serviceState;
+    private ServiceState _serviceState;
     private readonly ISettingsService _settingsService;
     private Task? _backupTask;
     private CancellationTokenSource? _cancellationTokenSource;
+
+    public event Action? StateChanged;
 
     public BackupManager(
         ILogger<BackupManager> logger,
@@ -34,6 +37,8 @@ public class BackupManager : IDisposable
         _backupService = backupService;
         _serviceState = ServiceState.LoadFromFile(StateFilePath);
     }
+
+    public ServiceState State => _serviceState;
 
     public void Dispose()
     {
@@ -262,7 +267,9 @@ public class BackupManager : IDisposable
     {
         try
         {
-            _serviceState.SaveToFile(StateFilePath);
+            var json = JsonSerializer.Serialize(_serviceState, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(StateFilePath, json);
+            StateChanged?.Invoke();
         }
         catch (Exception ex)
         {
