@@ -100,7 +100,7 @@ jobs:
             --output appimage
 
           mkdir -p installer
-          mv *.AppImage installer/Multi_Saves_Backup-x86_64.AppImage
+          mv Multi_Saves_Backup-x86_64.AppImage installer/Multi_Saves_Backup-x86_64.AppImage
 
       - name: Verify AppImage
         run: |
