@@ -48,10 +48,13 @@ public class App : Application
             var trayService = _serviceProvider.GetRequiredService<TrayService>();
             var gamesService = _serviceProvider.GetRequiredService<IGamesService>();
             var backupService = _serviceProvider.GetRequiredService<IBackupService>();
+            var settingsService = _serviceProvider.GetRequiredService<ISettingsService>();
+            var mainWindowLogger = _serviceProvider.GetRequiredService<ILogger<MainWindowViewModel>>();
+            var statsLogger = _serviceProvider.GetRequiredService<ILogger<StatsViewModel>>();
             _backupManager = _serviceProvider.GetRequiredService<BackupManager>();
 
             var mainWindow = new MainWindow();
-            var mainViewModel = new MainWindowViewModel(mainWindow, trayService, gamesService, backupService, _backupManager);
+            var mainViewModel = new MainWindowViewModel(mainWindow, trayService, gamesService, backupService, _backupManager, settingsService, mainWindowLogger, statsLogger);
 
             mainWindow.DataContext = mainViewModel;
             desktop.MainWindow = mainWindow;

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Threading;
+using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Models;
 using Multi_Saves_Backup_Tool.Services;
 using Properties;
@@ -12,14 +14,20 @@ namespace Multi_Saves_Backup_Tool.ViewModels;
 public class StatsViewModel : ViewModelBase, IDisposable
 {
     private readonly IGamesService _gameService;
+    private readonly IBackupService _backupService;
+    private readonly ISettingsService _settingsService;
+    private readonly ILogger<StatsViewModel> _logger;
     private readonly DispatcherTimer _updateTimer;
     private string _archivesCounts = "0";
     private string _sizesArchives = "0 MB";
     private ObservableCollection<GameStatsInfo> _games = new();
 
-    public StatsViewModel(IGamesService gameService)
+    public StatsViewModel(IGamesService gameService, IBackupService backupService, ISettingsService settingsService, ILogger<StatsViewModel> logger)
     {
         _gameService = gameService;
+        _backupService = backupService;
+        _settingsService = settingsService;
+        _logger = logger;
         
         _updateTimer = new DispatcherTimer
         {
@@ -51,25 +59,123 @@ public class StatsViewModel : ViewModelBase, IDisposable
 
     private async Task UpdateStatsAsync()
     {
-        var games = await _gameService.LoadGamesAsync();
-        var totalArchives = 0L;
-        var totalSize = 0L;
-
-        Games.Clear();
-        foreach (var game in games)
+        try
         {
-            // Since we don't have a direct method to get archives, we'll need to add it
-            // For now, we'll just show game information
-            Games.Add(new GameStatsInfo
-            {
-                GameName = game.GameName,
-                GamesCountArchives = "0", // This needs to be implemented when we have archive functionality
-                GamesSizesArchives = "0 B" // This needs to be implemented when we have archive functionality
-            });
-        }
+            var games = await _gameService.LoadGamesAsync();
+            _logger.LogInformation("Loaded {Count} games for statistics", games.Count);
+            
+            var totalArchives = 0;
+            var totalSize = 0L;
 
-        ArchivesCounts = totalArchives.ToString();
-        SizesArchives = FormatSize(totalSize);
+            Games.Clear();
+            foreach (var game in games)
+            {
+                var backupCount = _backupService.GetBackupCount(game);
+                var gameSize = CalculateGameBackupsSize(game);
+                
+                var specialArchivesCount = GetSpecialArchivesCount(game);
+                var specialArchivesSize = CalculateSpecialArchivesSize(game);
+                
+                _logger.LogInformation(
+                    "Game {GameName} stats: Regular backups: {RegularCount} ({RegularSize} bytes), Special archives: {SpecialCount} ({SpecialSize} bytes)",
+                    game.GameName, backupCount, gameSize, specialArchivesCount, specialArchivesSize);
+                
+                backupCount += specialArchivesCount;
+                gameSize += specialArchivesSize;
+                
+                totalArchives += backupCount;
+                totalSize += gameSize;
+
+                Games.Add(new GameStatsInfo
+                {
+                    GameName = game.GameName,
+                    GamesCountArchives = backupCount.ToString(),
+                    GamesSizesArchives = FormatSize(gameSize)
+                });
+            }
+
+            _logger.LogInformation("Total statistics: {Count} archives, {Size} bytes", totalArchives, totalSize);
+            
+            ArchivesCounts = totalArchives.ToString();
+            SizesArchives = FormatSize(totalSize);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating statistics");
+        }
+    }
+
+    private int GetSpecialArchivesCount(GameModel game)
+    {
+        try
+        {
+            var safeName = GetSafeDirectoryName(game.GameName);
+            var specialArchiveDir = Path.Combine(_settingsService.CurrentSettings.BackupSettings.BackupRootFolder, safeName, "SpecialArchive");
+            
+            if (!Directory.Exists(specialArchiveDir))
+            {
+                _logger.LogDebug("Special archive directory not found for {GameName}: {Path}", game.GameName, specialArchiveDir);
+                return 0;
+            }
+            
+            var count = Directory.GetDirectories(specialArchiveDir).Length;
+            _logger.LogDebug("Found {Count} special archives for {GameName}", count, game.GameName);
+            return count;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error counting special archives for {GameName}", game.GameName);
+            return 0;
+        }
+    }
+
+    private long CalculateGameBackupsSize(GameModel game)
+    {
+        try
+        {
+            var safeName = GetSafeDirectoryName(game.GameName);
+            var backupDir = Path.Combine(_settingsService.CurrentSettings.BackupSettings.BackupRootFolder, safeName);
+            if (!Directory.Exists(backupDir))
+            {
+                _logger.LogDebug("Backup directory not found for {GameName}: {Path}", game.GameName, backupDir);
+                return 0;
+            }
+
+            var files = Directory.GetFiles(backupDir, "*.zip");
+            var size = files.Sum(file => new FileInfo(file).Length);
+            _logger.LogDebug("Found {Count} backup files for {GameName}, total size: {Size} bytes", files.Length, game.GameName, size);
+            return size;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error calculating backup size for {GameName}", game.GameName);
+            return 0;
+        }
+    }
+
+    private long CalculateSpecialArchivesSize(GameModel game)
+    {
+        try
+        {
+            var safeName = GetSafeDirectoryName(game.GameName);
+            var specialArchiveDir = Path.Combine(_settingsService.CurrentSettings.BackupSettings.BackupRootFolder, safeName, "SpecialArchive");
+            if (!Directory.Exists(specialArchiveDir))
+            {
+                _logger.LogDebug("Special archive directory not found for {GameName}: {Path}", game.GameName, specialArchiveDir);
+                return 0;
+            }
+
+            var size = Directory.GetDirectories(specialArchiveDir)
+                .Sum(dir => Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories)
+                    .Sum(file => new FileInfo(file).Length));
+            _logger.LogDebug("Special archives size for {GameName}: {Size} bytes", game.GameName, size);
+            return size;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error calculating special archives size for {GameName}", game.GameName);
+            return 0;
+        }
     }
 
     private string FormatSize(long bytes)
@@ -85,6 +191,11 @@ public class StatsViewModel : ViewModelBase, IDisposable
         }
 
         return $"{size:0.##} {sizes[order]}";
+    }
+
+    private string GetSafeDirectoryName(string name)
+    {
+        return string.Join("_", name.Split(Path.GetInvalidFileNameChars()));
     }
 
     public void Dispose()
