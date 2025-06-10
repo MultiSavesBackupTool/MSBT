@@ -51,7 +51,7 @@ jobs:
       - name: Verify installer
         shell: cmd
         run: |
-          if not exist "%{{ steps.rename-win.outputs.file }}%" (
+          if not exist "installer/MultiSavesBackupSetup.exe" (
             echo Installer file not found! && exit 1
           )
 
