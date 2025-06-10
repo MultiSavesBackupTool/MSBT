@@ -11,6 +11,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.UI.Controls;
 using Multi_Saves_Backup_Tool.Models;
+using Multi_Saves_Backup_Tool.Paths;
 using Properties;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
@@ -52,7 +53,7 @@ public class GamesViewModel : ViewModelBase
     {
         try
         {
-            var jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "games.json");
+            var jsonPath = AppPaths.GamesFilePath;
             if (File.Exists(jsonPath))
             {
                 var json = File.ReadAllText(jsonPath);
@@ -115,7 +116,7 @@ public class GamesViewModel : ViewModelBase
     {
         try
         {
-            var jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "games.json");
+            var jsonPath = AppPaths.GamesFilePath;
 
             var gamesDict = Games.ToDictionary(game => game.GameName, game => game);
 

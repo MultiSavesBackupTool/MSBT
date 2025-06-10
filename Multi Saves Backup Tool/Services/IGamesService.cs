@@ -1,6 +1,8 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Multi_Saves_Backup_Tool.Models;
 
-namespace MultiSavesBackup.Service.Services;
+namespace Multi_Saves_Backup_Tool.Services;
 
 public interface IGamesService
 {

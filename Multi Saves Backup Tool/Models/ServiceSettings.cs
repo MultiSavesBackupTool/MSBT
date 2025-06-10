@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+
 namespace Multi_Saves_Backup_Tool.Models;
 
 public class ServiceSettings
@@ -13,11 +16,23 @@ public class BackupSettings
     public CompressionLevel CompressionLevel { get; set; } = CompressionLevel.Optimal;
     public string GamesConfigPath { get; set; } = "games.json";
     public bool EnableLogging { get; set; } = true;
+
+    public TimeSpan GetScanInterval()
+    {
+        return TimeSpan.FromMinutes(ScanIntervalMinutes);
+    }
+
+    public string GetAbsolutePath(string relativePath)
+    {
+        if (Path.IsPathRooted(relativePath))
+            return relativePath;
+        return Path.GetFullPath(relativePath, AppContext.BaseDirectory);
+    }
 }
 
 public enum CompressionLevel
 {
-    Fastest = 0,
-    Optimal = 1,
+    Optimal = 0,
+    Fastest = 1,
     SmallestSize = 2
 }

@@ -1,8 +1,14 @@
+using System;
+using System.IO;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MultiSavesBackup.Service.Models;
+using Multi_Saves_Backup_Tool.Models;
+using Multi_Saves_Backup_Tool.Paths;
 
-namespace MultiSavesBackup.Service.Services;
+namespace Multi_Saves_Backup_Tool.Services;
 
 public interface ISettingsService
 {
@@ -24,17 +30,30 @@ public class SettingsService : ISettingsService, IDisposable
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         var mainAppDirectory = AppContext.BaseDirectory;
-        _settingsPath = Path.Combine(mainAppDirectory, "settings.json");
+        _settingsPath = AppPaths.SettingsFilePath;
 
         if (string.IsNullOrEmpty(CurrentSettings.BackupSettings.GamesConfigPath))
-            CurrentSettings.BackupSettings.GamesConfigPath = Path.Combine(mainAppDirectory, "games.json");
+            CurrentSettings.BackupSettings.GamesConfigPath = AppPaths.GamesFilePath;
 
         _logger.LogInformation("Using settings file: {Path}", _settingsPath);
         _logger.LogInformation("Using games config: {Path}", CurrentSettings.BackupSettings.GamesConfigPath);
 
         try
         {
-            _watcher = new FileSystemWatcher(mainAppDirectory)
+            var directory = Path.GetDirectoryName(_settingsPath);
+            if (directory == null)
+            {
+                _logger.LogError("Could not get directory for settings file: {Path}", _settingsPath);
+                return;
+            }
+
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+                _logger.LogInformation("Created directory for settings file: {Path}", directory);
+            }
+
+            _watcher = new FileSystemWatcher(directory)
             {
                 Filter = "settings.json",
                 NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Size,

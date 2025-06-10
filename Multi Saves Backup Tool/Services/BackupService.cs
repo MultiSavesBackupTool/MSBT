@@ -1,9 +1,14 @@
+using System;
+using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Models;
-using CompressionLevel = System.IO.Compression.CompressionLevel;
+using CompressionLevel = Multi_Saves_Backup_Tool.Models.CompressionLevel;
 
-namespace MultiSavesBackup.Service.Services;
+namespace Multi_Saves_Backup_Tool.Services;
 
 public class BackupService : IBackupService
 {
@@ -339,7 +344,7 @@ public class BackupService : IBackupService
             if (month < 1 || month > 12) return false;
             if (day < 1 || day > 31) return false;
 
-            var date = new DateTime(year, month, day);  
+            var date = new DateTime(year, month, day);
             return true;
         }
         catch
@@ -368,18 +373,14 @@ public class BackupService : IBackupService
         });
     }
 
-    private CompressionLevel GetCompressionLevel()
+    private System.IO.Compression.CompressionLevel GetCompressionLevel()
     {
-        var compressionLevel =
-            (Multi_Saves_Backup_Tool.Models.CompressionLevel)_settingsService.CurrentSettings.BackupSettings
-                .CompressionLevel;
-        return compressionLevel switch
+        return _settingsService.CurrentSettings.BackupSettings.CompressionLevel switch
         {
-            Multi_Saves_Backup_Tool.Models.CompressionLevel.Fastest => CompressionLevel
-                .NoCompression,
-            Multi_Saves_Backup_Tool.Models.CompressionLevel.SmallestSize => CompressionLevel
-                .Optimal,
-            _ => CompressionLevel.NoCompression
+            CompressionLevel.Fastest => System.IO.Compression.CompressionLevel.Fastest,
+            CompressionLevel.Optimal => System.IO.Compression.CompressionLevel.Optimal,
+            CompressionLevel.SmallestSize => System.IO.Compression.CompressionLevel.NoCompression,
+            _ => System.IO.Compression.CompressionLevel.Optimal
         };
     }
 }

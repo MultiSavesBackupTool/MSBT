@@ -5,6 +5,7 @@ using System.IO;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Multi_Saves_Backup_Tool.Paths;
 using Properties;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
@@ -99,7 +100,7 @@ public class MonitoringViewModel : ViewModelBase, IDisposable
     {
         try
         {
-            var statePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "service_state.json");
+            var statePath = AppPaths.ServiceStateFilePath;
             if (!File.Exists(statePath))
             {
                 ServiceStatus = Resources.StatusServiceNotRunning;

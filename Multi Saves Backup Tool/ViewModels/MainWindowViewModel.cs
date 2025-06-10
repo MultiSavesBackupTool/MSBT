@@ -11,6 +11,7 @@ namespace Multi_Saves_Backup_Tool.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
+    private readonly ITrayService _trayService;
     private readonly UpdateService _updateService;
 
     [ObservableProperty] private ViewModelBase? _currentViewModel;
@@ -22,21 +23,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty] private string _updateMessage = string.Empty;
 
-    public MainWindowViewModel()
+    public MainWindowViewModel(Window mainWindow, ITrayService trayService)
     {
-        var window = new Window();
-        _updateService = new UpdateService();
-
-        MonitoringViewModel = new MonitoringViewModel();
-        GamesViewModel = new GamesViewModel();
-        SettingsViewModel = new SettingsViewModel(window.StorageProvider);
-        CurrentViewModel = MonitoringViewModel;
-
-        _ = CheckForUpdatesOnStartupAsync();
-    }
-
-    public MainWindowViewModel(Window mainWindow)
-    {
+        _trayService = trayService;
         _updateService = new UpdateService();
 
         MonitoringViewModel = new MonitoringViewModel();
@@ -45,6 +34,7 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentViewModel = MonitoringViewModel;
 
         _ = CheckForUpdatesOnStartupAsync();
+        MessengerService.Instance.Subscribe<NavigateToSettingsMessage>(OnNavigateToSettingsRequested);
     }
 
     public MonitoringViewModel MonitoringViewModel { get; }
@@ -123,6 +113,11 @@ public partial class MainWindowViewModel : ViewModelBase
             "settings" => SettingsViewModel,
             _ => CurrentViewModel
         };
+    }
+
+    private void OnNavigateToSettingsRequested(NavigateToSettingsMessage message)
+    {
+        CurrentViewModel = SettingsViewModel;
     }
 
     private Type _updateServiceGetType()

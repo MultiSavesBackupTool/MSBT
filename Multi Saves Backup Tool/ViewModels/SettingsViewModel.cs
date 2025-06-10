@@ -8,6 +8,7 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Multi_Saves_Backup_Tool.Models;
+using Multi_Saves_Backup_Tool.Paths;
 using Properties;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
@@ -24,9 +25,9 @@ public partial class SettingsViewModel : ViewModelBase
     public SettingsViewModel()
     {
         var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        _settingsPath = Path.Combine(baseDirectory, "settings.json");
-        _gamesPath = Path.Combine(baseDirectory, "games.json");
-        _serviceStatePath = Path.Combine(baseDirectory, "service_state.json");
+        _settingsPath = AppPaths.SettingsFilePath;
+        _gamesPath = AppPaths.GamesFilePath;
+        _serviceStatePath = AppPaths.ServiceStateFilePath;
         _settings = LoadSettings();
     }
 

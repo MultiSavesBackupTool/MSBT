@@ -1,6 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
 
-namespace MultiSavesBackup.Service.Models;
+namespace Multi_Saves_Backup_Tool.Models;
 
 public class ServiceState
 {

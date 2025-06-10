@@ -1,8 +1,16 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Models;
+using Multi_Saves_Backup_Tool.Paths;
 
-namespace MultiSavesBackup.Service.Services;
+namespace Multi_Saves_Backup_Tool.Services;
 
 public class GamesService : IGamesService, IDisposable
 {
@@ -17,13 +25,19 @@ public class GamesService : IGamesService, IDisposable
         _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        var gamesPath = _settingsService.CurrentSettings.BackupSettings.GetAbsoluteGamesConfigPath();
+        var gamesPath = AppPaths.GamesFilePath;
         var directory = Path.GetDirectoryName(gamesPath);
         var fileName = Path.GetFileName(gamesPath);
 
         if (directory != null)
             try
             {
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                    _logger.LogInformation("Created directory for games config: {Path}", directory);
+                }
+
                 _watcher = new FileSystemWatcher(directory)
                 {
                     Filter = fileName,
@@ -83,7 +97,7 @@ public class GamesService : IGamesService, IDisposable
             {
                 if (_cachedGames != null) return _cachedGames;
 
-                var gamesPath = _settingsService.CurrentSettings.BackupSettings.GetAbsoluteGamesConfigPath();
+                var gamesPath = AppPaths.GamesFilePath;
 
                 if (!File.Exists(gamesPath))
                 {

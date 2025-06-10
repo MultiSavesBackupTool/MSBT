@@ -1,22 +1,29 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Models;
-using MultiSavesBackup.Service.Models;
-using MultiSavesBackup.Service.Services;
+using Multi_Saves_Backup_Tool.Paths;
 
-namespace MultiSavesBackup.Service;
+namespace Multi_Saves_Backup_Tool.Services;
 
-public class BackupWorker : BackgroundService
+public class BackupManager : IDisposable
 {
-    private static readonly string StateFilePath =
-        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "service_state.json");
+    private static readonly string StateFilePath = AppPaths.ServiceStateFilePath;
 
     private readonly IBackupService _backupService;
     private readonly IGamesService _gamesService;
-    private readonly ILogger<BackupWorker> _logger;
+    private readonly ILogger<BackupManager> _logger;
     private readonly ServiceState _serviceState;
     private readonly ISettingsService _settingsService;
+    private Task? _backupTask;
+    private CancellationTokenSource? _cancellationTokenSource;
 
-    public BackupWorker(
-        ILogger<BackupWorker> logger,
+    public BackupManager(
+        ILogger<BackupManager> logger,
         ISettingsService settingsService,
         IGamesService gamesService,
         IBackupService backupService)
@@ -28,16 +35,37 @@ public class BackupWorker : BackgroundService
         _serviceState = ServiceState.LoadFromFile(StateFilePath);
     }
 
-    public override async Task StartAsync(CancellationToken cancellationToken)
+    public void Dispose()
     {
-        _logger.LogInformation("Backup service is starting...");
+        StopAsync().Wait();
+    }
+
+    public async Task StartAsync()
+    {
+        _logger.LogInformation("Backup manager is starting...");
         _serviceState.ServiceStatus = "Starting";
         SaveServiceState();
         await _settingsService.ReloadSettingsAsync();
-        await base.StartAsync(cancellationToken);
+
+        _cancellationTokenSource = new CancellationTokenSource();
+        _backupTask = Task.Run(() => ExecuteAsync(_cancellationTokenSource.Token));
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    public async Task StopAsync()
+    {
+        _serviceState.ServiceStatus = "Stopping";
+        SaveServiceState();
+
+        if (_cancellationTokenSource != null)
+        {
+            _cancellationTokenSource.Cancel();
+            if (_backupTask != null) await _backupTask;
+            _cancellationTokenSource.Dispose();
+            _cancellationTokenSource = null;
+        }
+    }
+
+    private async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         try
         {
@@ -55,7 +83,7 @@ public class BackupWorker : BackgroundService
         {
             _serviceState.ServiceStatus = $"Error: {ex.Message}";
             SaveServiceState();
-            _logger.LogError(ex, "Fatal error in backup service");
+            _logger.LogError(ex, "Fatal error in backup manager");
             throw;
         }
     }
@@ -240,12 +268,5 @@ public class BackupWorker : BackgroundService
         {
             _logger.LogError(ex, "Failed to save service state");
         }
-    }
-
-    public override async Task StopAsync(CancellationToken cancellationToken)
-    {
-        _serviceState.ServiceStatus = "Stopping";
-        SaveServiceState();
-        await base.StopAsync(cancellationToken);
     }
 }

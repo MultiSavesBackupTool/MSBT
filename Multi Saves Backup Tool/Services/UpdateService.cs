@@ -11,7 +11,6 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using FluentAvalonia.UI.Controls;
-using Microsoft.Win32;
 using Properties;
 
 namespace Multi_Saves_Backup_Tool.Services;
@@ -22,7 +21,6 @@ public class UpdateService
     private const string Owner = "TheNightlyGod";
     private const string Repo = "MSBT";
     private readonly string _currentVersion;
-
     private readonly HttpClient _httpClient;
 
     public UpdateService()
@@ -31,32 +29,6 @@ public class UpdateService
         _httpClient.DefaultRequestHeaders.Add("User-Agent", "MultiSavesBackupToolUpdateChecker");
         _currentVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
         Debug.WriteLine($"UpdateService initialized. Current version: {_currentVersion}");
-    }
-
-    private bool IsDotNetRuntimeInstalled()
-    {
-        try
-        {
-            if (!OperatingSystem.IsWindows())
-            {
-                Debug.WriteLine("Not running on Windows, skipping .NET Runtime check");
-                return true;
-            }
-
-            using var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full");
-            if (key != null)
-            {
-                var release = key.GetValue("Release") as int?;
-                Debug.WriteLine($"Found .NET Framework release: {release}");
-                return release.HasValue && release.Value >= 528040;
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Error checking .NET Runtime: {ex.Message}");
-        }
-
-        return false;
     }
 
     public async Task<(bool hasUpdate, string latestVersion, string? downloadUrl)> CheckForUpdatesAsync()
@@ -77,15 +49,9 @@ public class UpdateService
                 };
                 var release = JsonSerializer.Deserialize<GitHubRelease>(response, options);
 
-                if (release == null)
+                if (release == null || string.IsNullOrEmpty(release.TagName))
                 {
-                    Debug.WriteLine("Failed to deserialize release - release object is null");
-                    return (false, _currentVersion, null);
-                }
-
-                if (string.IsNullOrEmpty(release.TagName))
-                {
-                    Debug.WriteLine("Failed to deserialize release - tag name is empty");
+                    Debug.WriteLine("Failed to deserialize release or tag name is empty");
                     return (false, _currentVersion, null);
                 }
 
@@ -94,7 +60,8 @@ public class UpdateService
                 var latestVersionString = release.TagName.TrimStart('v');
                 Debug.WriteLine($"Current version: {_currentVersion}, Latest version: {latestVersionString}");
 
-                if (!latestVersionString.Contains('.')) latestVersionString = $"{latestVersionString}.0.0.0";
+                if (!latestVersionString.Contains('.'))
+                    latestVersionString = $"{latestVersionString}.0.0.0";
 
                 if (!Version.TryParse(latestVersionString, out var latestVersionParsed) ||
                     !Version.TryParse(_currentVersion, out var currentVersionParsed))
@@ -103,8 +70,7 @@ public class UpdateService
                         $"Could not parse versions for comparison: '{latestVersionString}' and '{_currentVersion}'");
                     var hasUpdateFallback = string.Compare(latestVersionString, _currentVersion,
                         StringComparison.OrdinalIgnoreCase) > 0;
-                    var downloadUrlFallback =
-                        release.Assets?.FirstOrDefault(a => a.Name.EndsWith(".exe"))?.BrowserDownloadUrl;
+                    var downloadUrlFallback = GetDownloadUrlForCurrentPlatform(release.Assets);
                     Debug.WriteLine(
                         $"Using fallback comparison. Has update: {hasUpdateFallback}, Download URL: {downloadUrlFallback}");
                     return (hasUpdateFallback, latestVersionString, downloadUrlFallback);
@@ -113,41 +79,51 @@ public class UpdateService
                 var hasUpdate = latestVersionParsed.CompareTo(currentVersionParsed) > 0;
                 Debug.WriteLine(
                     $"Version comparison: Current={currentVersionParsed}, Latest={latestVersionParsed}, HasUpdate={hasUpdate}");
+
                 string? downloadUrl = null;
                 if (hasUpdate)
                 {
-                    downloadUrl = release.Assets
-                                      ?.FirstOrDefault(a => a.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
-                                      ?.BrowserDownloadUrl
-                                  ?? release.Assets?.FirstOrDefault()?.BrowserDownloadUrl;
+                    downloadUrl = GetDownloadUrlForCurrentPlatform(release.Assets);
                     Debug.WriteLine($"Update found. Has update: {hasUpdate}, Download URL: {downloadUrl}");
                 }
 
                 if (hasUpdate && string.IsNullOrEmpty(downloadUrl))
                     Debug.WriteLine(
-                        $"Update detected (v{latestVersionString}) but no suitable download URL found in assets.");
+                        $"Update detected (v{latestVersionString}) but no suitable download URL found for current platform.");
 
                 return (hasUpdate, latestVersionString, downloadUrl);
             }
             catch (JsonException ex)
             {
                 Debug.WriteLine($"JSON deserialization error checking for updates: {ex.Message}");
-                Debug.WriteLine($"Stack trace: {ex.StackTrace}");
                 return (false, _currentVersion, null);
             }
         }
-        catch (HttpRequestException ex)
-        {
-            Debug.WriteLine($"HTTP request error checking for updates: {ex.Message}");
-            Debug.WriteLine($"Stack trace: {ex.StackTrace}");
-            return (false, _currentVersion, null);
-        }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Generic error checking for updates: {ex.Message}");
-            Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+            Debug.WriteLine($"Error checking for updates: {ex.Message}");
             return (false, _currentVersion, null);
         }
+    }
+
+    private string? GetDownloadUrlForCurrentPlatform(List<GitHubAsset>? assets)
+    {
+        if (assets == null || !assets.Any())
+            return null;
+
+        if (OperatingSystem.IsMacOS())
+            return assets.FirstOrDefault(a => a.Name.EndsWith(".dmg", StringComparison.OrdinalIgnoreCase))
+                ?.BrowserDownloadUrl;
+
+        if (OperatingSystem.IsWindows())
+            return assets.FirstOrDefault(a => a.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                ?.BrowserDownloadUrl;
+
+        if (OperatingSystem.IsLinux())
+            return assets.FirstOrDefault(a => a.Name.EndsWith(".AppImage", StringComparison.OrdinalIgnoreCase))
+                ?.BrowserDownloadUrl;
+
+        return assets.FirstOrDefault()?.BrowserDownloadUrl;
     }
 
     public async Task<bool> DownloadAndInstallUpdateAsync(string downloadUrl)
@@ -182,14 +158,7 @@ public class UpdateService
 
         try
         {
-            if (!IsDotNetRuntimeInstalled())
-            {
-                Debug.WriteLine(".NET Runtime is not installed or version is too old.");
-                return false;
-            }
-
             var fileName = Path.GetFileName(new Uri(downloadUrl).AbsolutePath);
-            if (string.IsNullOrWhiteSpace(fileName)) fileName = "MultiSavesBackupSetup.exe";
             var tempFile = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}_{fileName}");
 
             Debug.WriteLine($"Downloading update from {downloadUrl} to {tempFile}");
@@ -200,91 +169,254 @@ public class UpdateService
             response.EnsureSuccessStatusCode();
             Debug.WriteLine($"Download response status: {response.StatusCode}");
 
-            using (var fileStream = File.Create(tempFile))
+            await using (var fileStream = File.Create(tempFile))
             {
                 await response.Content.CopyToAsync(fileStream);
             }
 
             Debug.WriteLine($"Download complete: {tempFile}");
 
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = tempFile,
-                Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS",
-                UseShellExecute = true,
-                Verb = "runas",
-                CreateNoWindow = true
-            };
+            if (OperatingSystem.IsMacOS()) return await InstallUpdateOnMacOS(tempFile);
 
-            Debug.WriteLine($"Starting installer with silent parameters: {tempFile}");
-            try
-            {
-                var process = Process.Start(startInfo);
-                if (process == null)
-                {
-                    Debug.WriteLine("Failed to start the installer process");
-                    dialog.Hide();
-                    return false;
-                }
+            if (OperatingSystem.IsWindows()) return await InstallUpdateOnWindows(tempFile);
 
-                Debug.WriteLine("Installer started successfully");
-                Debug.WriteLine("Exiting application to allow update to proceed.");
-                Environment.Exit(0);
-                return true;
-            }
-            catch (Win32Exception ex)
-            {
-                Debug.WriteLine($"Failed to start installer (possibly due to UAC): {ex.Message}");
-                Debug.WriteLine($"Error code: {ex.NativeErrorCode}");
-                Debug.WriteLine($"Stack trace: {ex.StackTrace}");
-                dialog.Hide();
-                return false;
-            }
-        }
-        catch (HttpRequestException ex)
-        {
-            Debug.WriteLine($"HTTP error downloading update: {ex.Message}");
-            Debug.WriteLine($"Stack trace: {ex.StackTrace}");
-            dialog.Hide();
-            return false;
-        }
-        catch (IOException ex)
-        {
-            Debug.WriteLine($"IO error saving update: {ex.Message}");
-            Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+            if (OperatingSystem.IsLinux()) return await InstallUpdateOnLinux(tempFile);
+
             dialog.Hide();
             return false;
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Error downloading or installing update: {ex.Message}");
-            Debug.WriteLine($"Stack trace: {ex.StackTrace}");
             dialog.Hide();
             return false;
         }
+    }
+
+    private async Task<bool> InstallUpdateOnMacOS(string filePath)
+    {
+        try
+        {
+            return await InstallDmgFile(filePath);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error installing update on macOS: {ex.Message}");
+            return false;
+        }
+    }
+
+    private async Task<bool> InstallDmgFile(string dmgPath)
+    {
+        try
+        {
+            var mountProcess = new ProcessStartInfo
+            {
+                FileName = "hdiutil",
+                Arguments = $"attach \"{dmgPath}\" -nobrowse -quiet",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+
+            Debug.WriteLine($"Mounting DMG: {dmgPath}");
+            using var process = Process.Start(mountProcess);
+            if (process == null)
+            {
+                Debug.WriteLine("Failed to start hdiutil process");
+                return false;
+            }
+
+            await process.WaitForExitAsync();
+            var output = await process.StandardOutput.ReadToEndAsync();
+            var error = await process.StandardError.ReadToEndAsync();
+
+            if (process.ExitCode != 0)
+            {
+                Debug.WriteLine($"Failed to mount DMG. Exit code: {process.ExitCode}, Error: {error}");
+                return false;
+            }
+
+            var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            var volumePath = lines.LastOrDefault()?.Split('\t').LastOrDefault()?.Trim();
+
+            if (string.IsNullOrEmpty(volumePath))
+            {
+                Debug.WriteLine("Could not determine mounted volume path");
+                return false;
+            }
+
+            Debug.WriteLine($"DMG mounted at: {volumePath}");
+
+            var appFiles = Directory.GetDirectories(volumePath, "*.app");
+            if (!appFiles.Any())
+            {
+                Debug.WriteLine("No .app files found in mounted DMG");
+                await UnmountDmg(volumePath);
+                return false;
+            }
+
+            var appPath = appFiles.First();
+            var appName = Path.GetFileName(appPath);
+            var destinationPath = Path.Combine("/Applications", appName);
+
+            Debug.WriteLine($"Copying {appPath} to {destinationPath}");
+
+            var copyProcess = new ProcessStartInfo
+            {
+                FileName = "cp",
+                Arguments = $"-R \"{appPath}\" \"/Applications/\"",
+                UseShellExecute = false,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+
+            using var copyProc = Process.Start(copyProcess);
+            if (copyProc != null)
+            {
+                await copyProc.WaitForExitAsync();
+                if (copyProc.ExitCode == 0)
+                {
+                    Debug.WriteLine("Application copied successfully");
+
+                    await UnmountDmg(volumePath);
+
+                    var openProcess = new ProcessStartInfo
+                    {
+                        FileName = "open",
+                        Arguments = $"\"{destinationPath}\"",
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+
+                    Process.Start(openProcess);
+
+                    Environment.Exit(0);
+                    return true;
+                }
+
+                var copyError = await copyProc.StandardError.ReadToEndAsync();
+                Debug.WriteLine($"Failed to copy application. Error: {copyError}");
+            }
+
+            await UnmountDmg(volumePath);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error installing DMG file: {ex.Message}");
+            return false;
+        }
+    }
+
+    private async Task UnmountDmg(string volumePath)
+    {
+        try
+        {
+            var unmountProcess = new ProcessStartInfo
+            {
+                FileName = "hdiutil",
+                Arguments = $"detach \"{volumePath}\" -quiet",
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = Process.Start(unmountProcess);
+            if (process != null)
+            {
+                await process.WaitForExitAsync();
+                Debug.WriteLine($"DMG unmounted: {volumePath}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error unmounting DMG: {ex.Message}");
+        }
+    }
+
+    private Task<bool> InstallUpdateOnWindows(string filePath)
+    {
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = filePath,
+            Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS",
+            UseShellExecute = true,
+            Verb = "runas",
+            CreateNoWindow = true
+        };
+
+        try
+        {
+            var process = Process.Start(startInfo);
+            if (process != null)
+            {
+                Environment.Exit(0);
+                return Task.FromResult(true);
+            }
+        }
+        catch (Win32Exception ex)
+        {
+            Debug.WriteLine($"Failed to start installer: {ex.Message}");
+        }
+
+        return Task.FromResult(false);
+    }
+
+    private async Task<bool> InstallUpdateOnLinux(string filePath)
+    {
+        var extension = Path.GetExtension(filePath).ToLowerInvariant();
+
+        try
+        {
+            if (extension == ".appimage")
+            {
+                var chmodProcess = new ProcessStartInfo
+                {
+                    FileName = "chmod",
+                    Arguments = $"+x \"{filePath}\"",
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using var process = Process.Start(chmodProcess);
+                if (process != null)
+                {
+                    await process.WaitForExitAsync();
+                    if (process.ExitCode == 0)
+                    {
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = filePath,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        });
+                        Environment.Exit(0);
+                        return true;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error installing update on Linux: {ex.Message}");
+        }
+
+        return false;
     }
 }
 
 public class GitHubRelease
 {
     [JsonPropertyName("tag_name")] public string TagName { get; set; } = string.Empty;
-
     [JsonPropertyName("name")] public string Name { get; set; } = string.Empty;
-
     [JsonPropertyName("body")] public string Body { get; set; } = string.Empty;
-
     [JsonPropertyName("assets")] public List<GitHubAsset>? Assets { get; set; }
-
     [JsonPropertyName("html_url")] public string HtmlUrl { get; set; } = string.Empty;
-
     [JsonPropertyName("target_commitish")] public string TargetCommitish { get; set; } = string.Empty;
-
     [JsonPropertyName("draft")] public bool Draft { get; set; }
-
     [JsonPropertyName("prerelease")] public bool Prerelease { get; set; }
-
     [JsonPropertyName("created_at")] public DateTime CreatedAt { get; set; }
-
     [JsonPropertyName("published_at")] public DateTime PublishedAt { get; set; }
 }
 
@@ -296,12 +428,8 @@ public class GitHubAsset
     public string BrowserDownloadUrl { get; set; } = string.Empty;
 
     [JsonPropertyName("content_type")] public string ContentType { get; set; } = string.Empty;
-
     [JsonPropertyName("size")] public long Size { get; set; }
-
     [JsonPropertyName("download_count")] public int DownloadCount { get; set; }
-
     [JsonPropertyName("created_at")] public DateTime CreatedAt { get; set; }
-
     [JsonPropertyName("updated_at")] public DateTime UpdatedAt { get; set; }
 }

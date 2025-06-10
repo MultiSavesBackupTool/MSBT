@@ -1,4 +1,4 @@
-name: Build Installer
+name: Build and Release
 
 on:
   push:
@@ -10,24 +10,34 @@ permissions:
   actions: read
 
 jobs:
-  build:
+  build-windows:
+    name: Build Windows installer
     runs-on: lukiwin
-
     steps:
-      - name: Clean previous build artifacts
+      - name: Clean previous artifacts
         shell: powershell
-        run: |
-          Remove-Item -Recurse -Force publish, installer -ErrorAction SilentlyContinue
+        run: Remove-Item -Recurse -Force publish, installer -ErrorAction SilentlyContinue
 
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Install prerequisites
+        shell: powershell
+        run: |
+          if (Get-Command choco -ErrorAction SilentlyContinue) {
+            choco upgrade chocolatey -y
+          } else {
+            Set-ExecutionPolicy Bypass -Scope Process -Force
+            iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+          }
+          choco install innosetup -y
 
       - name: Setup .NET 9.0
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0.x'
 
-      - name: Publish MultiSavesBackup.Service
+      - name: Publish Service
         shell: powershell
         run: |
           dotnet publish "MultiSavesBackup.Service/MultiSavesBackup.Service.csproj" `
@@ -35,34 +45,167 @@ jobs:
             -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false `
             -o "publish/release"
 
-      - name: Publish Multi Saves Backup Tool
+      - name: Publish Tool
         shell: powershell
         run: |
-          dotnet publish ".\Multi Saves Backup Tool\Multi Saves Backup Tool.csproj" `
+          dotnet publish "Multi Saves Backup Tool/Multi Saves Backup Tool.csproj" `
             -c Release -r win-x64 --self-contained true `
             -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false `
             -o "publish/release"
 
-      - name: Install Inno Setup
-        shell: powershell
-        run: |
-          Invoke-WebRequest https://jrsoftware.org/download.php/is.exe -OutFile is.exe
-          Start-Process -FilePath .\is.exe -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-' -Wait
-
-      - name: Build installer with Inno Setup
+      - name: Build .exe installer
         shell: cmd
-        run: |
-          "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
+        run: '"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss'
 
-      - name: Verify installer exists
+      - name: Verify installer
         shell: cmd
         run: |
           if not exist "installer/MultiSavesBackupSetup.exe" (
-            echo Installer file not found!
-            exit 1
+            echo Installer file not found! && exit 1
           )
 
-      - name: Create GitHub Release
+  build-linux:
+    name: Build Linux AppImage
+    runs-on: lukilinux
+    steps:
+      - name: Clean previous artifacts
+        run: rm -rf publish installer AppDir || true
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget fuse libfuse2 desktop-file-utils
+
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Publish Service
+        run: |
+          dotnet publish "MultiSavesBackup.Service/MultiSavesBackup.Service.csproj" \
+            -c Release -r linux-x64 --self-contained true \
+            -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false \
+            -o "publish/linux"
+
+      - name: Publish Tool
+        run: |
+          dotnet publish "Multi Saves Backup Tool/Multi Saves Backup Tool.csproj" \
+            -c Release -r linux-x64 --self-contained true \
+            -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false \
+            -o "publish/linux"
+
+      - name: Download linuxdeploy
+        run: |
+          wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage \
+            -O linuxdeploy.AppImage
+          chmod +x linuxdeploy.AppImage
+
+      - name: Prepare AppDir layout
+        run: |
+          mkdir -p AppDir/usr/bin AppDir/usr/share/applications AppDir/usr/share/icons/hicolor/256x256/apps
+          cp publish/linux/* AppDir/usr/bin/
+          cat > AppDir/usr/share/applications/multisavesbackup.desktop <<EOF
+          [Desktop Entry]
+          Name=Multi Saves Backup
+          Exec=MultiSavesBackupTool
+          Icon=multisavesbackup
+          Type=Application
+          Categories=Utility;
+          EOF
+
+      - name: Build AppImage
+        run: |
+          ./linuxdeploy.AppImage \
+            --appdir AppDir \
+            --desktop-file AppDir/usr/share/applications/multisavesbackup.desktop \
+            --executable AppDir/usr/bin/MultiSavesBackupTool \
+            --output appimage
+          mkdir -p installer
+          mv *.AppImage installer/multisaves-linux.AppImage
+
+      - name: Verify AppImage
+        run: |
+          if [ ! -f "installer/multisaves-linux.AppImage" ]; then
+            echo "AppImage not found!" >&2
+            exit 1
+          fi
+
+  build-macos:
+    name: Build macOS .dmg
+    runs-on: lukimacos
+    steps:
+      - name: Clean previous artifacts
+        run: rm -rf publish installer || true
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install prerequisites
+        run: |
+          if ! xcode-select -p &>/dev/null; then
+            xcode-select --install || true
+          fi
+
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Publish Service
+        run: |
+          dotnet publish "MultiSavesBackup.Service/MultiSavesBackup.Service.csproj" \
+            -c Release -r osx-x64 --self-contained true \
+            -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false \
+            -o "publish/macos"
+
+      - name: Publish Tool
+        run: |
+          dotnet publish "Multi Saves Backup Tool/Multi Saves Backup Tool.csproj" \
+            -c Release -r osx-x64 --self-contained true \
+            -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false \
+            -o "publish/macos"
+
+      - name: Create .app bundle
+        run: |
+          APP_NAME="MSBT"
+          APP_BIN="Multi Saves Backup Tool"
+          APP_DIR="publish/macos/$APP_NAME.app"
+          mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources"
+          cp "publish/macos/$APP_BIN" "$APP_DIR/Contents/MacOS/$APP_NAME"
+          cat > "$APP_DIR/Contents/Info.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" \
+              "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>CFBundleName</key><string>$APP_NAME</string>
+            <key>CFBundleExecutable</key><string>$APP_NAME</string>
+            <key>CFBundleIdentifier</key><string>com.example.msbt</string>
+            <key>CFBundleVersion</key><string>1.0</string>
+            <key>CFBundlePackageType</key><string>APPL</string>
+            <key>LSMinimumSystemVersion</key><string>10.13</string>
+          </dict></plist>
+          EOF
+
+      - name: Create .dmg
+        run: |
+          mkdir -p installer
+          hdiutil create -volname "MSBT" \
+                         -srcfolder "publish/macos/MSBT.app" \
+                         -ov -format UDZO installer/MSBT.dmg
+
+  release:
+    name: Create GitHub Release
+    needs:
+      - build-windows
+      - build-linux
+      - build-macos
+    runs-on: lukilinux
+    steps:
+      - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
@@ -73,10 +216,26 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload installer to release
+      - name: Upload Windows installer
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ github.run_number }}.0.0.0
           files: installer/MultiSavesBackupSetup.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Linux AppImage
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.run_number }}.0.0.0
+          files: installer/multisaves-linux.AppImage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Upload macOS .dmg
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.run_number }}.0.0.0
+          files: installer/MSBT.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
