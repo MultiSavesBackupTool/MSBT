@@ -31,6 +31,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         MonitoringViewModel = new MonitoringViewModel(backupManager);
         GamesViewModel = new GamesViewModel(gamesService, backupService);
+        StatsViewModel = new StatsViewModel(gamesService);
         SettingsViewModel = new SettingsViewModel(mainWindow.StorageProvider);
         CurrentViewModel = MonitoringViewModel;
 
@@ -40,6 +41,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public MonitoringViewModel MonitoringViewModel { get; }
     public GamesViewModel GamesViewModel { get; }
+    public StatsViewModel StatsViewModel { get; }
     public SettingsViewModel SettingsViewModel { get; }
 
     private async Task CheckForUpdatesOnStartupAsync()
@@ -111,6 +113,7 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             "monitoring" => MonitoringViewModel,
             "games" => GamesViewModel,
+            "stats" => StatsViewModel,
             "settings" => SettingsViewModel,
             _ => CurrentViewModel
         };

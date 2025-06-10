@@ -220,7 +220,6 @@ public partial class AddGameOverlayViewModel : ViewModelBase
                     }
                 };
             }
-            // For macOS and Linux, executables don't have a standard extension, so we allow any file.
 
             var files = await storageProvider.OpenFilePickerAsync(options);
             return files.Count > 0 ? files[0].Path.LocalPath : string.Empty;

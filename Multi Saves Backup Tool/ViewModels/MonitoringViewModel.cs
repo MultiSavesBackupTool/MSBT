@@ -8,7 +8,7 @@ using Properties;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
 
-public class GameMonitoringInfo
+public partial class GameMonitoringInfo
 {
     public string GameName { get; set; } = "";
     public string LastBackupTime { get; set; } = Resources.NoData;
@@ -73,13 +73,11 @@ public class MonitoringViewModel : ViewModelBase, IDisposable
             var gamesFromState = state.GamesState.Values.ToList();
             var gamesInVm = Games.ToList();
 
-            // Remove games that are no longer in the state
             foreach (var gameInVm in gamesInVm.Where(gameInVm => gamesFromState.All(gfs => gfs.GameName != gameInVm.GameName)))
             {
                 Games.Remove(gameInVm);
             }
             
-            // Update existing games and add new ones
             foreach (var gameState in gamesFromState)
             {
                 var existingGame = Games.FirstOrDefault(g => g.GameName == gameState.GameName);

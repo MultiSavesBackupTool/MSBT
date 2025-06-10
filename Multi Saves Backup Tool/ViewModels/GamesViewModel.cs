@@ -94,7 +94,6 @@ public class GamesViewModel : ViewModelBase
         {
             Games[index] = updatedGame;
             UpdateBackupCount(updatedGame);
-            // Save is triggered by CollectionChanged
         }
     }
 

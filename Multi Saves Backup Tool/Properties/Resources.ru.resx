@@ -75,6 +75,9 @@
     <data name="MainWindow_Games" xml:space="preserve">
     <value>Игры</value>
   </data>
+    <data name="MainWindow_Stats" xml:space="preserve">
+    <value>Статистика</value>
+  </data>
     <data name="MainWindow_Settings" xml:space="preserve">
     <value>Настройки</value>
   </data>
@@ -342,5 +345,19 @@
     <data name="UpdateWarningContent" xml:space="preserve">
     <value>Мы устанавливаем последние обновления. Пожалуйста, не выключайте устройство
 и не закрывайте приложение — это займёт всего немного времени.</value>
+  </data>
+    
+    <!-- StatsView -->
+    <data name="StatsView_SizesArchives" xml:space="preserve">
+    <value>Размер всех архивов:</value>
+  </data>
+    <data name="StatsView_ArchivesCounts" xml:space="preserve">
+    <value>Количество всех архивов:</value>
+  </data>
+    <data name="StatsView_GamesCountArchives" xml:space="preserve">
+    <value>Количество архивов</value>
+  </data>
+    <data name="StatsView_GamesSizesArchives" xml:space="preserve">
+    <value>Общий размер</value>
   </data>
 </root> 

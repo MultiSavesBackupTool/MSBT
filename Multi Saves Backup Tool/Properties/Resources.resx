@@ -75,10 +75,13 @@
     <data name="MainWindow_Games" xml:space="preserve">
     <value>Games</value>
   </data>
+    <data name="MainWindow_Stats" xml:space="preserve">
+    <value>Statistics</value>
+  </data>
     <data name="MainWindow_Settings" xml:space="preserve">
     <value>Settings</value>
   </data>
-
+    
     <!-- GamesView strings -->
     <data name="GamesView_AddGame" xml:space="preserve">
     <value>Add Game</value>
@@ -345,5 +348,19 @@ This action cannot be undone.</value>
     <data name="UpdateWarningContent" xml:space="preserve">
     <value>We are installing the latest updates. Please do not turn off your device
 or close the application — this will only take a moment.</value>
+  </data>
+    
+    <!-- StatsView -->
+    <data name="StatsView_SizesArchives" xml:space="preserve">
+    <value>Size of all archives:</value>
+  </data>
+    <data name="StatsView_ArchivesCounts" xml:space="preserve">
+    <value>Number of all archives:</value>
+  </data>
+    <data name="StatsView_GamesCountArchives" xml:space="preserve">
+    <value>Number of archives</value>
+  </data>
+    <data name="StatsView_GamesSizesArchives" xml:space="preserve">
+    <value>Total size</value>
   </data>
 </root> 

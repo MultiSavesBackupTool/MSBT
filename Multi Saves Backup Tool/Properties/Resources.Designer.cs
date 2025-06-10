@@ -65,6 +65,14 @@ namespace Properties
             }
         }
 
+        public static string MainWindow_Stats
+        {
+            get
+            {
+                return ResourceManager.GetString("MainWindow_Stats", resourceCulture);
+            }
+        }
+        
         public static string MainWindow_Settings
         {
             get
@@ -762,6 +770,39 @@ namespace Properties
             get
             {
                 return ResourceManager.GetString("UpdateWarningContent", resourceCulture);
+            }
+        }
+        #endregion
+        
+        #region StatsView
+        public static string StatsView_SizesArchives
+        {
+            get
+            {
+                return ResourceManager.GetString("StatsView_SizesArchives", resourceCulture);
+            }
+        }
+
+        public static string StatsView_ArchivesCounts
+        {
+            get
+            {
+                return ResourceManager.GetString("StatsView_ArchivesCounts", resourceCulture);
+            }
+        }
+        public static string StatsView_GamesCountArchives
+        {
+            get
+            {
+                return ResourceManager.GetString("StatsView_GamesCountArchives", resourceCulture);
+            }
+        }
+
+        public static string StatsView_GamesSizesArchives
+        {
+            get
+            {
+                return ResourceManager.GetString("StatsView_GamesSizesArchives", resourceCulture);
             }
         }
         #endregion
