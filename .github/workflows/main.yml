@@ -37,14 +37,6 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Publish Service
-        shell: powershell
-        run: |
-          dotnet publish "MultiSavesBackup.Service/MultiSavesBackup.Service.csproj" `
-            -c Release -r win-x64 --self-contained true `
-            -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false `
-            -o "publish/release"
-
       - name: Publish Tool
         shell: powershell
         run: |
@@ -74,22 +66,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install prerequisites
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wget fuse libfuse2 desktop-file-utils
-
       - name: Setup .NET 9.0
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0.x'
-
-      - name: Publish Service
-        run: |
-          dotnet publish "MultiSavesBackup.Service/MultiSavesBackup.Service.csproj" \
-            -c Release -r linux-x64 --self-contained true \
-            -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false \
-            -o "publish/linux"
 
       - name: Publish Tool
         run: |
@@ -144,23 +124,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install prerequisites
-        run: |
-          if ! xcode-select -p &>/dev/null; then
-            xcode-select --install || true
-          fi
-
       - name: Setup .NET 9.0
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0.x'
-
-      - name: Publish Service
-        run: |
-          dotnet publish "MultiSavesBackup.Service/MultiSavesBackup.Service.csproj" \
-            -c Release -r osx-x64 --self-contained true \
-            -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false \
-            -o "publish/macos"
 
       - name: Publish Tool
         run: |
@@ -183,7 +150,7 @@ jobs:
           <plist version="1.0"><dict>
             <key>CFBundleName</key><string>$APP_NAME</string>
             <key>CFBundleExecutable</key><string>$APP_NAME</string>
-            <key>CFBundleIdentifier</key><string>com.example.msbt</string>
+            <key>CFBundleIdentifier</key><string>com.luki.msbt</string>
             <key>CFBundleVersion</key><string>1.0</string>
             <key>CFBundlePackageType</key><string>APPL</string>
             <key>LSMinimumSystemVersion</key><string>10.13</string>
