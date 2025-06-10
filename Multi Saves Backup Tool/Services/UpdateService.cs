@@ -249,160 +249,104 @@ public class UpdateService
 
             Debug.WriteLine($"DMG mounted at: {volumePath}");
 
-            var appFiles = Directory.GetDirectories(volumePath, "*.app");
-            if (!appFiles.Any())
+            // Open the mounted volume in Finder to let the user drag-and-drop
+            var openFinderProcess = new ProcessStartInfo
             {
-                Debug.WriteLine("No .app files found in mounted DMG");
-                await UnmountDmg(volumePath);
-                return false;
-            }
-
-            var appPath = appFiles.First();
-            var appName = Path.GetFileName(appPath);
-            var destinationPath = Path.Combine("/Applications", appName);
-
-            Debug.WriteLine($"Copying {appPath} to {destinationPath}");
-
-            var copyProcess = new ProcessStartInfo
-            {
-                FileName = "cp",
-                Arguments = $"-R \"{appPath}\" \"/Applications/\"",
-                UseShellExecute = false,
-                RedirectStandardError = true,
+                FileName = "open",
+                Arguments = $"\"{volumePath}\"",
+                UseShellExecute = true,
                 CreateNoWindow = true
             };
+            Process.Start(openFinderProcess);
 
-            using var copyProc = Process.Start(copyProcess);
-            if (copyProc != null)
+            // Shutdown the app to allow for manual replacement.
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
             {
-                await copyProc.WaitForExitAsync();
-                if (copyProc.ExitCode == 0)
-                {
-                    Debug.WriteLine("Application copied successfully");
-
-                    await UnmountDmg(volumePath);
-
-                    var openProcess = new ProcessStartInfo
-                    {
-                        FileName = "open",
-                        Arguments = $"\"{destinationPath}\"",
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    };
-
-                    Process.Start(openProcess);
-
-                    Environment.Exit(0);
-                    return true;
-                }
-
-                var copyError = await copyProc.StandardError.ReadToEndAsync();
-                Debug.WriteLine($"Failed to copy application. Error: {copyError}");
+                lifetime.Shutdown();
             }
 
-            await UnmountDmg(volumePath);
-            return false;
+            return true;
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Error installing DMG file: {ex.Message}");
+            Debug.WriteLine($"Failed to install DMG file: {ex.Message}");
             return false;
         }
-    }
-
-    private async Task UnmountDmg(string volumePath)
-    {
-        try
+        finally
         {
-            var unmountProcess = new ProcessStartInfo
-            {
-                FileName = "hdiutil",
-                Arguments = $"detach \"{volumePath}\" -quiet",
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            using var process = Process.Start(unmountProcess);
-            if (process != null)
-            {
-                await process.WaitForExitAsync();
-                Debug.WriteLine($"DMG unmounted: {volumePath}");
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Error unmounting DMG: {ex.Message}");
+            // Unmounting is now the user's responsibility after they finish installing.
         }
     }
 
     private Task<bool> InstallUpdateOnWindows(string filePath)
     {
-        var startInfo = new ProcessStartInfo
-        {
-            FileName = filePath,
-            Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS",
-            UseShellExecute = true,
-            Verb = "runas",
-            CreateNoWindow = true
-        };
-
         try
         {
-            var process = Process.Start(startInfo);
-            if (process != null)
+            var processStartInfo = new ProcessStartInfo(filePath)
             {
-                Environment.Exit(0);
-                return Task.FromResult(true);
-            }
-        }
-        catch (Win32Exception ex)
-        {
-            Debug.WriteLine($"Failed to start installer: {ex.Message}");
-        }
+                UseShellExecute = true
+            };
+            Process.Start(processStartInfo);
 
-        return Task.FromResult(false);
+            // Correctly request shutdown of the current application
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
+            {
+                lifetime.Shutdown();
+            }
+            
+            return Task.FromResult(true);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error starting Windows update installer: {ex.Message}");
+            return Task.FromResult(false);
+        }
     }
 
     private async Task<bool> InstallUpdateOnLinux(string filePath)
     {
-        var extension = Path.GetExtension(filePath).ToLowerInvariant();
-
         try
         {
-            if (extension == ".appimage")
+            var currentExecutable = Process.GetCurrentProcess().MainModule?.FileName;
+            if (string.IsNullOrEmpty(currentExecutable))
             {
-                var chmodProcess = new ProcessStartInfo
-                {
-                    FileName = "chmod",
-                    Arguments = $"+x \"{filePath}\"",
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-
-                using var process = Process.Start(chmodProcess);
-                if (process != null)
-                {
-                    await process.WaitForExitAsync();
-                    if (process.ExitCode == 0)
-                    {
-                        Process.Start(new ProcessStartInfo
-                        {
-                            FileName = filePath,
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        });
-                        Environment.Exit(0);
-                        return true;
-                    }
-                }
+                Debug.WriteLine("Could not determine current executable path.");
+                return false;
             }
+
+            // Make the new file executable
+            var chmodProcess = new ProcessStartInfo
+            {
+                FileName = "chmod",
+                Arguments = $"+x \"{filePath}\"",
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+            using (var proc = Process.Start(chmodProcess))
+            {
+                await proc.WaitForExitAsync();
+            }
+
+            // Replace the old executable with the new one.
+            File.Move(filePath, currentExecutable, true);
+            Debug.WriteLine($"Replaced current executable at {currentExecutable}");
+
+            // Relaunch the application
+            Process.Start(currentExecutable);
+            
+            // Shutdown the old instance
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
+            {
+                lifetime.Shutdown();
+            }
+
+            return true;
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Error installing update on Linux: {ex.Message}");
+            return false;
         }
-
-        return false;
     }
 }
 
