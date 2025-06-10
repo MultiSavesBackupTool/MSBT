@@ -199,6 +199,7 @@ jobs:
     name: Upload Windows installer
     runs-on: lukiwindows
     needs:
+      - createrelease
       - build-windows
       - build-linux
       - build-macos
@@ -215,6 +216,7 @@ jobs:
     name: Upload Linux installer
     runs-on: lukilinux
     needs:
+      - createrelease
       - build-windows
       - build-linux
       - build-macos
@@ -231,6 +233,7 @@ jobs:
     name: Upload MacOS installer
     runs-on: lukimacos
     needs:
+      - createrelease
       - build-windows
       - build-linux
       - build-macos
