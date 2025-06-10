@@ -179,6 +179,10 @@ jobs:
   createrelease:
     name: Create GitHub Release
     runs-on: lukilinux
+    needs:
+      - build-windows
+      - build-linux
+      - build-macos
     steps:
       - name: Create Release
         id: create_release
@@ -194,6 +198,10 @@ jobs:
   uploadwindows:
     name: Upload Windows installer
     runs-on: lukiwindows
+    needs:
+      - build-windows
+      - build-linux
+      - build-macos
     steps:
       - name: Upload Windows installer
         uses: softprops/action-gh-release@v1
@@ -206,6 +214,10 @@ jobs:
   uploadlinux:
     name: Upload Linux installer
     runs-on: lukilinux
+    needs:
+      - build-windows
+      - build-linux
+      - build-macos
     steps:
       - name: Upload Linux AppImage
         uses: softprops/action-gh-release@v1
@@ -218,6 +230,10 @@ jobs:
   uploadmacos:
     name: Upload MacOS installer
     runs-on: lukimacos
+    needs:
+      - build-windows
+      - build-linux
+      - build-macos
     steps:
       - name: Upload Linux AppImage
         uses: softprops/action-gh-release@v1
