@@ -197,7 +197,7 @@ jobs:
           
   uploadwindows:
     name: Upload Windows installer
-    runs-on: lukiwindows
+    runs-on: lukiwin
     needs:
       - createrelease
       - build-windows
