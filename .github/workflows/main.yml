@@ -70,11 +70,12 @@ jobs:
 
       - name: Prepare AppDir layout
         run: |
-          mkdir -p AppDir/usr/bin AppDir/usr/share/applications AppDir/usr/share/icons/hicolor/256x256/apps
+          mkdir -p AppDir/usr/bin AppDir/usr/share/applications
 
-          cp publish/linux/* AppDir/usr/bin/
+          cp publish/linux/'Multi Saves Backup Tool' \
+            AppDir/usr/bin/MultiSavesBackupTool
 
-          mv "AppDir/usr/bin/Multi Saves Backup Tool" AppDir/usr/bin/MultiSavesBackupTool
+          cp publish/linux/*.so AppDir/usr/bin/
 
           chmod +x AppDir/usr/bin/MultiSavesBackupTool
 
@@ -82,12 +83,10 @@ jobs:
           [Desktop Entry]
           Name=Multi Saves Backup
           Exec=MultiSavesBackupTool
-          Icon=multisavesbackup
           Type=Application
           Categories=Utility;
           EOF
-      
-      
+
       - name: Build AppImage
         run: |
           ./linuxdeploy.AppImage \
@@ -95,6 +94,7 @@ jobs:
             --desktop-file AppDir/usr/share/applications/multisavesbackup.desktop \
             --executable AppDir/usr/bin/MultiSavesBackupTool \
             --output appimage
+
           mkdir -p installer
           mv *.AppImage installer/multisaves-linux.AppImage
 
