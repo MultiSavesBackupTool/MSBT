@@ -55,11 +55,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup .NET 9.0
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '9.0.x'
-
       - name: Publish Tool
         run: |
           dotnet publish "Multi Saves Backup Tool/Multi Saves Backup Tool.csproj" \
