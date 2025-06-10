@@ -81,15 +81,11 @@ jobs:
           mkdir -p AppDir/usr/bin \
                    AppDir/usr/share/applications \
                    AppDir/usr/share/icons/hicolor/256x256/apps
-
           cp "publish/linux/Multi Saves Backup Tool" AppDir/usr/bin/MultiSavesBackupTool
           chmod +x AppDir/usr/bin/MultiSavesBackupTool
           cp publish/linux/*.so AppDir/usr/bin/
-
-          sudo apt-get update -qq && sudo apt-get install -y -qq imagemagick
           convert "Multi Saves Backup Tool/Assets/avalonia-logo.ico[0]" \
                   -resize 256x256 AppDir/usr/share/icons/hicolor/256x256/apps/multisavesbackup.png
-
           cat > AppDir/usr/share/applications/multisavesbackup.desktop <<EOF
           [Desktop Entry]
           Name=Multi Saves Backup
@@ -111,7 +107,7 @@ jobs:
         id: rename-linux
         run: |
           mkdir -p installer
-          FILE=$(ls -1 *.AppImage | head -n1)
+          FILE=$(ls -1 *-x86_64.AppImage | head -n1)
           mv "$FILE" installer/Multi_Saves_Backup-x86_64.AppImage
           echo "::set-output name=file::installer/Multi_Saves_Backup-x86_64.AppImage"
 
@@ -145,8 +141,9 @@ jobs:
           APP_NAME="MSBT"
           APP_BIN="Multi Saves Backup Tool"
           APP_DIR="publish/macos/$APP_NAME.app"
-          mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources"
+          mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources" "$APP_DIR/Contents/Frameworks"
           cp "publish/macos/$APP_BIN" "$APP_DIR/Contents/MacOS/$APP_NAME"
+          find publish/macos -maxdepth 1 -name '*.dylib' -exec cp {} "$APP_DIR/Contents/Frameworks/" \;
           cat > "$APP_DIR/Contents/Info.plist" <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" \
@@ -160,7 +157,7 @@ jobs:
             <key>LSMinimumSystemVersion</key><string>10.13</string>
           </dict></plist>
           EOF
-
+      
       - name: Create .dmg
         run: |
           mkdir -p installer
