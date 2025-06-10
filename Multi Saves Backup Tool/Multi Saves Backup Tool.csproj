@@ -13,9 +13,9 @@
         <RuntimeIdentifier>win-x64</RuntimeIdentifier>
         <DebugType>none</DebugType>
         <DebugSymbols>false</DebugSymbols>
-        <Version>62.0.0.0</Version>
-        <AssemblyVersion>62.0.0.0</AssemblyVersion>
-        <FileVersion>62.0.0.0</FileVersion>
+        <Version>63.0.0.0</Version>
+        <AssemblyVersion>63.0.0.0</AssemblyVersion>
+        <FileVersion>63.0.0.0</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
