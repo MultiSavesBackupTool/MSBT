@@ -71,11 +71,13 @@ jobs:
       - name: Prepare AppDir layout
         run: |
           mkdir -p AppDir/usr/bin AppDir/usr/share/applications AppDir/usr/share/icons/hicolor/256x256/apps
-          cp publish/linux/* AppDir/usr/bin/
+
+          cp publish/linux/* "AppDir/usr/bin/MultiSavesBackupTool"
+
           cat > AppDir/usr/share/applications/multisavesbackup.desktop <<EOF
           [Desktop Entry]
           Name=Multi Saves Backup
-          Exec=Multi Saves Backup Tool
+          Exec=MultiSavesBackupTool
           Icon=multisavesbackup
           Type=Application
           Categories=Utility;
@@ -97,7 +99,7 @@ jobs:
             echo "AppImage not found!" >&2
             exit 1
           fi
-
+  
   build-macos:
     name: Build macOS .dmg
     runs-on: lukimacos
