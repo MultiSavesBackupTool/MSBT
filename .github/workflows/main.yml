@@ -70,23 +70,27 @@ jobs:
 
       - name: Prepare AppDir layout
         run: |
-          mkdir -p AppDir/usr/bin AppDir/usr/share/applications
+          mkdir -p AppDir/usr/bin \
+                   AppDir/usr/share/applications \
+                   AppDir/usr/share/icons/hicolor/256x256/apps
 
-          cp publish/linux/'Multi Saves Backup Tool' \
-            AppDir/usr/bin/MultiSavesBackupTool
+          cp "publish/linux/Multi Saves Backup Tool" AppDir/usr/bin/MultiSavesBackupTool
+          chmod +x AppDir/usr/bin/MultiSavesBackupTool
 
           cp publish/linux/*.so AppDir/usr/bin/
 
-          chmod +x AppDir/usr/bin/MultiSavesBackupTool
+          convert "Multi Saves Backup Tool/Assets/avalonia-logo.ico[0]" \
+                  -resize 256x256 AppDir/usr/share/icons/hicolor/256x256/apps/multisavesbackup.png
 
           cat > AppDir/usr/share/applications/multisavesbackup.desktop <<EOF
           [Desktop Entry]
           Name=Multi Saves Backup
           Exec=MultiSavesBackupTool
+          Icon=multisavesbackup
           Type=Application
           Categories=Utility;
           EOF
-
+      
       - name: Build AppImage
         run: |
           ./linuxdeploy.AppImage \
