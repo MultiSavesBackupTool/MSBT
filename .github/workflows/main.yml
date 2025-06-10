@@ -72,7 +72,11 @@ jobs:
         run: |
           mkdir -p AppDir/usr/bin AppDir/usr/share/applications AppDir/usr/share/icons/hicolor/256x256/apps
 
-          cp publish/linux/* "AppDir/usr/bin/MultiSavesBackupTool"
+          cp publish/linux/* AppDir/usr/bin/
+
+          mv "AppDir/usr/bin/Multi Saves Backup Tool" AppDir/usr/bin/MultiSavesBackupTool
+
+          chmod +x AppDir/usr/bin/MultiSavesBackupTool
 
           cat > AppDir/usr/share/applications/multisavesbackup.desktop <<EOF
           [Desktop Entry]
@@ -82,7 +86,8 @@ jobs:
           Type=Application
           Categories=Utility;
           EOF
-
+      
+      
       - name: Build AppImage
         run: |
           ./linuxdeploy.AppImage \
