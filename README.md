@@ -1,7 +1,10 @@
 # Multi Saves Backup Tool
 
 <p align="center">
-   <img alt="MSBT" src="msbt_logo.png">
+   <img alt="MSBT Logo" src="msbt_logo.png">
+</p>
+
+<p align="center">
    <img alt="MSBT Count" src="https://count.lukiuwu.xyz/@MSBT?name=MSBT&theme=rule34&padding=7&offset=0&align=top&scale=1&pixelated=1&darkmode=auto">
 </p>
 
