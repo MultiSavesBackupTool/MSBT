@@ -157,7 +157,6 @@ public class GamesService : IGamesService, IDisposable
             await File.WriteAllTextAsync(gamesPath, json);
             _logger.LogInformation("Saved {Count} games to configuration", gamesDict.Count);
 
-            // Invalidate cache after saving
             await ClearCacheAsync();
         }
         catch (Exception ex)

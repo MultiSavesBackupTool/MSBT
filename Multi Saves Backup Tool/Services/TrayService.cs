@@ -37,7 +37,7 @@ namespace Multi_Saves_Backup_Tool.Services
             var trayIcon = new TrayIcon
             {
                 Icon = new WindowIcon(
-                    AssetLoader.Open(new Uri("avares://Multi Saves Backup Tool/Assets/avalonia-logo.ico"))),
+                    AssetLoader.Open(new Uri("avares://Multi Saves Backup Tool/Assets/msbt.ico"))),
                 ToolTipText = "Multi Saves Backup Tool",
                 IsVisible = true
             };

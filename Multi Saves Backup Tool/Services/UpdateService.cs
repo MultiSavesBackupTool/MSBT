@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -8,9 +9,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using FluentAvalonia.UI.Controls;
 using Properties;
 
@@ -279,11 +278,7 @@ public class UpdateService
         {
             var processStartInfo = new ProcessStartInfo(filePath)
             {
-                FileName = filePath,
-                Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS",
-                UseShellExecute = true,
-                Verb = "runas",
-                CreateNoWindow = true
+                UseShellExecute = true
             };
             Process.Start(processStartInfo);
 
@@ -321,7 +316,7 @@ public class UpdateService
             };
             using (var proc = Process.Start(chmodProcess))
             {
-                await proc?.WaitForExitAsync()!;
+                await proc.WaitForExitAsync();
             }
 
             File.Move(filePath, currentExecutable, true);

@@ -84,7 +84,7 @@ jobs:
           cp "publish/linux/Multi Saves Backup Tool" AppDir/usr/bin/MultiSavesBackupTool
           chmod +x AppDir/usr/bin/MultiSavesBackupTool
           cp publish/linux/*.so AppDir/usr/bin/
-          convert "Multi Saves Backup Tool/Assets/avalonia-logo.ico[0]" \
+          convert "Multi Saves Backup Tool/Assets/msbt.ico" \
                   -resize 256x256 AppDir/usr/share/icons/hicolor/256x256/apps/multisavesbackup.png
           cat > AppDir/usr/share/applications/multisavesbackup.desktop <<EOF
           [Desktop Entry]
