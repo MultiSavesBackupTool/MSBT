@@ -54,7 +54,8 @@ public class App : Application
             _backupManager = _serviceProvider.GetRequiredService<BackupManager>();
 
             var mainWindow = new MainWindow();
-            var mainViewModel = new MainWindowViewModel(mainWindow, trayService, gamesService, backupService, _backupManager, settingsService, mainWindowLogger, statsLogger);
+            var mainViewModel = new MainWindowViewModel(mainWindow, trayService, gamesService, backupService,
+                _backupManager, settingsService, mainWindowLogger, statsLogger);
 
             mainWindow.DataContext = mainViewModel;
             desktop.MainWindow = mainWindow;

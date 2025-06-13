@@ -16,9 +16,9 @@ public partial class GamesView : UserControl
     private void OnLoaded(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not GamesViewModel viewModel) return;
-        
+
         viewModel.EditGameRequested += OnEditGameRequested;
-        
+
         foreach (var game in viewModel.Games)
             viewModel.UpdateBackupCount(game);
     }

@@ -7,35 +7,35 @@ using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Models;
 using Multi_Saves_Backup_Tool.Services;
-using Properties;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
 
 public class StatsViewModel : ViewModelBase, IDisposable
 {
-    private readonly IGamesService _gameService;
     private readonly IBackupService _backupService;
-    private readonly ISettingsService _settingsService;
+    private readonly IGamesService _gameService;
     private readonly ILogger<StatsViewModel> _logger;
+    private readonly ISettingsService _settingsService;
     private readonly DispatcherTimer _updateTimer;
     private string _archivesCounts = "0";
-    private string _sizesArchives = "0 MB";
     private ObservableCollection<GameStatsInfo> _games = new();
+    private string _sizesArchives = "0 MB";
 
-    public StatsViewModel(IGamesService gameService, IBackupService backupService, ISettingsService settingsService, ILogger<StatsViewModel> logger)
+    public StatsViewModel(IGamesService gameService, IBackupService backupService, ISettingsService settingsService,
+        ILogger<StatsViewModel> logger)
     {
         _gameService = gameService;
         _backupService = backupService;
         _settingsService = settingsService;
         _logger = logger;
-        
+
         _updateTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromSeconds(5)
         };
         _updateTimer.Tick += async (_, _) => await UpdateStatsAsync();
         _updateTimer.Start();
-        
+
         _ = UpdateStatsAsync();
     }
 
@@ -57,13 +57,18 @@ public class StatsViewModel : ViewModelBase, IDisposable
         private set => SetProperty(ref _games, value);
     }
 
+    public void Dispose()
+    {
+        _updateTimer.Stop();
+    }
+
     private async Task UpdateStatsAsync()
     {
         try
         {
             var games = await _gameService.LoadGamesAsync();
             _logger.LogInformation("Loaded {Count} games for statistics", games.Count);
-            
+
             var totalArchives = 0;
             var totalSize = 0L;
 
@@ -72,17 +77,17 @@ public class StatsViewModel : ViewModelBase, IDisposable
             {
                 var backupCount = _backupService.GetBackupCount(game);
                 var gameSize = CalculateGameBackupsSize(game);
-                
+
                 var specialArchivesCount = GetSpecialArchivesCount(game);
                 var specialArchivesSize = CalculateSpecialArchivesSize(game);
-                
+
                 _logger.LogInformation(
                     "Game {GameName} stats: Regular backups: {RegularCount} ({RegularSize} bytes), Special archives: {SpecialCount} ({SpecialSize} bytes)",
                     game.GameName, backupCount, gameSize, specialArchivesCount, specialArchivesSize);
-                
+
                 backupCount += specialArchivesCount;
                 gameSize += specialArchivesSize;
-                
+
                 totalArchives += backupCount;
                 totalSize += gameSize;
 
@@ -95,7 +100,7 @@ public class StatsViewModel : ViewModelBase, IDisposable
             }
 
             _logger.LogInformation("Total statistics: {Count} archives, {Size} bytes", totalArchives, totalSize);
-            
+
             ArchivesCounts = totalArchives.ToString();
             SizesArchives = FormatSize(totalSize);
         }
@@ -110,14 +115,16 @@ public class StatsViewModel : ViewModelBase, IDisposable
         try
         {
             var safeName = GetSafeDirectoryName(game.GameName);
-            var specialArchiveDir = Path.Combine(_settingsService.CurrentSettings.BackupSettings.BackupRootFolder, safeName, "SpecialArchive");
-            
+            var specialArchiveDir = Path.Combine(_settingsService.CurrentSettings.BackupSettings.BackupRootFolder,
+                safeName, "SpecialArchive");
+
             if (!Directory.Exists(specialArchiveDir))
             {
-                _logger.LogDebug("Special archive directory not found for {GameName}: {Path}", game.GameName, specialArchiveDir);
+                _logger.LogDebug("Special archive directory not found for {GameName}: {Path}", game.GameName,
+                    specialArchiveDir);
                 return 0;
             }
-            
+
             var count = Directory.GetDirectories(specialArchiveDir).Length;
             _logger.LogDebug("Found {Count} special archives for {GameName}", count, game.GameName);
             return count;
@@ -143,7 +150,8 @@ public class StatsViewModel : ViewModelBase, IDisposable
 
             var files = Directory.GetFiles(backupDir, "*.zip");
             var size = files.Sum(file => new FileInfo(file).Length);
-            _logger.LogDebug("Found {Count} backup files for {GameName}, total size: {Size} bytes", files.Length, game.GameName, size);
+            _logger.LogDebug("Found {Count} backup files for {GameName}, total size: {Size} bytes", files.Length,
+                game.GameName, size);
             return size;
         }
         catch (Exception ex)
@@ -158,10 +166,12 @@ public class StatsViewModel : ViewModelBase, IDisposable
         try
         {
             var safeName = GetSafeDirectoryName(game.GameName);
-            var specialArchiveDir = Path.Combine(_settingsService.CurrentSettings.BackupSettings.BackupRootFolder, safeName, "SpecialArchive");
+            var specialArchiveDir = Path.Combine(_settingsService.CurrentSettings.BackupSettings.BackupRootFolder,
+                safeName, "SpecialArchive");
             if (!Directory.Exists(specialArchiveDir))
             {
-                _logger.LogDebug("Special archive directory not found for {GameName}: {Path}", game.GameName, specialArchiveDir);
+                _logger.LogDebug("Special archive directory not found for {GameName}: {Path}", game.GameName,
+                    specialArchiveDir);
                 return 0;
             }
 
@@ -181,9 +191,9 @@ public class StatsViewModel : ViewModelBase, IDisposable
     private string FormatSize(long bytes)
     {
         string[] sizes = { "B", "KB", "MB", "GB" };
-        int order = 0;
+        var order = 0;
         double size = bytes;
-        
+
         while (size >= 1024 && order < sizes.Length - 1)
         {
             order++;
@@ -196,11 +206,6 @@ public class StatsViewModel : ViewModelBase, IDisposable
     private string GetSafeDirectoryName(string name)
     {
         return string.Join("_", name.Split(Path.GetInvalidFileNameChars()));
-    }
-
-    public void Dispose()
-    {
-        _updateTimer.Stop();
     }
 }
 

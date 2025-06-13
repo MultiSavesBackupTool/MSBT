@@ -81,7 +81,7 @@
     <data name="MainWindow_Settings" xml:space="preserve">
     <value>Settings</value>
   </data>
-    
+
     <!-- GamesView strings -->
     <data name="GamesView_AddGame" xml:space="preserve">
     <value>Add Game</value>
@@ -349,7 +349,7 @@ This action cannot be undone.</value>
     <value>We are installing the latest updates. Please do not turn off your device
 or close the application — this will only take a moment.</value>
   </data>
-    
+
     <!-- StatsView -->
     <data name="StatsView_SizesArchives" xml:space="preserve">
     <value>Size of all archives:</value>

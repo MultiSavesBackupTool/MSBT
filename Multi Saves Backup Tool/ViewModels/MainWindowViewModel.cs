@@ -5,8 +5,8 @@ using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.UI.Controls;
-using Multi_Saves_Backup_Tool.Services;
 using Microsoft.Extensions.Logging;
+using Multi_Saves_Backup_Tool.Services;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
 
@@ -25,7 +25,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private string _updateMessage = string.Empty;
 
     public MainWindowViewModel(Window mainWindow, ITrayService trayService, IGamesService gamesService,
-        IBackupService backupService, BackupManager backupManager, ISettingsService settingsService, 
+        IBackupService backupService, BackupManager backupManager, ISettingsService settingsService,
         ILogger<MainWindowViewModel> logger, ILogger<StatsViewModel> statsLogger)
     {
         _trayService = trayService;

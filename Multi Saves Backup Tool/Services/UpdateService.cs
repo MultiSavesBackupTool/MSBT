@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -261,9 +260,7 @@ public class UpdateService
             Process.Start(openFinderProcess);
 
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
-            {
                 lifetime.Shutdown();
-            }
 
             return true;
         }
@@ -285,10 +282,8 @@ public class UpdateService
             Process.Start(processStartInfo);
 
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
-            {
                 lifetime.Shutdown();
-            }
-            
+
             return Task.FromResult(true);
         }
         catch (Exception ex)
@@ -318,18 +313,16 @@ public class UpdateService
             };
             using (var proc = Process.Start(chmodProcess))
             {
-                await proc.WaitForExitAsync();
+                await proc?.WaitForExitAsync()!;
             }
 
             File.Move(filePath, currentExecutable, true);
             Debug.WriteLine($"Replaced current executable at {currentExecutable}");
 
             Process.Start(currentExecutable);
-            
+
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
-            {
                 lifetime.Shutdown();
-            }
 
             return true;
         }

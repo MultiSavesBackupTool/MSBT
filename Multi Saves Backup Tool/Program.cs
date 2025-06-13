@@ -18,12 +18,9 @@ internal sealed class Program
     public static void Main(string[] args)
     {
         const string appName = "MultiSavesBackupTool";
-        _mutex = new Mutex(true, appName, out bool createdNew);
+        _mutex = new Mutex(true, appName, out var createdNew);
 
-        if (!createdNew)
-        {
-            return;
-        }
+        if (!createdNew) return;
 
         try
         {

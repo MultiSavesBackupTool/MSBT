@@ -63,7 +63,7 @@
                         <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                             <views:SettingsView />
                         </DataTemplate>
-                        
+
                         <DataTemplate DataType="{x:Type vm:StatsViewModel}">
                             <views:StatsView />
                         </DataTemplate>

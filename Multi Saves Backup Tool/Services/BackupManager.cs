@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Models;
 using Multi_Saves_Backup_Tool.Paths;
-using System.Text.Json;
 
 namespace Multi_Saves_Backup_Tool.Services;
 
@@ -18,12 +18,9 @@ public class BackupManager : IDisposable
     private readonly IBackupService _backupService;
     private readonly IGamesService _gamesService;
     private readonly ILogger<BackupManager> _logger;
-    private ServiceState _serviceState;
     private readonly ISettingsService _settingsService;
     private Task? _backupTask;
     private CancellationTokenSource? _cancellationTokenSource;
-
-    public event Action? StateChanged;
 
     public BackupManager(
         ILogger<BackupManager> logger,
@@ -35,20 +32,22 @@ public class BackupManager : IDisposable
         _settingsService = settingsService;
         _gamesService = gamesService;
         _backupService = backupService;
-        _serviceState = ServiceState.LoadFromFile(StateFilePath);
+        State = ServiceState.LoadFromFile(StateFilePath);
     }
 
-    public ServiceState State => _serviceState;
+    public ServiceState State { get; }
 
     public void Dispose()
     {
         StopAsync().Wait();
     }
 
+    public event Action? StateChanged;
+
     public async Task StartAsync()
     {
         _logger.LogInformation("Backup manager is starting...");
-        _serviceState.ServiceStatus = "Starting";
+        State.ServiceStatus = "Starting";
         SaveServiceState();
         await _settingsService.ReloadSettingsAsync();
 
@@ -58,7 +57,7 @@ public class BackupManager : IDisposable
 
     public async Task StopAsync()
     {
-        _serviceState.ServiceStatus = "Stopping";
+        State.ServiceStatus = "Stopping";
         SaveServiceState();
 
         if (_cancellationTokenSource != null)
@@ -74,7 +73,7 @@ public class BackupManager : IDisposable
     {
         try
         {
-            _serviceState.ServiceStatus = "Running";
+            State.ServiceStatus = "Running";
             SaveServiceState();
 
             while (!stoppingToken.IsCancellationRequested)
@@ -86,7 +85,7 @@ public class BackupManager : IDisposable
         }
         catch (Exception ex)
         {
-            _serviceState.ServiceStatus = $"Error: {ex.Message}";
+            State.ServiceStatus = $"Error: {ex.Message}";
             SaveServiceState();
             _logger.LogError(ex, "Fatal error in backup manager");
             throw;
@@ -110,7 +109,7 @@ public class BackupManager : IDisposable
             _logger.LogInformation("Found {Count} enabled games for backup", enabledGames.Count);
 
             var removedGames = new List<string>();
-            foreach (var gameName in _serviceState.GamesState.Keys)
+            foreach (var gameName in State.GamesState.Keys)
             {
                 var game = await _gamesService.GetGameByNameAsync(gameName);
                 if (game == null) removedGames.Add(gameName);
@@ -119,15 +118,15 @@ public class BackupManager : IDisposable
             foreach (var gameName in removedGames)
             {
                 _logger.LogInformation("Removing state for deleted game: {GameName}", gameName);
-                _serviceState.GamesState.Remove(gameName);
+                State.GamesState.Remove(gameName);
             }
 
             foreach (var game in games)
             {
-                if (!_serviceState.GamesState.ContainsKey(game.GameName))
-                    _serviceState.GamesState[game.GameName] = new GameState { GameName = game.GameName };
+                if (!State.GamesState.ContainsKey(game.GameName))
+                    State.GamesState[game.GameName] = new GameState { GameName = game.GameName };
 
-                _serviceState.GamesState[game.GameName].Status = game.IsEnabled ? "Waiting" : "Disabled";
+                State.GamesState[game.GameName].Status = game.IsEnabled ? "Waiting" : "Disabled";
             }
 
             var settings = _settingsService.CurrentSettings.BackupSettings;
@@ -142,7 +141,7 @@ public class BackupManager : IDisposable
                     break;
                 }
 
-                var gameState = _serviceState.GamesState[game.GameName];
+                var gameState = State.GamesState[game.GameName];
                 if (gameState.NextBackupScheduled > DateTime.Now)
                 {
                     _logger.LogInformation(
@@ -172,7 +171,7 @@ public class BackupManager : IDisposable
                         catch (Exception ex)
                         {
                             _logger.LogError(ex, "Error processing backup for game {GameName}", game.GameName);
-                            var state = _serviceState.GamesState[game.GameName];
+                            var state = State.GamesState[game.GameName];
                             state.Status = "Error";
                             state.LastError = ex.Message;
                             SaveServiceState();
@@ -200,14 +199,14 @@ public class BackupManager : IDisposable
                     _logger.LogError(ex, "Error during parallel backup execution");
                 }
 
-            _serviceState.LastUpdateTime = DateTime.Now;
+            State.LastUpdateTime = DateTime.Now;
             SaveServiceState();
             _logger.LogInformation("Backup process completed");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during backup process");
-            _serviceState.ServiceStatus = $"Error: {ex.Message}";
+            State.ServiceStatus = $"Error: {ex.Message}";
             SaveServiceState();
         }
     }
@@ -221,7 +220,7 @@ public class BackupManager : IDisposable
             return;
         }
 
-        var gameState = _serviceState.GamesState[game.GameName];
+        var gameState = State.GamesState[game.GameName];
         try
         {
             _logger.LogInformation("Processing backup for game: {GameName}", game.GameName);
@@ -267,7 +266,7 @@ public class BackupManager : IDisposable
     {
         try
         {
-            var json = JsonSerializer.Serialize(_serviceState, new JsonSerializerOptions { WriteIndented = true });
+            var json = JsonSerializer.Serialize(State, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(StateFilePath, json);
             StateChanged?.Invoke();
         }

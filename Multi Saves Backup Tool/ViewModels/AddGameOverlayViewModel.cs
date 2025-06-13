@@ -210,7 +210,6 @@ public partial class AddGameOverlayViewModel : ViewModelBase
             };
 
             if (OperatingSystem.IsWindows())
-            {
                 options.FileTypeFilter = new[]
                 {
                     new FilePickerFileType("Executable Files")
@@ -219,7 +218,6 @@ public partial class AddGameOverlayViewModel : ViewModelBase
                         MimeTypes = new[] { "application/x-msdownload" }
                     }
                 };
-            }
 
             var files = await storageProvider.OpenFilePickerAsync(options);
             return files.Count > 0 ? files[0].Path.LocalPath : string.Empty;
