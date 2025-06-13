@@ -277,7 +277,11 @@ public class UpdateService
         {
             var processStartInfo = new ProcessStartInfo(filePath)
             {
-                UseShellExecute = true
+                FileName = filePath,
+                Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS",
+                UseShellExecute = true,
+                Verb = "runas",
+                CreateNoWindow = true
             };
             Process.Start(processStartInfo);
 
