@@ -79,7 +79,6 @@ the following information:
 - Steps to reproduce
 - Expected behavior
 - Actual behavior
-- System information (OS version, .NET version)
 - Any relevant error messages or logs
 
 ## Contributing
