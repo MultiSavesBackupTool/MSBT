@@ -148,7 +148,12 @@ public class PcGamingWikiSaveParser
         }
 
         processedPath = Regex.Replace(processedPath, @"\{\{[^}]+\}\}", "");
-        return processedPath.Trim().Trim(Path.DirectorySeparatorChar);
+        processedPath = processedPath.Trim().Trim(Path.DirectorySeparatorChar);
+
+        if (!string.IsNullOrEmpty(Path.GetExtension(processedPath)))
+            return Path.GetDirectoryName(processedPath) ?? processedPath;
+
+        return processedPath;
     }
 
     public class SavePathResult
