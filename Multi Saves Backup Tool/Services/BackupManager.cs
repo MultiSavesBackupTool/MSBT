@@ -240,8 +240,8 @@ public class BackupManager : IDisposable
                     });
                 }
 
-                State.GamesState[game.GameName].Status =
-                    isRunning ? "Running" : game.IsEnabled ? "Waiting" : "Disabled";
+                State.GamesState[game.GameName].Status = game.IsEnabled ? "Waiting" : "Disabled";
+                State.GamesState[game.GameName].IsRun = isRunning;
                 SaveServiceState();
             }
 

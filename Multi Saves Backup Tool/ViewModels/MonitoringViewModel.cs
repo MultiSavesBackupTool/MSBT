@@ -88,7 +88,7 @@ public class MonitoringViewModel : ViewModelBase, IDisposable
                 }
             }
 
-            var runningGame = state.GamesState.Values.FirstOrDefault(g => g.Status == "Running");
+            var runningGame = state.GamesState.Values.FirstOrDefault(g => g.IsRun);
             CurrentGameName = runningGame?.GameName;
             OnPropertyChanged(nameof(CurrentGameName));
         }
