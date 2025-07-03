@@ -157,31 +157,50 @@ public class BackupService : IBackupService
 
         try
         {
-            if (game.SavePath != null)
+            if (latestBackup != null)
             {
-                var extractPath = Path.Combine(game.SavePath, "restored");
-                Directory.CreateDirectory(extractPath);
-
-                if (latestBackup != null)
+                using var archive = ZipArchive.Open(latestBackup);
+                foreach (var entry in archive.Entries)
                 {
-                    using var archive = ZipArchive.Open(latestBackup);
-                    foreach (var entry in archive.Entries)
-                        if (!entry.IsDirectory)
-                            if (entry.Key != null)
-                            {
-                                var entryPath = Path.Combine(extractPath, entry.Key);
-                                var directory = Path.GetDirectoryName(entryPath);
-                                if (!string.IsNullOrEmpty(directory))
-                                    Directory.CreateDirectory(directory);
+                    if (entry.IsDirectory || string.IsNullOrEmpty(entry.Key))
+                        continue;
 
-                                entry.WriteToFile(entryPath);
-                            }
-                }
+                    string? targetRoot = null;
+                    var relativePath = string.Empty;
 
-                foreach (var file in Directory.GetFiles(extractPath))
-                {
-                    var destinationFile = Path.Combine(game.SavePath, Path.GetFileName(file));
-                    File.Copy(file, destinationFile, true);
+                    if (entry.Key.StartsWith("saves/"))
+                    {
+                        if (!string.IsNullOrEmpty(game.SavePath))
+                        {
+                            targetRoot = game.SavePath;
+                            relativePath = entry.Key.Substring("saves/".Length);
+                        }
+                    }
+                    else if (entry.Key.StartsWith("mods/"))
+                    {
+                        if (!string.IsNullOrEmpty(game.ModPath))
+                        {
+                            targetRoot = game.ModPath;
+                            relativePath = entry.Key.Substring("mods/".Length);
+                        }
+                    }
+                    else if (entry.Key.StartsWith("additional/"))
+                    {
+                        if (!string.IsNullOrEmpty(game.AddPath))
+                        {
+                            targetRoot = game.AddPath;
+                            relativePath = entry.Key.Substring("additional/".Length);
+                        }
+                    }
+
+                    if (targetRoot != null && !string.IsNullOrEmpty(relativePath))
+                    {
+                        var entryPath = Path.Combine(targetRoot, relativePath);
+                        var directory = Path.GetDirectoryName(entryPath);
+                        if (!string.IsNullOrEmpty(directory))
+                            Directory.CreateDirectory(directory);
+                        entry.WriteToFile(entryPath);
+                    }
                 }
             }
 

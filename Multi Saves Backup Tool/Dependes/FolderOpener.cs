@@ -9,20 +9,33 @@ public static class FolderOpener
 {
     public static void OpenFolder(string? path)
     {
-        if (string.IsNullOrWhiteSpace(path))
-            throw new ArgumentException("Path cannot be empty", nameof(path));
-
-        if (!Directory.Exists(path))
-            throw new DirectoryNotFoundException($"Folder not found: {path}");
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            Process.Start(new ProcessStartInfo
+        try
+        {
+            if (string.IsNullOrWhiteSpace(path))
             {
-                FileName = "explorer",
-                Arguments = $"\"{path}\"",
-                UseShellExecute = true
-            });
-        else
-            throw new PlatformNotSupportedException("Unsupported operating system");
+                Debug.WriteLine("Path cannot be empty");
+                return;
+            }
+
+            if (!Directory.Exists(path))
+            {
+                Debug.WriteLine($"Folder not found: {path}");
+                return;
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "explorer",
+                    Arguments = $"\"{path}\"",
+                    UseShellExecute = true
+                });
+            else
+                Debug.WriteLine("Unsupported operating system");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error opening folder: {ex.Message}");
+        }
     }
 }

@@ -16,9 +16,9 @@ namespace Multi_Saves_Backup_Tool.Services
 {
     public class TrayService : ITrayService, IDisposable
     {
+        private readonly BackupManager _backupManager;
         private readonly IGamesService _gamesService;
         private readonly MonitoringViewModel _monitoringViewModel;
-        private readonly BackupManager _backupManager;
         private NativeMenuItem? _backupMenuItem;
         private NativeMenuItem? _backupProtectedMenuItem;
         private NativeMenuItem? _currentGameMenuItem;

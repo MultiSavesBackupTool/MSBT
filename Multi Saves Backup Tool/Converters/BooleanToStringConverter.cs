@@ -27,6 +27,7 @@ public class BooleanToStringConverter : IValueConverter
                 }
             }
         }
+
         return value;
     }
 
