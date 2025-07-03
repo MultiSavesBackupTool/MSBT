@@ -29,7 +29,6 @@ public class SettingsService : ISettingsService, IDisposable
         CurrentSettings = options.Value ?? throw new ArgumentNullException(nameof(options));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        var mainAppDirectory = AppContext.BaseDirectory;
         _settingsPath = AppPaths.SettingsFilePath;
 
         if (string.IsNullOrEmpty(CurrentSettings.BackupSettings.GamesConfigPath))

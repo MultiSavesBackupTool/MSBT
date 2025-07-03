@@ -15,7 +15,7 @@ public class GameModel : INotifyPropertyChanged
     private string _gameName = string.Empty;
     private bool _isEnabled = true;
     private string? _modPath;
-    private string _savePath = string.Empty;
+    private string? _savePath = string.Empty;
     private int _setOldFilesStatus;
     private bool _specialBackupMark;
 
@@ -37,7 +37,7 @@ public class GameModel : INotifyPropertyChanged
         set => SetField(ref _gameExeAlt, value);
     }
 
-    public string SavePath
+    public string? SavePath
     {
         get => _savePath;
         set => SetField(ref _savePath, value);

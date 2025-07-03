@@ -1,9 +1,12 @@
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform;
+using Multi_Saves_Backup_Tool.ViewModels;
+using Properties;
 
 public class NavigateToSettingsMessage
 {
@@ -11,18 +14,33 @@ public class NavigateToSettingsMessage
 
 namespace Multi_Saves_Backup_Tool.Services
 {
-    public interface ITrayService
+    public class TrayService : ITrayService, IDisposable
     {
-        bool IsVisible { get; set; }
-        void Initialize();
-        void ShowBalloonTip(string title, string message);
-        void UpdateTooltip(string tooltip);
-    }
+        private readonly IGamesService _gamesService;
+        private readonly MonitoringViewModel _monitoringViewModel;
+        private readonly BackupManager _backupManager;
+        private NativeMenuItem? _backupMenuItem;
+        private NativeMenuItem? _backupProtectedMenuItem;
+        private NativeMenuItem? _currentGameMenuItem;
 
-    public class TrayService : ITrayService
-    {
+        private bool _disposed;
         private Window? _mainWindow;
         private TrayIcon? _trayIcon;
+
+        public TrayService(MonitoringViewModel monitoringViewModel, IGamesService gamesService,
+            IBackupService backupService, BackupManager backupManager)
+        {
+            _monitoringViewModel = monitoringViewModel;
+            _gamesService = gamesService;
+            _backupManager = backupManager;
+            _monitoringViewModel.PropertyChanged += MonitoringViewModelOnPropertyChanged;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         public bool IsVisible { get; set; } = true;
 
@@ -42,21 +60,32 @@ namespace Multi_Saves_Backup_Tool.Services
                 IsVisible = true
             };
 
+            _currentGameMenuItem = new NativeMenuItem(Resources.CurrentGameNotRunning) { IsEnabled = false };
+            _backupMenuItem = new NativeMenuItem(Resources.CreateBackup);
+            _backupMenuItem.Click += (s, e) => CreateBackup(false);
+            _backupProtectedMenuItem = new NativeMenuItem(Resources.CreateProtectedBackup);
+            _backupProtectedMenuItem.Click += (s, e) => CreateBackup(true);
+
             trayIcon.Menu = new NativeMenu
             {
                 Items =
                 {
-                    new NativeMenuItem("Показать/Скрыть")
+                    _currentGameMenuItem,
+                    new NativeMenuItemSeparator(),
+                    _backupMenuItem,
+                    _backupProtectedMenuItem,
+                    new NativeMenuItemSeparator(),
+                    new NativeMenuItem(Resources.ShowHide)
                     {
                         Command = new RelayCommand(ToggleWindowVisibility)
                     },
                     new NativeMenuItemSeparator(),
-                    new NativeMenuItem("Настройки")
+                    new NativeMenuItem(Resources.Settings)
                     {
                         Command = new RelayCommand(OpenSettings)
                     },
                     new NativeMenuItemSeparator(),
-                    new NativeMenuItem("Выход")
+                    new NativeMenuItem(Resources.Exit)
                     {
                         Command = new RelayCommand(ExitApplication)
                     }
@@ -68,20 +97,46 @@ namespace Multi_Saves_Backup_Tool.Services
             _trayIcon = trayIcon;
 
             _mainWindow.Closing += OnMainWindowClosing;
-        }
-
-        public void ShowBalloonTip(string title, string message)
-        {
-            if (OperatingSystem.IsWindows())
-                ShowWindowsNotification(title, message);
-            else if (OperatingSystem.IsMacOS())
-                ShowMacOsNotification(title, message);
-            else if (OperatingSystem.IsLinux()) ShowLinuxNotification(title, message);
+            UpdateCurrentGameMenu();
         }
 
         public void UpdateTooltip(string tooltip)
         {
             if (_trayIcon != null) _trayIcon.ToolTipText = tooltip;
+        }
+
+        private void MonitoringViewModelOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(MonitoringViewModel.CurrentGameName))
+                UpdateCurrentGameMenu();
+        }
+
+        private void UpdateCurrentGameMenu()
+        {
+            if (_currentGameMenuItem == null) return;
+            var gameName = _monitoringViewModel.CurrentGameName;
+
+            var notRunningText = Resources.CurrentGameNotRunning;
+            var runningFormatText = Resources.CurrentGameRunning;
+
+            var headerText = string.IsNullOrEmpty(gameName)
+                ? notRunningText
+                : string.Format(runningFormatText, gameName);
+
+            _currentGameMenuItem.Header = headerText;
+            _backupMenuItem!.IsEnabled = !string.IsNullOrEmpty(gameName);
+            _backupProtectedMenuItem!.IsEnabled = !string.IsNullOrEmpty(gameName);
+        }
+
+        private async void CreateBackup(bool isProtected)
+        {
+            var gameName = _monitoringViewModel.CurrentGameName;
+            if (string.IsNullOrEmpty(gameName)) return;
+
+            var game = await _gamesService.GetGameByNameAsync(gameName);
+
+            if (game == null) return;
+            await _backupManager.ProcessGameBackupAsync(game, isProtected);
         }
 
         private void OnMainWindowClosing(object? sender, WindowClosingEventArgs e)
@@ -121,73 +176,44 @@ namespace Multi_Saves_Backup_Tool.Services
             MessengerService.Instance.Send(new NavigateToSettingsMessage());
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    if (_trayIcon != null)
+                    {
+                        _trayIcon.Dispose();
+                        _trayIcon = null;
+                    }
+
+                    _monitoringViewModel.PropertyChanged -= MonitoringViewModelOnPropertyChanged;
+
+                    if (_mainWindow != null)
+                    {
+                        _mainWindow.Closing -= OnMainWindowClosing;
+                        _mainWindow = null;
+                    }
+                }
+
+                _disposed = true;
+            }
+        }
+
         private void ExitApplication()
         {
-            IsVisible = false;
-            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-                desktop.Shutdown();
-        }
-
-        private void ShowWindowsNotification(string title, string message)
-        {
             try
             {
-                var script = $@"
-                    Add-Type -AssemblyName System.Windows.Forms
-                    $notify = New-Object System.Windows.Forms.NotifyIcon
-                    $notify.Icon = [System.Drawing.SystemIcons]::Information
-                    $notify.Visible = $true
-                    $notify.ShowBalloonTip(3000, '{title}', '{message}', [System.Windows.Forms.ToolTipIcon]::Info)
-                ";
-
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = "powershell",
-                    Arguments = $"-Command \"{script}\"",
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                });
+                IsVisible = false;
+                if (_trayIcon != null) _trayIcon.IsVisible = false;
+                Dispose();
+                if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+                    desktop.Shutdown();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Failed to show Windows notification: {ex.Message}");
-            }
-        }
-
-        private void ShowMacOsNotification(string title, string message)
-        {
-            try
-            {
-                var script = $@"display notification ""{message}"" with title ""{title}""";
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = "osascript",
-                    Arguments = $"-e '{script}'",
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                });
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Failed to show macOS notification: {ex.Message}");
-            }
-        }
-
-        private void ShowLinuxNotification(string title, string message)
-        {
-            try
-            {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = "notify-send",
-                    Arguments = $"\"{title}\" \"{message}\"",
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                });
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Failed to show Linux notification: {ex.Message}");
+                Debug.WriteLine($"Error during application exit: {ex}");
             }
         }
     }

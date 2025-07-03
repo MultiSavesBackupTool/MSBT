@@ -14,12 +14,16 @@
     </Design.DataContext>
 
     <DockPanel>
-        <Button Content="{x:Static properties:Resources.GamesView_AddGame}"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Click="AddGameButton_Click"
-                DockPanel.Dock="Top"
-                Margin="10,10,0,10" />
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10,10,0,10" Spacing="10">
+            <Button Content="{x:Static properties:Resources.GamesView_AddGame}"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Click="AddGameButton_Click" />
+            <Button Content="{x:Static properties:Resources.GamesView_ScanInstalledGames}"
+                    Command="{Binding ScanInstalledGamesCommand}"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top" />
+        </StackPanel>
 
         <ScrollViewer>
             <ItemsControl ItemsSource="{Binding Games}">
@@ -43,6 +47,14 @@
                                     <TextBlock
                                         Text="{Binding BackupCount, StringFormat={x:Static properties:Resources.GamesView_BackupCount}}"
                                         VerticalAlignment="Center" />
+                                    <Button Content="{x:Static properties:Resources.GamesView_OpenGameFolder}"
+                                            Command="{Binding ((vm:GamesViewModel)DataContext).OpenSaveCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            CommandParameter="{Binding}"
+                                            Padding="8,4" />
+                                    <Button Content="{x:Static properties:Resources.GamesView_RestoreBackup}"
+                                            Command="{Binding ((vm:GamesViewModel)DataContext).RestoreBackupCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            CommandParameter="{Binding}"
+                                            Padding="8,4" />
                                     <Button Content="{x:Static properties:Resources.GamesView_EditGame}"
                                             Command="{Binding ((vm:GamesViewModel)DataContext).EditGameCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                             CommandParameter="{Binding}"

@@ -1,28 +1,47 @@
 using System;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Models;
+using SharpCompress.Archives;
+using SharpCompress.Archives.Zip;
+using SharpCompress.Common;
+using SharpCompress.Writers;
 using CompressionLevel = Multi_Saves_Backup_Tool.Models.CompressionLevel;
 
 namespace Multi_Saves_Backup_Tool.Services;
 
 public class BackupService : IBackupService
 {
+    private readonly CancellationTokenSource _cancellationTokenSource;
     private readonly ILogger<BackupService> _logger;
     private readonly ISettingsService _settingsService;
+    private bool _disposed;
 
     public BackupService(ISettingsService settingsService, ILogger<BackupService> logger)
     {
         _settingsService = settingsService;
         _logger = logger;
+        _cancellationTokenSource = new CancellationTokenSource();
     }
 
-    public async Task CreateBackupAsync(GameModel game)
+    public void Dispose()
     {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    public async Task CreateBackupAsync(GameModel game, bool isPermanent)
+    {
+        if (_disposed)
+        {
+            _logger.LogWarning("Attempted to create backup after service disposal");
+            return;
+        }
+
         if (game == null)
             throw new ArgumentNullException(nameof(game));
 
@@ -33,21 +52,24 @@ public class BackupService : IBackupService
             var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
             var safeName = GetSafeDirectoryName(game.GameName);
             var backupDir = Path.Combine(settings.BackupRootFolder, safeName);
-            var archivePath = Path.Combine(backupDir, $"{timestamp}.zip");
+            if (isPermanent)
+                backupDir = Path.Combine(backupDir, "permanent");
+            var archivePath = Path.Combine(backupDir, $"{game.GameName}_{timestamp}.zip");
 
             Directory.CreateDirectory(backupDir);
 
-            _logger.LogInformation("Creating backup for game {GameName} at {Path}", game.GameName, archivePath);
+            _logger.LogInformation("Creating{0} backup for game {1} at {2}",
+                isPermanent ? " permanent" : string.Empty, game.GameName, archivePath);
 
             try
             {
-                archive = ZipFile.Open(archivePath, ZipArchiveMode.Create);
+                archive = ZipArchive.Create();
 
                 var backupSuccess = false;
 
                 if (Directory.Exists(game.SavePath))
                 {
-                    await AddToArchiveAsync(archive, game.SavePath, "saves");
+                    await AddToArchiveAsync(archive, game.SavePath, "saves", _cancellationTokenSource.Token);
                     backupSuccess = true;
                 }
                 else
@@ -56,52 +78,121 @@ public class BackupService : IBackupService
                 }
 
                 if (!string.IsNullOrEmpty(game.ModPath) && Directory.Exists(game.ModPath))
-                    await AddToArchiveAsync(archive, game.ModPath, "mods");
+                    await AddToArchiveAsync(archive, game.ModPath, "mods", _cancellationTokenSource.Token);
 
                 if (!string.IsNullOrEmpty(game.AddPath) && Directory.Exists(game.AddPath))
-                    await AddToArchiveAsync(archive, game.AddPath, "additional");
+                    await AddToArchiveAsync(archive, game.AddPath, "additional", _cancellationTokenSource.Token);
 
                 if (!backupSuccess)
                 {
                     _logger.LogWarning("No valid paths found for backup of game {GameName}", game.GameName);
                     archive.Dispose();
                     archive = null;
-                    if (File.Exists(archivePath)) File.Delete(archivePath);
+                    if (File.Exists(archivePath))
+                        try
+                        {
+                            File.Delete(archivePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Error deleting failed backup file: {Path}", archivePath);
+                        }
                 }
                 else
                 {
+                    var writerOptions = new WriterOptions(GetSharpCompressCompressionType());
+
+                    using var fileStream = File.Create(archivePath);
+                    archive.SaveTo(fileStream, writerOptions);
+
+                    if (isPermanent && File.Exists(archivePath))
+                        File.SetAttributes(archivePath, File.GetAttributes(archivePath) | FileAttributes.ReadOnly);
                     _logger.LogInformation("Backup created successfully for {GameName}", game.GameName);
                 }
             }
-            catch (Exception)
-            {
-                archive?.Dispose();
-                archive = null;
-
-                await Task.Delay(100);
-
-                if (File.Exists(archivePath))
-                    try
-                    {
-                        File.Delete(archivePath);
-                    }
-                    catch (Exception deleteEx)
-                    {
-                        _logger.LogWarning(deleteEx, "Could not delete failed backup file {Path}", archivePath);
-                    }
-
-                throw;
-            }
             finally
             {
-                archive?.Dispose();
+                if (archive != null)
+                    try
+                    {
+                        archive.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error disposing archive for {GameName}", game.GameName);
+                    }
             }
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogInformation("Backup operation cancelled for {GameName}", game.GameName);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to create backup for game {GameName}", game.GameName);
-            throw;
+            _logger.LogError(ex, "Error creating backup for {GameName}", game.GameName);
         }
+    }
+
+    public Task RestoreLatestBackupAsync(GameModel game)
+    {
+        if (_disposed) _logger.LogWarning("Attempted to restore backup after service disposal");
+
+        if (game == null)
+            throw new ArgumentNullException(nameof(game));
+
+        var settings = _settingsService.CurrentSettings.BackupSettings;
+        var safeName = GetSafeDirectoryName(game.GameName);
+        var backupDir = Path.Combine(settings.BackupRootFolder, safeName);
+
+        if (!Directory.Exists(backupDir))
+            _logger.LogWarning("Backup directory not found for game {GameName}: {Path}", game.GameName, backupDir);
+
+        var latestBackup = Directory.GetFiles(backupDir, "*.zip")
+            .OrderByDescending(File.GetLastWriteTime)
+            .FirstOrDefault();
+
+        if (latestBackup == null) _logger.LogWarning("No backups found for game {GameName}", game.GameName);
+
+        _logger.LogInformation("Restoring latest backup for game {GameName} from {Path}", game.GameName, latestBackup);
+
+        try
+        {
+            if (game.SavePath != null)
+            {
+                var extractPath = Path.Combine(game.SavePath, "restored");
+                Directory.CreateDirectory(extractPath);
+
+                if (latestBackup != null)
+                {
+                    using var archive = ZipArchive.Open(latestBackup);
+                    foreach (var entry in archive.Entries)
+                        if (!entry.IsDirectory)
+                            if (entry.Key != null)
+                            {
+                                var entryPath = Path.Combine(extractPath, entry.Key);
+                                var directory = Path.GetDirectoryName(entryPath);
+                                if (!string.IsNullOrEmpty(directory))
+                                    Directory.CreateDirectory(directory);
+
+                                entry.WriteToFile(entryPath);
+                            }
+                }
+
+                foreach (var file in Directory.GetFiles(extractPath))
+                {
+                    var destinationFile = Path.Combine(game.SavePath, Path.GetFileName(file));
+                    File.Copy(file, destinationFile, true);
+                }
+            }
+
+            _logger.LogInformation("Backup restored successfully for game {GameName}", game.GameName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error restoring backup for game {GameName}", game.GameName);
+        }
+
+        return Task.CompletedTask;
     }
 
     public void CleanupOldBackups(GameModel game)
@@ -287,7 +378,6 @@ public class BackupService : IBackupService
 
     public int GetBackupCount(GameModel game)
     {
-        if (game == null) return 0;
         try
         {
             var safeName = GetSafeDirectoryName(game.GameName);
@@ -302,6 +392,61 @@ public class BackupService : IBackupService
             _logger.LogError(ex, "Failed to get backup count for {GameName}", game.GameName);
             return 0;
         }
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+                try
+                {
+                    _cancellationTokenSource.Cancel();
+                    _cancellationTokenSource.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error during BackupService disposal");
+                }
+
+            _disposed = true;
+        }
+    }
+
+    private Task AddToArchiveAsync(ZipArchive archive, string? sourcePath, string entryPrefix,
+        CancellationToken cancellationToken)
+    {
+        if (sourcePath != null)
+            foreach (var file in Directory.GetFiles(sourcePath, "*", SearchOption.AllDirectories))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var relativePath = Path.GetRelativePath(sourcePath, file);
+                var entryPath = Path.Combine(entryPrefix, relativePath).Replace('\\', '/');
+
+                var added = false;
+                try
+                {
+                    archive.AddEntry(entryPath, file);
+                    added = true;
+                }
+                catch (IOException ioEx)
+                {
+                    _logger.LogWarning(ioEx, "File in use, skipping: {File}", file);
+                }
+                catch (UnauthorizedAccessException uaEx)
+                {
+                    _logger.LogWarning(uaEx, "Access denied, skipping: {File}", file);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error adding file to archive: {File}", file);
+                }
+
+                if (!added) _logger.LogWarning("File could not be backed up: {File}", file);
+            }
+
+        return Task.CompletedTask;
     }
 
     private string? ExtractDateFromDirectoryName(string directoryName)
@@ -378,28 +523,14 @@ public class BackupService : IBackupService
         return string.Join("_", name.Split(invalid));
     }
 
-    private async Task AddToArchiveAsync(ZipArchive? archive, string sourcePath, string entryPrefix)
-    {
-        await Task.Run(() =>
-        {
-            var files = Directory.GetFiles(sourcePath, "*", SearchOption.AllDirectories);
-            foreach (var file in files)
-            {
-                var relativePath = Path.GetRelativePath(sourcePath, file);
-                var entryPath = Path.Combine(entryPrefix, relativePath);
-                if (archive != null) archive.CreateEntryFromFile(file, entryPath, GetCompressionLevel());
-            }
-        });
-    }
-
-    private System.IO.Compression.CompressionLevel GetCompressionLevel()
+    private CompressionType GetSharpCompressCompressionType()
     {
         return _settingsService.CurrentSettings.BackupSettings.CompressionLevel switch
         {
-            CompressionLevel.Fastest => System.IO.Compression.CompressionLevel.Fastest,
-            CompressionLevel.Optimal => System.IO.Compression.CompressionLevel.Optimal,
-            CompressionLevel.SmallestSize => System.IO.Compression.CompressionLevel.NoCompression,
-            _ => System.IO.Compression.CompressionLevel.Optimal
+            CompressionLevel.Fastest => CompressionType.None,
+            CompressionLevel.Optimal => CompressionType.Deflate,
+            CompressionLevel.SmallestSize => CompressionType.BZip2,
+            _ => CompressionType.Deflate
         };
     }
 }

@@ -112,16 +112,8 @@ public class UpdateService
         if (assets == null || !assets.Any())
             return null;
 
-        if (OperatingSystem.IsMacOS())
-            return assets.FirstOrDefault(a => a.Name.EndsWith(".dmg", StringComparison.OrdinalIgnoreCase))
-                ?.BrowserDownloadUrl;
-
         if (OperatingSystem.IsWindows())
             return assets.FirstOrDefault(a => a.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
-                ?.BrowserDownloadUrl;
-
-        if (OperatingSystem.IsLinux())
-            return assets.FirstOrDefault(a => a.Name.EndsWith(".AppImage", StringComparison.OrdinalIgnoreCase))
                 ?.BrowserDownloadUrl;
 
         return assets.FirstOrDefault()?.BrowserDownloadUrl;
@@ -177,11 +169,7 @@ public class UpdateService
 
             Debug.WriteLine($"Download complete: {tempFile}");
 
-            if (OperatingSystem.IsMacOS()) return await InstallUpdateOnMacOS(tempFile);
-
             if (OperatingSystem.IsWindows()) return await InstallUpdateOnWindows(tempFile);
-
-            if (OperatingSystem.IsLinux()) return await InstallUpdateOnLinux(tempFile);
 
             dialog.Hide();
             return false;
@@ -190,83 +178,6 @@ public class UpdateService
         {
             Debug.WriteLine($"Error downloading or installing update: {ex.Message}");
             dialog.Hide();
-            return false;
-        }
-    }
-
-    private async Task<bool> InstallUpdateOnMacOS(string filePath)
-    {
-        try
-        {
-            return await InstallDmgFile(filePath);
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Error installing update on macOS: {ex.Message}");
-            return false;
-        }
-    }
-
-    private async Task<bool> InstallDmgFile(string dmgPath)
-    {
-        try
-        {
-            var mountProcess = new ProcessStartInfo
-            {
-                FileName = "hdiutil",
-                Arguments = $"attach \"{dmgPath}\" -nobrowse -quiet",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            };
-
-            Debug.WriteLine($"Mounting DMG: {dmgPath}");
-            using var process = Process.Start(mountProcess);
-            if (process == null)
-            {
-                Debug.WriteLine("Failed to start hdiutil process");
-                return false;
-            }
-
-            await process.WaitForExitAsync();
-            var output = await process.StandardOutput.ReadToEndAsync();
-            var error = await process.StandardError.ReadToEndAsync();
-
-            if (process.ExitCode != 0)
-            {
-                Debug.WriteLine($"Failed to mount DMG. Exit code: {process.ExitCode}, Error: {error}");
-                return false;
-            }
-
-            var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-            var volumePath = lines.LastOrDefault()?.Split('\t').LastOrDefault()?.Trim();
-
-            if (string.IsNullOrEmpty(volumePath))
-            {
-                Debug.WriteLine("Could not determine mounted volume path");
-                return false;
-            }
-
-            Debug.WriteLine($"DMG mounted at: {volumePath}");
-
-            var openFinderProcess = new ProcessStartInfo
-            {
-                FileName = "open",
-                Arguments = $"\"{volumePath}\"",
-                UseShellExecute = true,
-                CreateNoWindow = true
-            };
-            Process.Start(openFinderProcess);
-
-            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
-                lifetime.Shutdown();
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Failed to install DMG file: {ex.Message}");
             return false;
         }
     }
@@ -294,46 +205,6 @@ public class UpdateService
         {
             Debug.WriteLine($"Error starting Windows update installer: {ex.Message}");
             return Task.FromResult(false);
-        }
-    }
-
-    private async Task<bool> InstallUpdateOnLinux(string filePath)
-    {
-        try
-        {
-            var currentExecutable = Process.GetCurrentProcess().MainModule?.FileName;
-            if (string.IsNullOrEmpty(currentExecutable))
-            {
-                Debug.WriteLine("Could not determine current executable path.");
-                return false;
-            }
-
-            var chmodProcess = new ProcessStartInfo
-            {
-                FileName = "chmod",
-                Arguments = $"+x \"{filePath}\"",
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-            using (var proc = Process.Start(chmodProcess))
-            {
-                await proc?.WaitForExitAsync()!;
-            }
-
-            File.Move(filePath, currentExecutable, true);
-            Debug.WriteLine($"Replaced current executable at {currentExecutable}");
-
-            Process.Start(currentExecutable);
-
-            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
-                lifetime.Shutdown();
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Error installing update on Linux: {ex.Message}");
-            return false;
         }
     }
 }

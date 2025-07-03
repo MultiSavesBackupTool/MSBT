@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
@@ -120,12 +121,12 @@ public partial class SettingsViewModel : ViewModelBase
                     await serviceStateFile.CopyToAsync(serviceStateStream);
                 }
 
-                Console.WriteLine("Settings exported successfully");
+                Debug.WriteLine("Settings exported successfully");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error exporting settings: {ex}");
+            Debug.WriteLine($"Error exporting settings: {ex}");
         }
     }
 
@@ -188,17 +189,17 @@ public partial class SettingsViewModel : ViewModelBase
                     OnPropertyChanged(nameof(Settings));
                     OnPropertyChanged(nameof(BackupRootFolder));
 
-                    Console.WriteLine($"Settings imported successfully. {importedFiles} files restored.");
+                    Debug.WriteLine($"Settings imported successfully. {importedFiles} files restored.");
                 }
                 else
                 {
-                    Console.WriteLine("No valid configuration files found in the archive.");
+                    Debug.WriteLine("No valid configuration files found in the archive.");
                 }
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error importing settings: {ex}");
+            Debug.WriteLine($"Error importing settings: {ex}");
         }
     }
 
@@ -219,7 +220,7 @@ public partial class SettingsViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading settings: {ex}");
+            Debug.WriteLine($"Error loading settings: {ex}");
             return new ServiceSettings();
         }
     }
@@ -237,7 +238,7 @@ public partial class SettingsViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error saving settings: {ex}");
+            Debug.WriteLine($"Error saving settings: {ex}");
         }
     }
 

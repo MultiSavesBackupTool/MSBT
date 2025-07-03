@@ -95,9 +95,18 @@
     <data name="GamesView_EditGame" xml:space="preserve">
     <value>Edit</value>
   </data>
+    <data name="GamesView_OpenGameFolder" xml:space="preserve">
+    <value>Open save folder</value>
+  </data>
+    <data name="GamesView_RestoreBackup" xml:space="preserve">
+    <value>Restore Backup</value>
+  </data>
+    <data name="GamesView_ScanInstalledGames" xml:space="preserve">
+    <value>Scan Installed Games</value>
+  </data>
 
     <!-- AddGameOverlay strings -->
-    <data name="AddGameOverlay_Title" xml:space="preserve">
+    <data name="AddGameOverlay_AddGame" xml:space="preserve">
     <value>Add New Game</value>
   </data>
     <data name="AddGameOverlay_GameName" xml:space="preserve">
@@ -159,6 +168,15 @@
   </data>
     <data name="AddGameOverlay_SpecialBackupMark" xml:space="preserve">
     <value>Special Backup</value>
+  </data>
+    <data name="AddGameOverlay_EditGame" xml:space="preserve">
+    <value>Edit Game</value>
+  </data>
+    <data name="AddGameOverlay_GameNameExists" xml:space="preserve">
+    <value>A game with this name already exists.</value>
+  </data>
+    <data name="AddGameOverlay_Save" xml:space="preserve">
+    <value>Save</value>
   </data>
 
     <!-- MonitoringView strings -->
@@ -363,4 +381,45 @@ or close the application — this will only take a moment.</value>
     <data name="StatsView_GamesSizesArchives" xml:space="preserve">
     <value>Total size</value>
   </data>
-</root> 
+
+    <!-- New strings -->
+    <data name="CurrentGameNotRunning" xml:space="preserve">
+    <value>Game is not running</value>
+  </data>
+    <data name="CreateBackup" xml:space="preserve">
+    <value>Create Backup</value>
+  </data>
+    <data name="CreateProtectedBackup" xml:space="preserve">
+    <value>Create Protected Backup</value>
+  </data>
+    <data name="ShowHide" xml:space="preserve">
+    <value>Show / Hide</value>
+  </data>
+    <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+    <data name="Exit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+    <data name="CurrentGameRunning" xml:space="preserve">
+    <value>Game is running: {0}</value>
+  </data>
+    <data name="BackupCreated" xml:space="preserve">
+    <value>Backup created</value>
+  </data>
+    <data name="ProtectedBackupCreated" xml:space="preserve">
+    <value>Protected backup created</value>
+  </data>
+    <data name="RegularBackupCreated" xml:space="preserve">
+    <value>Regular backup created</value>
+  </data>
+    <data name="PCGamingWikiSaveParser_PageNotFound" xml:space="preserve">
+    <value>PCGamingWiki page not found.</value>
+  </data>
+    <data name="PCGamingWikiSaveParser_SavePathNotFound" xml:space="preserve">
+    <value>Save path not found on PCGamingWiki.</value>
+  </data>
+    <data name="PCGamingWikiSaveParser_Error" xml:space="preserve">
+    <value>Error retrieving data from PCGamingWiki</value>
+  </data>
+</root>

@@ -179,7 +179,8 @@ public class GamesService : IGamesService, IDisposable
             {
                 try
                 {
-                    return p.ProcessName.Equals(gameExeName, StringComparison.OrdinalIgnoreCase);
+                    var isMatch = p.ProcessName.Equals(gameExeName, StringComparison.OrdinalIgnoreCase);
+                    return isMatch;
                 }
                 catch (Exception ex)
                 {
@@ -193,11 +194,12 @@ public class GamesService : IGamesService, IDisposable
             if (!string.IsNullOrEmpty(game.GameExeAlt))
             {
                 var altExeName = Path.GetFileNameWithoutExtension(game.GameExeAlt);
-                return processes.Any(p =>
+                var isAltExeRunning = processes.Any(p =>
                 {
                     try
                     {
-                        return p.ProcessName.Equals(altExeName, StringComparison.OrdinalIgnoreCase);
+                        var isMatch = p.ProcessName.Equals(altExeName, StringComparison.OrdinalIgnoreCase);
+                        return isMatch;
                     }
                     catch (Exception ex)
                     {
@@ -205,6 +207,8 @@ public class GamesService : IGamesService, IDisposable
                         return false;
                     }
                 });
+
+                if (isAltExeRunning) return true;
             }
 
             return false;

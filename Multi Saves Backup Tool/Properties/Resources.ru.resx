@@ -95,9 +95,18 @@
     <data name="GamesView_EditGame" xml:space="preserve">
     <value>Редактировать</value>
   </data>
+    <data name="GamesView_OpenGameFolder" xml:space="preserve">
+    <value>Открыть папку сохранений</value>
+  </data>
+    <data name="GamesView_RestoreBackup" xml:space="preserve">
+    <value>Восстановить сохранение</value>
+  </data>
+    <data name="GamesView_ScanInstalledGames" xml:space="preserve">
+    <value>Сканировать установленные игры</value>
+  </data>
 
     <!-- AddGameOverlay strings -->
-    <data name="AddGameOverlay_Title" xml:space="preserve">
+    <data name="AddGameOverlay_AddGame" xml:space="preserve">
     <value>Добавить новую игру</value>
   </data>
     <data name="AddGameOverlay_GameName" xml:space="preserve">
@@ -122,8 +131,8 @@
     <value>Добавить путь</value>
   </data>
     <data name="AddGameOverlay_BackupInterval" xml:space="preserve">
-    <value>Интервал резервного копирования (минуты):</value>
-  </data>
+      <value>Интервал резервного копирования (минуты):</value>
+    </data>
     <data name="AddGameOverlay_BackupIntervalHint" xml:space="preserve">
     <value>Как часто проверять изменения и создавать резервные копии</value>
   </data>
@@ -159,6 +168,15 @@
   </data>
     <data name="AddGameOverlay_SpecialBackupMark" xml:space="preserve">
     <value>Специальный бэкап</value>
+  </data>
+    <data name="AddGameOverlay_EditGame" xml:space="preserve">
+    <value>Редактировать игру</value>
+  </data>
+    <data name="AddGameOverlay_GameNameExists" xml:space="preserve">
+    <value>Игра с таким названием уже существует.</value>
+  </data>
+    <data name="AddGameOverlay_Save" xml:space="preserve">
+    <value>Сохранить</value>
   </data>
 
     <!-- MonitoringView strings -->
@@ -266,8 +284,8 @@
     <value>Ошибка</value>
   </data>
     <data name="StatusPathError" xml:space="preserve">
-    <value>Ошибка пути</value>
-  </data>
+      <value>Ошибка пути</value>
+    </data>
     <data name="StatusConnectionError" xml:space="preserve">
     <value>Ошибка соединения: {0}</value>
   </data>
@@ -360,4 +378,48 @@
     <data name="StatsView_GamesSizesArchives" xml:space="preserve">
     <value>Общий размер</value>
   </data>
-</root> 
+    <data name="BrowseBackupFolderTitle" xml:space="preserve">
+    <value>Выбрать папку бэкапа</value>
+  </data>
+
+    <!-- New strings -->
+    <data name="CurrentGameNotRunning" xml:space="preserve">
+    <value>Игра не запущена</value>
+  </data>
+    <data name="CreateBackup" xml:space="preserve">
+    <value>Создать резервную копию</value>
+  </data>
+    <data name="CreateProtectedBackup" xml:space="preserve">
+    <value>Создать защищенную резервную копию</value>
+  </data>
+    <data name="ShowHide" xml:space="preserve">
+    <value>Показать / Скрыть</value>
+  </data>
+    <data name="Settings" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+    <data name="Exit" xml:space="preserve">
+    <value>Выход</value>
+  </data>
+    <data name="CurrentGameRunning" xml:space="preserve">
+    <value>Игра запущена: {0}</value>
+  </data>
+    <data name="BackupCreated" xml:space="preserve">
+    <value>Резервная копия создана</value>
+  </data>
+    <data name="ProtectedBackupCreated" xml:space="preserve">
+    <value>Защищенная резервная копия создана</value>
+  </data>
+    <data name="RegularBackupCreated" xml:space="preserve">
+    <value>Обычная резервная копия создана</value>
+  </data>
+    <data name="PCGamingWikiSaveParser_PageNotFound" xml:space="preserve">
+    <value>Страница PCGamingWiki не найдена.</value>
+  </data>
+    <data name="PCGamingWikiSaveParser_SavePathNotFound" xml:space="preserve">
+    <value>Путь к сохранениям не найден на PCGamingWiki.</value>
+  </data>
+    <data name="PCGamingWikiSaveParser_Error" xml:space="preserve">
+    <value>Ошибка при получении данных с PCGamingWiki</value>
+  </data>
+</root>

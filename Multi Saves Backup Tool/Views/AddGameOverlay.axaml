@@ -183,7 +183,7 @@
                             Spacing="10"
                             Margin="0,20,0,0">
                     <Button
-                        Content="{Binding IsEditMode, Converter={StaticResource BooleanToStringConverter}, ConverterParameter='Сохранить|Добавить'}"
+                        Content="{Binding IsEditMode, Converter={StaticResource BooleanToStringConverter}, ConverterParameter='AddGameOverlay_Save|AddGameOverlay_Add'}"
                         Command="{Binding SaveGameCommand}" />
                     <Button Content="{x:Static properties:Resources.AddGameOverlay_Cancel}"
                             Click="Close" />

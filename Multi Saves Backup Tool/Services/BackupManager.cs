@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -21,6 +22,7 @@ public class BackupManager : IDisposable
     private readonly ISettingsService _settingsService;
     private Task? _backupTask;
     private CancellationTokenSource? _cancellationTokenSource;
+    private bool _disposed;
 
     public BackupManager(
         ILogger<BackupManager> logger,
@@ -39,10 +41,33 @@ public class BackupManager : IDisposable
 
     public void Dispose()
     {
-        StopAsync().Wait();
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
     public event Action? StateChanged;
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+                try
+                {
+                    StopAsync().Wait();
+                    _backupService.Dispose();
+                    _cancellationTokenSource?.Dispose();
+                    State.ServiceStatus = "Stopped";
+                    SaveServiceState();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error during BackupManager disposal");
+                }
+
+            _disposed = true;
+        }
+    }
 
     public async Task StartAsync()
     {
@@ -57,35 +82,79 @@ public class BackupManager : IDisposable
 
     public async Task StopAsync()
     {
-        State.ServiceStatus = "Stopping";
-        SaveServiceState();
-
-        if (_cancellationTokenSource != null)
+        if (_disposed)
         {
-            _cancellationTokenSource.Cancel();
-            if (_backupTask != null) await _backupTask;
-            _cancellationTokenSource.Dispose();
-            _cancellationTokenSource = null;
+            _logger.LogWarning("Attempted to stop already disposed BackupManager");
+            return;
+        }
+
+        try
+        {
+            State.ServiceStatus = "Stopping";
+            SaveServiceState();
+
+            if (_cancellationTokenSource != null)
+            {
+                await Task.Run(() => _cancellationTokenSource.Cancel());
+                if (_backupTask != null)
+                    try
+                    {
+                        await Task.WhenAny(_backupTask, Task.Delay(5000));
+                        if (!_backupTask.IsCompleted) _logger.LogWarning("Backup task did not complete within timeout");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error waiting for backup task to complete");
+                    }
+
+                _cancellationTokenSource.Dispose();
+                _cancellationTokenSource = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during BackupManager stop");
+            throw;
         }
     }
 
     private async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        if (_disposed)
+        {
+            _logger.LogWarning("Attempted to execute disposed BackupManager");
+            return;
+        }
+
         try
         {
             State.ServiceStatus = "Running";
             SaveServiceState();
 
             while (!stoppingToken.IsCancellationRequested)
-            {
-                await ProcessBackupsAsync(stoppingToken);
-                var interval = _settingsService.CurrentSettings.BackupSettings.GetScanInterval();
-                await Task.Delay(interval, stoppingToken);
-            }
+                try
+                {
+                    await ProcessBackupsAsync(stoppingToken);
+                    var interval = _settingsService.CurrentSettings.BackupSettings.GetScanInterval();
+                    await Task.Delay(interval, stoppingToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    _logger.LogInformation("Backup process cancelled");
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error during backup process");
+                    State.ServiceStatus = $"Error: {ex.Message}";
+                    SaveServiceState();
+
+                    await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+                }
         }
         catch (Exception ex)
         {
-            State.ServiceStatus = $"Error: {ex.Message}";
+            State.ServiceStatus = $"Fatal error: {ex.Message}";
             SaveServiceState();
             _logger.LogError(ex, "Fatal error in backup manager");
             throw;
@@ -94,9 +163,21 @@ public class BackupManager : IDisposable
 
     private async Task ProcessBackupsAsync(CancellationToken stoppingToken)
     {
+        if (_disposed)
+        {
+            _logger.LogWarning("Attempted to process backups after disposal");
+            return;
+        }
+
         try
         {
             _logger.LogInformation("Starting backup process at: {time}", DateTimeOffset.Now);
+
+            if (stoppingToken.IsCancellationRequested)
+            {
+                _logger.LogInformation("Backup process cancelled before starting");
+                return;
+            }
 
             var games = await _gamesService.LoadGamesAsync();
             if (!games.Any())
@@ -126,7 +207,42 @@ public class BackupManager : IDisposable
                 if (!State.GamesState.ContainsKey(game.GameName))
                     State.GamesState[game.GameName] = new GameState { GameName = game.GameName };
 
-                State.GamesState[game.GameName].Status = game.IsEnabled ? "Waiting" : "Disabled";
+                var gameExeName = Path.GetFileNameWithoutExtension(game.GameExe);
+                var isRunning = Process.GetProcesses().Any(p =>
+                {
+                    try
+                    {
+                        return p.ProcessName.Equals(gameExeName, StringComparison.OrdinalIgnoreCase);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Error checking process {ProcessName} for game {GameName}",
+                            p.ProcessName, game.GameName);
+                        return false;
+                    }
+                });
+
+                if (!isRunning && !string.IsNullOrEmpty(game.GameExeAlt))
+                {
+                    var altExeName = Path.GetFileNameWithoutExtension(game.GameExeAlt);
+                    isRunning = Process.GetProcesses().Any(p =>
+                    {
+                        try
+                        {
+                            return p.ProcessName.Equals(altExeName, StringComparison.OrdinalIgnoreCase);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "Error checking process {ProcessName} for alt game exe {GameName}",
+                                p.ProcessName, game.GameName);
+                            return false;
+                        }
+                    });
+                }
+
+                State.GamesState[game.GameName].Status =
+                    isRunning ? "Running" : game.IsEnabled ? "Waiting" : "Disabled";
+                SaveServiceState();
             }
 
             var settings = _settingsService.CurrentSettings.BackupSettings;
@@ -166,7 +282,7 @@ public class BackupManager : IDisposable
                     {
                         try
                         {
-                            await ProcessGameBackupAsync(game);
+                            await ProcessGameBackupAsync(game, false);
                         }
                         catch (Exception ex)
                         {
@@ -211,7 +327,7 @@ public class BackupManager : IDisposable
         }
     }
 
-    private async Task ProcessGameBackupAsync(GameModel game)
+    public async Task ProcessGameBackupAsync(GameModel game, bool isProtected)
     {
         var existingGame = await _gamesService.GetGameByNameAsync(game.GameName);
         if (existingGame == null)
@@ -230,7 +346,7 @@ public class BackupManager : IDisposable
             if (_backupService.VerifyBackupPaths(game))
             {
                 await _backupService.ProcessSpecialBackup(game);
-                await _backupService.CreateBackupAsync(game);
+                await _backupService.CreateBackupAsync(game, isProtected);
                 _backupService.CleanupOldBackups(game);
 
                 gameState.LastBackupTime = DateTime.Now;
@@ -266,7 +382,8 @@ public class BackupManager : IDisposable
     {
         try
         {
-            var json = JsonSerializer.Serialize(State, new JsonSerializerOptions { WriteIndented = true });
+            State.LastUpdateTime = DateTime.Now;
+            var json = JsonSerializer.Serialize(State);
             File.WriteAllText(StateFilePath, json);
             StateChanged?.Invoke();
         }

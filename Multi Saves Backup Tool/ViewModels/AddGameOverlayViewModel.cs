@@ -13,7 +13,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
 {
     private readonly GamesViewModel _gamesViewModel;
 
-    [ObservableProperty] private string _addPath = string.Empty;
+    [ObservableProperty] private string? _addPath = string.Empty;
     [ObservableProperty] private int _backupInterval = 60;
     [ObservableProperty] private int _backupMode;
     [ObservableProperty] private int _daysForKeep;
@@ -26,10 +26,10 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     [ObservableProperty] private string _gameNameError = string.Empty;
     [ObservableProperty] private bool _includeTimestamp = true;
     [ObservableProperty] private bool _isEditMode;
-    [ObservableProperty] private string _modPath = string.Empty;
+    [ObservableProperty] private string? _modPath = string.Empty;
     [ObservableProperty] private int _oldFilesStatus;
     [ObservableProperty] private string _overlayTitle = string.Empty;
-    [ObservableProperty] private string _saveLocation = string.Empty;
+    [ObservableProperty] private string? _saveLocation = string.Empty;
     [ObservableProperty] private string _saveLocationError = string.Empty;
     [ObservableProperty] private bool _specialBackupMark;
 
@@ -50,7 +50,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
 
     private void UpdateOverlayTitle()
     {
-        OverlayTitle = IsEditMode ? "Редактировать игру" : "Добавить игру";
+        OverlayTitle = IsEditMode ? Resources.AddGameOverlay_EditGame : Resources.AddGameOverlay_AddGame;
     }
 
     public void SetEditMode(GameModel gameToEdit)
@@ -140,7 +140,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
         if (!IsEditMode || (_editingGame != null && _editingGame.GameName != GameName))
             if (_gamesViewModel.Games.Any(g => g.GameName.Equals(GameName, StringComparison.OrdinalIgnoreCase)))
             {
-                ErrorMessage = "Игра с таким названием уже существует";
+                ErrorMessage = Resources.AddGameOverlay_GameNameExists;
                 return false;
             }
 
@@ -183,7 +183,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
         CloseRequested?.Invoke(this, EventArgs.Empty);
     }
 
-    private async Task<string> BrowseFolder(IStorageProvider? storageProvider)
+    private async Task<string?> BrowseFolder(IStorageProvider? storageProvider)
     {
         if (storageProvider != null)
         {

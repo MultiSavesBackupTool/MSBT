@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -13,6 +14,7 @@ namespace Multi_Saves_Backup_Tool.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly ITrayService _trayService;
+    private readonly string? _updateDownloadUrl = string.Empty;
     private readonly UpdateService _updateService;
 
     [ObservableProperty] private ViewModelBase? _currentViewModel;
@@ -20,13 +22,13 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private bool _isUpdateAvailable;
 
     [ObservableProperty] private NavigationViewItem? _selectedMenuItem;
-    private string? _updateDownloadUrl;
 
     [ObservableProperty] private string _updateMessage = string.Empty;
 
+    [SupportedOSPlatform("windows")]
     public MainWindowViewModel(Window mainWindow, ITrayService trayService, IGamesService gamesService,
         IBackupService backupService, BackupManager backupManager, ISettingsService settingsService,
-        ILogger<MainWindowViewModel> logger, ILogger<StatsViewModel> statsLogger)
+        ILogger<StatsViewModel> statsLogger)
     {
         _trayService = trayService;
         _updateService = new UpdateService();
@@ -54,7 +56,6 @@ public partial class MainWindowViewModel : ViewModelBase
         if (hasUpdate && !string.IsNullOrEmpty(downloadUrl))
         {
             IsUpdateAvailable = true;
-            _updateDownloadUrl = downloadUrl;
             Debug.WriteLine($"Update available: {latestVersion}, URL: {downloadUrl}");
 
             await DownloadAndInstallUpdateAsync();
@@ -62,20 +63,17 @@ public partial class MainWindowViewModel : ViewModelBase
         else if (hasUpdate)
         {
             IsUpdateAvailable = false;
-            _updateDownloadUrl = null;
             Debug.WriteLine($"Update available: {latestVersion}, but no download URL.");
         }
         else if (downloadUrl == null &&
                  latestVersion == (_updateServiceGetType().Assembly.GetName().Version?.ToString() ?? "1.0.0"))
         {
             IsUpdateAvailable = false;
-            _updateDownloadUrl = null;
             Debug.WriteLine("Error occurred while checking for updates.");
         }
         else
         {
             IsUpdateAvailable = false;
-            _updateDownloadUrl = null;
             Debug.WriteLine("No updates available.");
         }
     }
@@ -107,11 +105,11 @@ public partial class MainWindowViewModel : ViewModelBase
         return IsUpdateAvailable && !string.IsNullOrEmpty(_updateDownloadUrl);
     }
 
-    partial void OnSelectedMenuItemChanged(NavigationViewItem? oldValue, NavigationViewItem? newValue)
+    partial void OnSelectedMenuItemChanged(NavigationViewItem? value)
     {
-        if (newValue == null) return;
+        if (value == null) return;
 
-        CurrentViewModel = (newValue.Tag as string) switch
+        CurrentViewModel = (value.Tag as string) switch
         {
             "monitoring" => MonitoringViewModel,
             "games" => GamesViewModel,

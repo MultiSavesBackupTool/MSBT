@@ -164,17 +164,33 @@ namespace Properties
                 return ResourceManager.GetString("GamesView_EditGame", resourceCulture);
             }
         }
-        #endregion
-
-        #region AddGameOverlay strings
-        public static string AddGameOverlay_Title
+        
+        public static string GamesView_OpenGameFolder
         {
             get
             {
-                return ResourceManager.GetString("AddGameOverlay_Title", resourceCulture);
+                return ResourceManager.GetString("GamesView_OpenGameFolder", resourceCulture);
+            }
+        }
+        
+        public static string GamesView_RestoreBackup
+        {
+            get
+            {
+                return ResourceManager.GetString("GamesView_RestoreBackup", resourceCulture);
             }
         }
 
+        public static string GamesView_ScanInstalledGames
+        {
+            get
+            {
+                return ResourceManager.GetString("GamesView_ScanInstalledGames", resourceCulture);
+            }
+        }
+        #endregion
+
+        #region AddGameOverlay strings
         public static string AddGameOverlay_GameName
         {
             get
@@ -332,6 +348,38 @@ namespace Properties
             get
             {
                 return ResourceManager.GetString("AddGameOverlay_SpecialBackupMark", resourceCulture);
+            }
+        }
+
+        public static string AddGameOverlay_EditGame
+        {
+            get
+            {
+                return ResourceManager.GetString("AddGameOverlay_EditGame", resourceCulture);
+            }
+        }
+
+        public static string AddGameOverlay_AddGame
+        {
+            get
+            {
+                return ResourceManager.GetString("AddGameOverlay_AddGame", resourceCulture);
+            }
+        }
+
+        public static string AddGameOverlay_GameNameExists
+        {
+            get
+            {
+                return ResourceManager.GetString("AddGameOverlay_GameNameExists", resourceCulture);
+            }
+        }
+
+        public static string AddGameOverlay_Save
+        {
+            get
+            {
+                return ResourceManager.GetString("AddGameOverlay_Save", resourceCulture);
             }
         }
         #endregion
@@ -803,6 +851,112 @@ namespace Properties
             get
             {
                 return ResourceManager.GetString("StatsView_GamesSizesArchives", resourceCulture);
+            }
+        }
+        #endregion
+
+        #region New strings
+        public static string CurrentGameNotRunning
+        {
+            get
+            {
+                return ResourceManager.GetString("CurrentGameNotRunning", resourceCulture);
+            }
+        }
+
+        public static string CreateBackup
+        {
+            get
+            {
+                return ResourceManager.GetString("CreateBackup", resourceCulture);
+            }
+        }
+
+        public static string CreateProtectedBackup
+        {
+            get
+            {
+                return ResourceManager.GetString("CreateProtectedBackup", resourceCulture);
+            }
+        }
+
+        public static string ShowHide
+        {
+            get
+            {
+                return ResourceManager.GetString("ShowHide", resourceCulture);
+            }
+        }
+
+        public static string Settings
+        {
+            get
+            {
+                return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+
+        public static string Exit
+        {
+            get
+            {
+                return ResourceManager.GetString("Exit", resourceCulture);
+            }
+        }
+
+        public static string CurrentGameRunning
+        {
+            get
+            {
+                return ResourceManager.GetString("CurrentGameRunning", resourceCulture);
+            }
+        }
+
+        public static string BackupCreated
+        {
+            get
+            {
+                return ResourceManager.GetString("BackupCreated", resourceCulture);
+            }
+        }
+
+        public static string ProtectedBackupCreated
+        {
+            get
+            {
+                return ResourceManager.GetString("ProtectedBackupCreated", resourceCulture);
+            }
+        }
+
+        public static string RegularBackupCreated
+        {
+            get
+            {
+                return ResourceManager.GetString("RegularBackupCreated", resourceCulture);
+            }
+        }
+
+        public static string PCGamingWikiSaveParser_PageNotFound
+        {
+            get
+            {
+                return ResourceManager.GetString("PCGamingWikiSaveParser_PageNotFound", resourceCulture);
+            }
+        }
+
+        public static string PCGamingWikiSaveParser_SavePathNotFound
+        {
+            get
+            {
+                return ResourceManager.GetString("PCGamingWikiSaveParser_SavePathNotFound", resourceCulture);
+            }
+        }
+
+        public static string PCGamingWikiSaveParser_Error
+        {
+            get
+            {
+                return ResourceManager.GetString("PCGamingWikiSaveParser_Error", resourceCulture);
             }
         }
         #endregion

@@ -39,6 +39,8 @@ public class MonitoringViewModel : ViewModelBase, IDisposable
 
     public string LastUpdateTime => _lastUpdateTime.ToString("g");
 
+    public string? CurrentGameName { get; private set; }
+
     public void Dispose()
     {
         _backupManager.StateChanged -= OnStateChanged;
@@ -54,11 +56,6 @@ public class MonitoringViewModel : ViewModelBase, IDisposable
         try
         {
             var state = _backupManager.State;
-            if (state == null)
-            {
-                ServiceStatus = Resources.StatusServiceNotRunning;
-                return;
-            }
 
             ServiceStatus = state.ServiceStatus switch
             {
@@ -90,11 +87,16 @@ public class MonitoringViewModel : ViewModelBase, IDisposable
                     Games.Add(newGameInfo);
                 }
             }
+
+            var runningGame = state.GamesState.Values.FirstOrDefault(g => g.Status == "Running");
+            CurrentGameName = runningGame?.GameName;
+            OnPropertyChanged(nameof(CurrentGameName));
         }
         catch (Exception ex)
         {
             ServiceStatus = string.Format(Resources.StatusConnectionError, ex.Message);
-            Console.WriteLine($"Error updating state: {ex}");
+            CurrentGameName = null;
+            OnPropertyChanged(nameof(CurrentGameName));
         }
     }
 

@@ -2,12 +2,17 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.UI.Controls;
+using Multi_Saves_Backup_Tool.Dependes;
 using Multi_Saves_Backup_Tool.Models;
 using Multi_Saves_Backup_Tool.Services;
+using Multi_Saves_Backup_Tool.Services.GameDiscovery;
 using Properties;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
@@ -16,8 +21,10 @@ public class GamesViewModel : ViewModelBase
 {
     private readonly IBackupService _backupService;
     private readonly IGamesService _gamesService;
+    private readonly InstalledGamesScanner _installedGamesScanner = new();
     private ObservableCollection<GameModel> _games;
 
+    [SupportedOSPlatform("windows")]
     public GamesViewModel(IGamesService gamesService, IBackupService backupService)
     {
         _gamesService = gamesService;
@@ -25,6 +32,9 @@ public class GamesViewModel : ViewModelBase
         _games = new ObservableCollection<GameModel>();
         DeleteGameCommand = new AsyncRelayCommand<GameModel?>(DeleteGameAsync);
         EditGameCommand = new RelayCommand<GameModel?>(EditGame);
+        OpenSaveCommand = new RelayCommand<GameModel?>(OpenSave);
+        RestoreBackupCommand = new AsyncRelayCommand<GameModel?>(RestoreBackupAsync);
+        ScanInstalledGamesCommand = new AsyncRelayCommand(ScanInstalledGamesAsync);
         _ = LoadGames();
     }
 
@@ -33,16 +43,17 @@ public class GamesViewModel : ViewModelBase
         get => _games;
         set
         {
-            if (_games != null)
-                _games.CollectionChanged -= Games_CollectionChanged;
+            _games.CollectionChanged -= Games_CollectionChanged;
             SetProperty(ref _games, value);
-            if (_games != null)
-                _games.CollectionChanged += Games_CollectionChanged;
+            _games.CollectionChanged += Games_CollectionChanged;
         }
     }
 
     public ICommand DeleteGameCommand { get; }
     public ICommand EditGameCommand { get; }
+    public ICommand OpenSaveCommand { get; }
+    public ICommand RestoreBackupCommand { get; }
+    public ICommand ScanInstalledGamesCommand { get; }
 
     public event EventHandler<GameModel>? EditGameRequested;
 
@@ -94,6 +105,11 @@ public class GamesViewModel : ViewModelBase
         }
     }
 
+    private void OpenSave(GameModel? game)
+    {
+        if (game != null) FolderOpener.OpenFolder(game.SavePath);
+    }
+
     private void EditGame(GameModel? game)
     {
         if (game != null) EditGameRequested?.Invoke(this, game);
@@ -117,6 +133,21 @@ public class GamesViewModel : ViewModelBase
         if (result == ContentDialogResult.Primary) Games.Remove(game);
     }
 
+    private async Task RestoreBackupAsync(GameModel? game)
+    {
+        if (game == null)
+            return;
+
+        try
+        {
+            await _backupService.RestoreLatestBackupAsync(game);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error restore backup: {ex.Message}");
+        }
+    }
+
     public void UpdateBackupCount(GameModel game)
     {
         try
@@ -125,8 +156,22 @@ public class GamesViewModel : ViewModelBase
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Error updating backup count: {e.Message}");
+            Debug.WriteLine($"Error updating backup count: {e.Message}");
             game.BackupCount = 0;
         }
+    }
+
+    [SupportedOSPlatform("windows")]
+    private async Task ScanInstalledGamesAsync()
+    {
+        var foundGames = await _installedGamesScanner.ScanForInstalledGamesAsync();
+        foreach (var game in foundGames)
+            if (!Games.Any(g => g.GameName == game.GameName && g.GameExe == game.GameExe))
+            {
+                Games.Add(game);
+                UpdateBackupCount(game);
+            }
+
+        await SaveGames();
     }
 }
