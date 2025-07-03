@@ -14,7 +14,7 @@ namespace Multi_Saves_Backup_Tool.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly ITrayService _trayService;
-    private readonly string? _updateDownloadUrl = string.Empty;
+    private string? _updateDownloadUrl = string.Empty;
     private readonly UpdateService _updateService;
 
     [ObservableProperty] private ViewModelBase? _currentViewModel;
@@ -58,6 +58,8 @@ public partial class MainWindowViewModel : ViewModelBase
             IsUpdateAvailable = true;
             Debug.WriteLine($"Update available: {latestVersion}, URL: {downloadUrl}");
 
+            _updateDownloadUrl = downloadUrl;
+            
             await DownloadAndInstallUpdateAsync();
         }
         else if (hasUpdate)
