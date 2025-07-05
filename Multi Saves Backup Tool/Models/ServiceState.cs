@@ -11,10 +11,10 @@ public class ServiceState
     public Dictionary<string, GameState> GamesState { get; set; } = new();
     public string ServiceStatus { get; set; } = "Running";
 
-    public void SaveToFile(string path)
+    public void SaveToFile(string path, ServiceState state)
     {
-        var json = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
-        File.WriteAllText(path, json);
+        var json = JsonSerializer.Serialize(state);
+        File.WriteAllText(path, json);;
     }
 
     public static ServiceState LoadFromFile(string path)
@@ -25,12 +25,7 @@ public class ServiceState
                 return new ServiceState();
 
             var json = File.ReadAllText(path);
-            var state = JsonSerializer.Deserialize<ServiceState>(json);
-
-            if (state == null)
-                return new ServiceState();
-
-            return state;
+            return JsonSerializer.Deserialize<ServiceState>(json) ?? new ServiceState();
         }
         catch (Exception)
         {

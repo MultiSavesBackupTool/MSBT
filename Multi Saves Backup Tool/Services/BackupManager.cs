@@ -45,13 +45,13 @@ public class BackupManager(
 
     private void ReloadState()
     {
-        State = ServiceState.LoadFromFile(StateFilePath);
         StateChanged?.Invoke();
     }
 
     private void SaveServiceState()
     {
-        State.SaveToFile(StateFilePath);
+        State.LastUpdateTime = DateTime.Now;
+        State.SaveToFile(StateFilePath, State);
         ReloadState();
     }
 
@@ -412,8 +412,7 @@ public class BackupManager(
         {
             _logger.LogInformation("Processing backup for game: {GameName}", game.GameName!);
             gameState.Status = "Processing";
-            if (previousStatus != "Processing")
-                SaveServiceState();
+            SaveServiceState();
 
             if (_backupService.VerifyBackupPaths(game))
             {
