@@ -5,9 +5,11 @@
              xmlns:vm="using:Multi_Saves_Backup_Tool.ViewModels"
              xmlns:models="using:Multi_Saves_Backup_Tool.Models"
              xmlns:properties="clr-namespace:Properties"
+             xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              x:DataType="vm:GamesViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Multi_Saves_Backup_Tool.Views.GamesView">
+             x:Class="Multi_Saves_Backup_Tool.Views.GamesView"
+             x:Name="RootControl">
 
     <Design.DataContext>
         <vm:GamesViewModel />
@@ -18,11 +20,18 @@
             <Button Content="{x:Static properties:Resources.GamesView_AddGame}"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
-                    Click="AddGameButton_Click" />
+                    Click="AddGameButton_Click"
+                    IsEnabled="{Binding IsNotLoading}" />
             <Button Content="{x:Static properties:Resources.GamesView_ScanInstalledGames}"
                     Command="{Binding ScanInstalledGamesCommand}"
                     HorizontalAlignment="Left"
-                    VerticalAlignment="Top" />
+                    VerticalAlignment="Top"
+                    IsEnabled="{Binding IsNotLoading}" />
+            <controls:ProgressRing IsVisible="{Binding IsLoading}"
+                                   IsIndeterminate="True"
+                                   Width="20"
+                                   Height="20"
+                                   VerticalAlignment="Center" />
         </StackPanel>
 
         <ScrollViewer>
@@ -35,34 +44,42 @@
                                 CornerRadius="4">
                             <Grid ColumnDefinitions="Auto,*,Auto">
                                 <CheckBox IsChecked="{Binding IsEnabled}"
-                                          VerticalAlignment="Center" />
+                                          VerticalAlignment="Center"
+                                          IsEnabled="{Binding DataContext.IsNotLoading, ElementName=RootControl}" />
                                 <StackPanel Grid.Column="1" Margin="10,0">
                                     <TextBlock Text="{Binding GameName}"
                                                FontWeight="Bold" />
                                     <TextBlock Text="{Binding SavePath}"
                                                FontSize="12"
                                                Opacity="0.7" />
+                                    <TextBlock Text="{Binding GameExe}"
+                                               FontSize="10"
+                                               Opacity="0.5" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10">
                                     <TextBlock
                                         Text="{Binding BackupCount, StringFormat={x:Static properties:Resources.GamesView_BackupCount}}"
                                         VerticalAlignment="Center" />
                                     <Button Content="{x:Static properties:Resources.GamesView_OpenGameFolder}"
-                                            Command="{Binding ((vm:GamesViewModel)DataContext).OpenSaveCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            Command="{Binding DataContext.OpenSaveCommand, ElementName=RootControl}"
                                             CommandParameter="{Binding}"
-                                            Padding="8,4" />
+                                            Padding="8,4"
+                                            IsEnabled="{Binding DataContext.IsNotLoading, ElementName=RootControl}" />
                                     <Button Content="{x:Static properties:Resources.GamesView_RestoreBackup}"
-                                            Command="{Binding ((vm:GamesViewModel)DataContext).RestoreBackupCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            Command="{Binding DataContext.RestoreBackupCommand, ElementName=RootControl}"
                                             CommandParameter="{Binding}"
-                                            Padding="8,4" />
+                                            Padding="8,4"
+                                            IsEnabled="{Binding DataContext.IsNotLoading, ElementName=RootControl}" />
                                     <Button Content="{x:Static properties:Resources.GamesView_EditGame}"
-                                            Command="{Binding ((vm:GamesViewModel)DataContext).EditGameCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            Command="{Binding DataContext.EditGameCommand, ElementName=RootControl}"
                                             CommandParameter="{Binding}"
-                                            Padding="8,4" />
+                                            Padding="8,4"
+                                            IsEnabled="{Binding DataContext.IsNotLoading, ElementName=RootControl}" />
                                     <Button Content="{x:Static properties:Resources.GamesView_Delete}"
-                                            Command="{Binding ((vm:GamesViewModel)DataContext).DeleteGameCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            Command="{Binding DataContext.DeleteGameCommand, ElementName=RootControl}"
                                             CommandParameter="{Binding}"
-                                            Padding="8,4" />
+                                            Padding="8,4"
+                                            IsEnabled="{Binding DataContext.IsNotLoading, ElementName=RootControl}" />
                                 </StackPanel>
                             </Grid>
                         </Border>

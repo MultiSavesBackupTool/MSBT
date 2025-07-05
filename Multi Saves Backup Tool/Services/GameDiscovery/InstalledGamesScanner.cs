@@ -290,9 +290,4 @@ public class InstalledGamesScanner
 
         return new List<string>();
     }
-
-    private void LogInfo(string message)
-    {
-        Debug.WriteLine(message);
-    }
 }

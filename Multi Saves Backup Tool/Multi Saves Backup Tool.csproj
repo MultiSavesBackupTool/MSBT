@@ -13,13 +13,15 @@
         <RuntimeIdentifier>win-x64</RuntimeIdentifier>
         <DebugType>none</DebugType>
         <DebugSymbols>false</DebugSymbols>
-        <Version>81.0.0.0</Version>
-        <AssemblyVersion>81.0.0.0</AssemblyVersion>
-        <FileVersion>81.0.0.0</FileVersion>
+        <Version>82.0.0.0</Version>
+        <AssemblyVersion>82.0.0.0</AssemblyVersion>
+        <FileVersion>82.0.0.0</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Include="Assets\msbt.ico">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </AvaloniaResource>
     </ItemGroup>
 
     <ItemGroup>
@@ -67,10 +69,6 @@
             <DependentUpon>StatsView.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-        <AdditionalFiles Include="Views\**\*.axaml"/>
     </ItemGroup>
 
     <ItemGroup>

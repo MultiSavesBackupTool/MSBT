@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -11,12 +10,13 @@ using Multi_Saves_Backup_Tool.Services;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
 
-public partial class MainWindowViewModel : ViewModelBase
+public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {
-    private readonly ITrayService _trayService;
+    private readonly ILogger<MainWindowViewModel> _logger;
     private readonly UpdateService _updateService;
 
     [ObservableProperty] private ViewModelBase? _currentViewModel;
+    private bool _disposed;
 
     [ObservableProperty] private bool _isUpdateAvailable;
 
@@ -26,21 +26,31 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private string _updateMessage = string.Empty;
 
     [SupportedOSPlatform("windows")]
-    public MainWindowViewModel(Window mainWindow, ITrayService trayService, IGamesService gamesService,
+    public MainWindowViewModel(Window mainWindow, IGamesService gamesService,
         IBackupService backupService, BackupManager backupManager, ISettingsService settingsService,
-        ILogger<StatsViewModel> statsLogger)
+        ILogger<StatsViewModel> statsLogger, ILogger<MainWindowViewModel> logger,
+        ILogger<MonitoringViewModel> monitoringLogger, ILogger<GamesViewModel> gamesLogger,
+        ILogger<SettingsViewModel> settingsLogger)
     {
-        _trayService = trayService;
         _updateService = new UpdateService();
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        MonitoringViewModel = new MonitoringViewModel(backupManager);
-        GamesViewModel = new GamesViewModel(gamesService, backupService);
-        StatsViewModel = new StatsViewModel(gamesService, backupService, settingsService, statsLogger);
-        SettingsViewModel = new SettingsViewModel(mainWindow.StorageProvider);
-        CurrentViewModel = MonitoringViewModel;
+        try
+        {
+            MonitoringViewModel = new MonitoringViewModel(backupManager, monitoringLogger);
+            GamesViewModel = new GamesViewModel(gamesService, backupService, gamesLogger);
+            StatsViewModel = new StatsViewModel(gamesService, backupService, settingsService, statsLogger);
+            SettingsViewModel = new SettingsViewModel(mainWindow.StorageProvider, settingsLogger);
+            CurrentViewModel = MonitoringViewModel;
 
-        _ = CheckForUpdatesOnStartupAsync();
-        MessengerService.Instance.Subscribe<NavigateToSettingsMessage>(OnNavigateToSettingsRequested);
+            _ = CheckForUpdatesOnStartupAsync();
+            MessengerService.Instance.Subscribe<NavigateToSettingsMessage>(OnNavigateToSettingsRequested);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error initializing MainWindowViewModel");
+            throw;
+        }
     }
 
     public MonitoringViewModel MonitoringViewModel { get; }
@@ -48,35 +58,50 @@ public partial class MainWindowViewModel : ViewModelBase
     public StatsViewModel StatsViewModel { get; }
     public SettingsViewModel SettingsViewModel { get; }
 
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
     private async Task CheckForUpdatesOnStartupAsync()
     {
-        Debug.WriteLine("Checking for updates on startup...");
-        var (hasUpdate, latestVersion, downloadUrl) = await _updateService.CheckForUpdatesAsync();
+        try
+        {
+            _logger.LogDebug("Checking for updates on startup...");
+            var (hasUpdate, latestVersion, downloadUrl) = await _updateService.CheckForUpdatesAsync();
 
-        if (hasUpdate && !string.IsNullOrEmpty(downloadUrl))
-        {
-            IsUpdateAvailable = true;
-            Debug.WriteLine($"Update available: {latestVersion}, URL: {downloadUrl}");
+            if (hasUpdate && !string.IsNullOrEmpty(downloadUrl))
+            {
+                IsUpdateAvailable = true;
+                _logger.LogInformation("Update available: {LatestVersion}, URL: {DownloadUrl}", latestVersion,
+                    downloadUrl);
 
-            _updateDownloadUrl = downloadUrl;
+                _updateDownloadUrl = downloadUrl;
 
-            await DownloadAndInstallUpdateAsync();
+                await DownloadAndInstallUpdateAsync();
+            }
+            else if (hasUpdate)
+            {
+                IsUpdateAvailable = false;
+                _logger.LogWarning("Update available: {LatestVersion}, but no download URL.", latestVersion);
+            }
+            else if (downloadUrl == null &&
+                     latestVersion == (_updateService.GetType().Assembly.GetName().Version?.ToString() ?? "1.0.0"))
+            {
+                IsUpdateAvailable = false;
+                _logger.LogError("Error occurred while checking for updates.");
+            }
+            else
+            {
+                IsUpdateAvailable = false;
+                _logger.LogDebug("No updates available.");
+            }
         }
-        else if (hasUpdate)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Error checking for updates");
             IsUpdateAvailable = false;
-            Debug.WriteLine($"Update available: {latestVersion}, but no download URL.");
-        }
-        else if (downloadUrl == null &&
-                 latestVersion == (_updateServiceGetType().Assembly.GetName().Version?.ToString() ?? "1.0.0"))
-        {
-            IsUpdateAvailable = false;
-            Debug.WriteLine("Error occurred while checking for updates.");
-        }
-        else
-        {
-            IsUpdateAvailable = false;
-            Debug.WriteLine("No updates available.");
         }
     }
 
@@ -85,19 +110,19 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (!IsUpdateAvailable || string.IsNullOrEmpty(_updateDownloadUrl)) return;
 
-        Debug.WriteLine("DownloadAndInstallUpdateCommand executed.");
+        _logger.LogInformation("DownloadAndInstallUpdateCommand executed.");
         try
         {
             var success = await _updateService.DownloadAndInstallUpdateAsync(_updateDownloadUrl);
             if (!success)
             {
                 IsUpdateAvailable = true;
-                Debug.WriteLine("Update installation failed. Please try running the application as administrator.");
+                _logger.LogWarning("Update installation failed. Please try running the application as administrator.");
             }
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Error during update installation: {ex.Message}");
+            _logger.LogError(ex, "Error during update installation");
             IsUpdateAvailable = true;
         }
     }
@@ -111,23 +136,51 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (value == null) return;
 
-        CurrentViewModel = (value.Tag as string) switch
+        try
         {
-            "monitoring" => MonitoringViewModel,
-            "games" => GamesViewModel,
-            "stats" => StatsViewModel,
-            "settings" => SettingsViewModel,
-            _ => CurrentViewModel
-        };
+            CurrentViewModel = (value.Tag as string) switch
+            {
+                "monitoring" => MonitoringViewModel,
+                "games" => GamesViewModel,
+                "stats" => StatsViewModel,
+                "settings" => SettingsViewModel,
+                _ => CurrentViewModel
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error changing selected menu item");
+        }
     }
 
     private void OnNavigateToSettingsRequested(NavigateToSettingsMessage message)
     {
-        CurrentViewModel = SettingsViewModel;
+        try
+        {
+            CurrentViewModel = SettingsViewModel;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error navigating to settings");
+        }
     }
 
-    private Type _updateServiceGetType()
+    protected virtual void Dispose(bool disposing)
     {
-        return _updateService.GetType();
+        if (!_disposed)
+        {
+            if (disposing)
+                try
+                {
+                    _updateService.Dispose();
+                    MessengerService.Instance.Unsubscribe<NavigateToSettingsMessage>(OnNavigateToSettingsRequested);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error during disposal");
+                }
+
+            _disposed = true;
+        }
     }
 }

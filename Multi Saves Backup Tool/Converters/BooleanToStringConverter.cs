@@ -7,32 +7,37 @@ namespace Multi_Saves_Backup_Tool.Converters;
 
 public class BooleanToStringConverter : IValueConverter
 {
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is bool boolValue && parameter is string paramString)
+        try
         {
-            string?[] options = paramString.Split('|');
-            if (options.Length == 2)
+            if (value is bool boolValue && parameter is string paramString && !string.IsNullOrWhiteSpace(paramString))
             {
-                var trueKey = options[0];
-                var falseKey = options[1];
-                if (trueKey != null)
+                string?[] options = paramString.Split('|');
+                if (options.Length == 2)
                 {
-                    var trueValue = Resources.ResourceManager.GetString(trueKey, Resources.Culture) ?? trueKey;
-                    if (falseKey != null)
+                    var trueKey = options[0];
+                    var falseKey = options[1];
+
+                    if (!string.IsNullOrWhiteSpace(trueKey) && !string.IsNullOrWhiteSpace(falseKey))
                     {
+                        var trueValue = Resources.ResourceManager.GetString(trueKey, Resources.Culture) ?? trueKey;
                         var falseValue = Resources.ResourceManager.GetString(falseKey, Resources.Culture) ?? falseKey;
                         return boolValue ? trueValue : falseValue;
                     }
                 }
             }
-        }
 
-        return value;
+            return value?.ToString() ?? string.Empty;
+        }
+        catch (Exception)
+        {
+            return value?.ToString() ?? string.Empty;
+        }
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        throw new NotImplementedException();
+        throw new NotImplementedException("ConvertBack is not implemented for BooleanToStringConverter");
     }
 }

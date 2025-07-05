@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia.Threading;
+using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Models;
 using Multi_Saves_Backup_Tool.Services;
 using Properties;
@@ -22,7 +23,7 @@ public class MonitoringViewModel : ViewModelBase, IDisposable
     private DateTime _lastUpdateTime;
     private string _serviceStatus = Resources.StatusUnknown;
 
-    public MonitoringViewModel(BackupManager backupManager)
+    public MonitoringViewModel(BackupManager backupManager, ILogger<MonitoringViewModel>? logger = null) : base(logger)
     {
         _backupManager = backupManager;
         _backupManager.StateChanged += OnStateChanged;

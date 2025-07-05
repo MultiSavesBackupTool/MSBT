@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Models;
 using Properties;
 
@@ -33,7 +34,8 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     [ObservableProperty] private string _saveLocationError = string.Empty;
     [ObservableProperty] private bool _specialBackupMark;
 
-    public AddGameOverlayViewModel(GamesViewModel gamesViewModel)
+    public AddGameOverlayViewModel(GamesViewModel gamesViewModel, ILogger<AddGameOverlayViewModel>? logger = null) :
+        base(logger)
     {
         _gamesViewModel = gamesViewModel;
         UpdateOverlayTitle();
@@ -138,7 +140,8 @@ public partial class AddGameOverlayViewModel : ViewModelBase
         }
 
         if (!IsEditMode || (_editingGame != null && _editingGame.GameName != GameName))
-            if (_gamesViewModel.Games.Any(g => g.GameName.Equals(GameName, StringComparison.OrdinalIgnoreCase)))
+            if (_gamesViewModel.Games != null &&
+                _gamesViewModel.Games.Any(g => g.GameName.Equals(GameName, StringComparison.OrdinalIgnoreCase)))
             {
                 ErrorMessage = Resources.AddGameOverlay_GameNameExists;
                 return false;
@@ -165,7 +168,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
             SetOldFilesStatus = OldFilesStatus,
             BackupInterval = BackupInterval,
             SpecialBackupMark = SpecialBackupMark,
-            IsEnabled = IsEditMode ? _editingGame?.IsEnabled ?? true : true,
+            IsEnabled = !IsEditMode || (_editingGame?.IsEnabled ?? true),
             BackupCount = IsEditMode ? _editingGame?.BackupCount ?? 0 : 0
         };
 
@@ -210,14 +213,14 @@ public partial class AddGameOverlayViewModel : ViewModelBase
             };
 
             if (OperatingSystem.IsWindows())
-                options.FileTypeFilter = new[]
-                {
+                options.FileTypeFilter =
+                [
                     new FilePickerFileType("Executable Files")
                     {
-                        Patterns = new[] { "*.exe" },
-                        MimeTypes = new[] { "application/x-msdownload" }
+                        Patterns = ["*.exe"],
+                        MimeTypes = ["application/x-msdownload"]
                     }
-                };
+                ];
 
             var files = await storageProvider.OpenFilePickerAsync(options);
             return files.Count > 0 ? files[0].Path.LocalPath : string.Empty;

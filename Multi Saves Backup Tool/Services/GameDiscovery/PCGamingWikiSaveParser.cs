@@ -48,20 +48,18 @@ public class PcGamingWikiSaveParser
         response.EnsureSuccessStatusCode();
         var jsonResponse = await response.Content.ReadAsStringAsync();
 
-        using (var doc = JsonDocument.Parse(jsonResponse))
+        using var doc = JsonDocument.Parse(jsonResponse);
+        var query = doc.RootElement.GetProperty("query");
+        var pages = query.GetProperty("pages");
+        foreach (var page in pages.EnumerateObject())
         {
-            var query = doc.RootElement.GetProperty("query");
-            var pages = query.GetProperty("pages");
-            foreach (var page in pages.EnumerateObject())
+            var pageValue = page.Value;
+            if (pageValue.TryGetProperty("revisions", out var revisions))
             {
-                var pageValue = page.Value;
-                if (pageValue.TryGetProperty("revisions", out var revisions))
-                {
-                    var revision = revisions[0];
-                    var slots = revision.GetProperty("slots");
-                    var main = slots.GetProperty("main");
-                    return main.GetProperty("*").GetString() ?? string.Empty;
-                }
+                var revision = revisions[0];
+                var slots = revision.GetProperty("slots");
+                var main = slots.GetProperty("main");
+                return main.GetProperty("*").GetString() ?? string.Empty;
             }
         }
 
@@ -118,7 +116,7 @@ public class PcGamingWikiSaveParser
         {
             var variableName = match.Groups[1].Value;
 
-            var variableParts = variableName.Split(new[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
+            var variableParts = variableName.Split(['\\', '/'], StringSplitOptions.RemoveEmptyEntries);
             string? fullPath;
 
             if (variableParts.Length > 0)

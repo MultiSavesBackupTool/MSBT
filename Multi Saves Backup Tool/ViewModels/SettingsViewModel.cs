@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Models;
 using Multi_Saves_Backup_Tool.Paths;
 using Properties;
@@ -23,16 +24,15 @@ public partial class SettingsViewModel : ViewModelBase
 
     [ObservableProperty] private ServiceSettings _settings;
 
-    public SettingsViewModel()
+    public SettingsViewModel(ILogger<SettingsViewModel>? logger = null) : base(logger)
     {
-        var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
         _settingsPath = AppPaths.SettingsFilePath;
         _gamesPath = AppPaths.GamesFilePath;
         _serviceStatePath = AppPaths.ServiceStateFilePath;
         _settings = LoadSettings();
     }
 
-    public SettingsViewModel(IStorageProvider storageProvider) : this()
+    public SettingsViewModel(IStorageProvider storageProvider, ILogger<SettingsViewModel>? logger = null) : this(logger)
     {
         _storageProvider = storageProvider;
     }
@@ -83,13 +83,13 @@ public partial class SettingsViewModel : ViewModelBase
                 Title = Resources.ExportTitle,
                 DefaultExtension = "zip",
                 SuggestedFileName = $"backup_settings_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.zip",
-                FileTypeChoices = new[]
-                {
+                FileTypeChoices =
+                [
                     new FilePickerFileType("ZIP Archive")
                     {
-                        Patterns = new[] { "*.zip" }
+                        Patterns = ["*.zip"]
                     }
-                }
+                ]
             });
 
             if (file != null)
@@ -141,13 +141,13 @@ public partial class SettingsViewModel : ViewModelBase
             {
                 Title = Resources.ImportTitle,
                 AllowMultiple = false,
-                FileTypeFilter = new[]
-                {
+                FileTypeFilter =
+                [
                     new FilePickerFileType("ZIP Archive")
                     {
-                        Patterns = new[] { "*.zip" }
+                        Patterns = ["*.zip"]
                     }
-                }
+                ]
             });
 
             if (files.Count > 0)

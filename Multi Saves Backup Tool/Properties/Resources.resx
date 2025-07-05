@@ -65,361 +65,341 @@
         </value>
     </resheader>
 
-    <!-- MainWindow strings -->
+    <!-- ==========================================
+         MAIN WINDOW STRINGS
+         ========================================== -->
     <data name="MainWindow_Title" xml:space="preserve">
-    <value>Multi Saves Backup Tool</value>
-  </data>
+        <value>Multi Saves Backup Tool</value>
+    </data>
     <data name="MainWindow_Monitoring" xml:space="preserve">
-    <value>Monitoring</value>
-  </data>
+        <value>Monitoring</value>
+    </data>
     <data name="MainWindow_Games" xml:space="preserve">
-    <value>Games</value>
-  </data>
+        <value>Games</value>
+    </data>
     <data name="MainWindow_Stats" xml:space="preserve">
-    <value>Statistics</value>
-  </data>
+        <value>Statistics</value>
+    </data>
     <data name="MainWindow_Settings" xml:space="preserve">
-    <value>Settings</value>
-  </data>
+        <value>Settings</value>
+    </data>
 
-    <!-- GamesView strings -->
-    <data name="GamesView_AddGame" xml:space="preserve">
-    <value>Add Game</value>
-  </data>
-    <data name="GamesView_Delete" xml:space="preserve">
-    <value>Delete</value>
-  </data>
-    <data name="GamesView_BackupCount" xml:space="preserve">
-    <value>Backups: {0}</value>
-  </data>
-    <data name="GamesView_EditGame" xml:space="preserve">
-    <value>Edit</value>
-  </data>
-    <data name="GamesView_OpenGameFolder" xml:space="preserve">
-    <value>Open save folder</value>
-  </data>
-    <data name="GamesView_RestoreBackup" xml:space="preserve">
-    <value>Restore Backup</value>
-  </data>
-    <data name="GamesView_ScanInstalledGames" xml:space="preserve">
-    <value>Scan Installed Games</value>
-  </data>
-
-    <!-- AddGameOverlay strings -->
-    <data name="AddGameOverlay_AddGame" xml:space="preserve">
-    <value>Add New Game</value>
-  </data>
-    <data name="AddGameOverlay_GameName" xml:space="preserve">
-    <value>Game Name:</value>
-  </data>
-    <data name="AddGameOverlay_GameExe" xml:space="preserve">
-    <value>Game Executable:</value>
-  </data>
-    <data name="AddGameOverlay_Browse" xml:space="preserve">
-    <value>Browse</value>
-  </data>
-    <data name="AddGameOverlay_GameExeAlt" xml:space="preserve">
-    <value>Alternative Game Executable:</value>
-  </data>
-    <data name="AddGameOverlay_SaveLocation" xml:space="preserve">
-    <value>Save Location:</value>
-  </data>
-    <data name="AddGameOverlay_ModPath" xml:space="preserve">
-    <value>Mod Path:</value>
-  </data>
-    <data name="AddGameOverlay_AddPath" xml:space="preserve">
-    <value>Add Path</value>
-  </data>
-    <data name="AddGameOverlay_BackupInterval" xml:space="preserve">
-    <value>Backup Interval (minutes):</value>
-  </data>
-    <data name="AddGameOverlay_BackupIntervalHint" xml:space="preserve">
-    <value>How often to check for changes and create backups</value>
-  </data>
-    <data name="AddGameOverlay_BackupSettings" xml:space="preserve">
-    <value>Backup Settings</value>
-  </data>
-    <data name="AddGameOverlay_DaysToKeep" xml:space="preserve">
-    <value>Days to keep backups (0 - keep all)</value>
-  </data>
-    <data name="AddGameOverlay_KeepAllFiles" xml:space="preserve">
-    <value>Keep all files</value>
-  </data>
-    <data name="AddGameOverlay_MoveToArchive" xml:space="preserve">
-    <value>Move to archive</value>
-  </data>
-    <data name="AddGameOverlay_DeletePermanently" xml:space="preserve">
-    <value>Delete permanently</value>
-  </data>
-    <data name="AddGameOverlay_IncludeTimestamp" xml:space="preserve">
-    <value>Include timestamp in archive name</value>
-  </data>
-    <data name="AddGameOverlay_BackupAllFiles" xml:space="preserve">
-    <value>Backup all files</value>
-  </data>
-    <data name="AddGameOverlay_BackupChangedFiles" xml:space="preserve">
-    <value>Backup only changed files</value>
-  </data>
-    <data name="AddGameOverlay_Add" xml:space="preserve">
-    <value>Add</value>
-  </data>
-    <data name="AddGameOverlay_Cancel" xml:space="preserve">
-    <value>Cancel</value>
-  </data>
-    <data name="AddGameOverlay_SpecialBackupMark" xml:space="preserve">
-    <value>Special Backup</value>
-  </data>
-    <data name="AddGameOverlay_EditGame" xml:space="preserve">
-    <value>Edit Game</value>
-  </data>
-    <data name="AddGameOverlay_GameNameExists" xml:space="preserve">
-    <value>A game with this name already exists.</value>
-  </data>
-    <data name="AddGameOverlay_Save" xml:space="preserve">
-    <value>Save</value>
-  </data>
-
-    <!-- MonitoringView strings -->
+    <!-- ==========================================
+         MONITORING VIEW STRINGS
+         ========================================== -->
     <data name="MonitoringView_ServiceStatus" xml:space="preserve">
-    <value>Service Status:</value>
-  </data>
+        <value>Service Status:</value>
+    </data>
     <data name="MonitoringView_LastUpdate" xml:space="preserve">
-    <value>Last Update:</value>
-  </data>
+        <value>Last Update:</value>
+    </data>
     <data name="MonitoringView_GameName" xml:space="preserve">
-    <value>Game Name</value>
-  </data>
+        <value>Game Name</value>
+    </data>
     <data name="MonitoringView_Status" xml:space="preserve">
-    <value>Status</value>
-  </data>
+        <value>Status</value>
+    </data>
     <data name="MonitoringView_LastBackup" xml:space="preserve">
-    <value>Last Backup</value>
-  </data>
+        <value>Last Backup</value>
+    </data>
     <data name="MonitoringView_NextBackup" xml:space="preserve">
-    <value>Next Backup</value>
-  </data>
+        <value>Next Backup</value>
+    </data>
 
-    <!-- SettingsView strings -->
+    <!-- ==========================================
+         GAMES VIEW STRINGS
+         ========================================== -->
+    <data name="GamesView_AddGame" xml:space="preserve">
+        <value>Add Game</value>
+    </data>
+    <data name="GamesView_Delete" xml:space="preserve">
+        <value>Delete</value>
+    </data>
+    <data name="GamesView_BackupCount" xml:space="preserve">
+        <value>Backups: {0}</value>
+    </data>
+    <data name="GamesView_EditGame" xml:space="preserve">
+        <value>Edit</value>
+    </data>
+    <data name="GamesView_OpenGameFolder" xml:space="preserve">
+        <value>Open save folder</value>
+    </data>
+    <data name="GamesView_RestoreBackup" xml:space="preserve">
+        <value>Restore Backup</value>
+    </data>
+    <data name="GamesView_ScanInstalledGames" xml:space="preserve">
+        <value>Scan Installed Games</value>
+    </data>
+
+    <!-- ==========================================
+         ADD GAME OVERLAY STRINGS
+         ========================================== -->
+    <data name="AddGameOverlay_AddGame" xml:space="preserve">
+        <value>Add New Game</value>
+    </data>
+    <data name="AddGameOverlay_EditGame" xml:space="preserve">
+        <value>Edit Game</value>
+    </data>
+    <data name="AddGameOverlay_GameName" xml:space="preserve">
+        <value>Game Name:</value>
+    </data>
+    <data name="AddGameOverlay_GameExe" xml:space="preserve">
+        <value>Game Executable:</value>
+    </data>
+    <data name="AddGameOverlay_GameExeAlt" xml:space="preserve">
+        <value>Alternative Game Executable:</value>
+    </data>
+    <data name="AddGameOverlay_SaveLocation" xml:space="preserve">
+        <value>Save Location:</value>
+    </data>
+    <data name="AddGameOverlay_ModPath" xml:space="preserve">
+        <value>Mod Path:</value>
+    </data>
+    <data name="AddGameOverlay_AddPath" xml:space="preserve">
+        <value>Add Path</value>
+    </data>
+    <data name="AddGameOverlay_Browse" xml:space="preserve">
+        <value>Browse</value>
+    </data>
+    <data name="AddGameOverlay_Add" xml:space="preserve">
+        <value>Add</value>
+    </data>
+    <data name="AddGameOverlay_Save" xml:space="preserve">
+        <value>Save</value>
+    </data>
+    <data name="AddGameOverlay_Cancel" xml:space="preserve">
+        <value>Cancel</value>
+    </data>
+    <data name="AddGameOverlay_GameNameExists" xml:space="preserve">
+        <value>A game with this name already exists.</value>
+    </data>
+
+    <!-- Backup Settings -->
+    <data name="AddGameOverlay_BackupSettings" xml:space="preserve">
+        <value>Backup Settings</value>
+    </data>
+    <data name="AddGameOverlay_BackupInterval" xml:space="preserve">
+        <value>Backup Interval (minutes):</value>
+    </data>
+    <data name="AddGameOverlay_BackupIntervalHint" xml:space="preserve">
+        <value>How often to check for changes and create backups</value>
+    </data>
+    <data name="AddGameOverlay_DaysToKeep" xml:space="preserve">
+        <value>Days to keep backups (0 - keep all)</value>
+    </data>
+    <data name="AddGameOverlay_KeepAllFiles" xml:space="preserve">
+        <value>Keep all files</value>
+    </data>
+    <data name="AddGameOverlay_MoveToArchive" xml:space="preserve">
+        <value>Move to archive</value>
+    </data>
+    <data name="AddGameOverlay_DeletePermanently" xml:space="preserve">
+        <value>Delete permanently</value>
+    </data>
+    <data name="AddGameOverlay_IncludeTimestamp" xml:space="preserve">
+        <value>Include timestamp in archive name</value>
+    </data>
+    <data name="AddGameOverlay_BackupAllFiles" xml:space="preserve">
+        <value>Backup all files</value>
+    </data>
+    <data name="AddGameOverlay_BackupChangedFiles" xml:space="preserve">
+        <value>Backup only changed files</value>
+    </data>
+    <data name="AddGameOverlay_SpecialBackupMark" xml:space="preserve">
+        <value>Special Backup</value>
+    </data>
+
+    <!-- ==========================================
+         SETTINGS VIEW STRINGS
+         ========================================== -->
     <data name="SettingsView_BackupSettings" xml:space="preserve">
-    <value>Backup Settings</value>
-  </data>
+        <value>Backup Settings</value>
+    </data>
     <data name="SettingsView_BackupFolder" xml:space="preserve">
-    <value>Backup folder:</value>
-  </data>
+        <value>Backup folder:</value>
+    </data>
     <data name="SettingsView_Browse" xml:space="preserve">
-    <value>Browse</value>
-  </data>
+        <value>Browse</value>
+    </data>
     <data name="SettingsView_ScanInterval" xml:space="preserve">
-    <value>Scan interval (minutes):</value>
-  </data>
+        <value>Scan interval (minutes):</value>
+    </data>
     <data name="SettingsView_MaxParallelOperations" xml:space="preserve">
-    <value>Maximum parallel operations:</value>
-  </data>
+        <value>Maximum parallel operations:</value>
+    </data>
     <data name="SettingsView_CompressionLevel" xml:space="preserve">
-    <value>Compression level:</value>
-  </data>
+        <value>Compression level:</value>
+    </data>
     <data name="SettingsView_LoggingSettings" xml:space="preserve">
-    <value>Logging Settings</value>
-  </data>
+        <value>Logging Settings</value>
+    </data>
     <data name="SettingsView_EnableLogging" xml:space="preserve">
-    <value>Enable logging</value>
-  </data>
+        <value>Enable logging</value>
+    </data>
     <data name="SettingsView_Save" xml:space="preserve">
-    <value>Save</value>
-  </data>
+        <value>Save</value>
+    </data>
     <data name="BrowseBackupFolderTitle" xml:space="preserve">
-    <value>Select backup folder</value>
-  </data>
+        <value>Select backup folder</value>
+    </data>
     <data name="ExportTitle" xml:space="preserve">
-    <value>Export Settings</value>
-  </data>
+        <value>Export Settings</value>
+    </data>
     <data name="ImportTitle" xml:space="preserve">
-    <value>Import Settings</value>
-  </data>
+        <value>Import Settings</value>
+    </data>
 
-    <!-- Status strings -->
-    <data name="StatusSuccess" xml:space="preserve">
-    <value>Success</value>
-  </data>
-    <data name="StatusWaiting" xml:space="preserve">
-    <value>Waiting</value>
-  </data>
-    <data name="StatusBackingUp" xml:space="preserve">
-    <value>Backing up</value>
-  </data>
-    <data name="StatusCleaning" xml:space="preserve">
-    <value>Cleaning old backups</value>
-  </data>
-    <data name="StatusDisabled" xml:space="preserve">
-    <value>Disabled</value>
-  </data>
-    <data name="StatusRunning" xml:space="preserve">
-    <value>Running</value>
-  </data>
-    <data name="StatusStopped" xml:space="preserve">
-    <value>Stopped</value>
-  </data>
-    <data name="StatusUnknown" xml:space="preserve">
-    <value>Unknown</value>
-  </data>
-    <data name="StatusServiceNotRunning" xml:space="preserve">
-    <value>Service Not Running</value>
-  </data>
-    <data name="StatusConnectionError" xml:space="preserve">
-    <value>Connection error: {0}</value>
-  </data>
-    <data name="NoData" xml:space="preserve">
-    <value>No data</value>
-  </data>
-    <data name="NotScheduled" xml:space="preserve">
-    <value>Not scheduled</value>
-  </data>
-    <data name="StatusServiceRunning" xml:space="preserve">
-    <value>Running</value>
-  </data>
-    <data name="StatusServiceWaiting" xml:space="preserve">
-    <value>Waiting</value>
-  </data>
-    <data name="StatusServiceStopped" xml:space="preserve">
-    <value>Stopped</value>
-  </data>
-    <data name="StatusServiceSuccess" xml:space="preserve">
-    <value>Success</value>
-  </data>
-    <data name="StatusServiceBackingUp" xml:space="preserve">
-    <value>Backing up</value>
-  </data>
-    <data name="StatusServiceCleaning" xml:space="preserve">
-    <value>Cleaning</value>
-  </data>
-    <data name="StatusError" xml:space="preserve">
-    <value>Error</value>
-  </data>
-    <data name="StatusPathError" xml:space="preserve">
-    <value>Path Error</value>
-  </data>
-    <data name="StatusGameNotRunning" xml:space="preserve">
-    <value>Game Not Running</value>
-  </data>
-
-    <!-- Error messages -->
-    <data name="ErrorGameNameRequired" xml:space="preserve">
-    <value>Game name is required</value>
-  </data>
-    <data name="ErrorGameExeRequired" xml:space="preserve">
-    <value>Game executable path is required</value>
-  </data>
-    <data name="ErrorSaveLocationRequired" xml:space="preserve">
-    <value>Save location is required</value>
-  </data>
-    <data name="ErrorLoadingSettings" xml:space="preserve">
-    <value>Error loading settings</value>
-  </data>
-    <data name="ErrorSavingSettings" xml:space="preserve">
-    <value>Error saving settings</value>
-  </data>
-
-    <!-- Dialog strings -->
-    <data name="DialogSelectGameExe" xml:space="preserve">
-    <value>Select Game Executable</value>
-  </data>
-    <data name="DialogExecutableFiles" xml:space="preserve">
-    <value>Executable Files (*.exe)|*.exe|All Files (*.*)|*.*</value>
-  </data>
-    <data name="DialogSelectFolder" xml:space="preserve">
-    <value>Select Folder</value>
-  </data>
-    <data name="DialogSelectBackupFolder" xml:space="preserve">
-    <value>Select Backup Folder</value>
-  </data>
-
-    <!-- Compression level strings -->
-    <data name="CompressionLevel_Fast" xml:space="preserve">
-    <value>Fast</value>
-  </data>
-    <data name="CompressionLevel_Optimal" xml:space="preserve">
-    <value>Optimal</value>
-  </data>
-    <data name="CompressionLevel_SmallestSize" xml:space="preserve">
-    <value>Smallest Size</value>
-  </data>
-
-    <!-- Delete Confirmation -->
-    <data name="DeleteConfirmation_Title" xml:space="preserve">
-    <value>Confirming deletion</value>
-  </data>
-    <data name="DeleteConfirmation_Message" xml:space="preserve">
-    <value>Are you sure you want to uninstall the game '{0}'?
-This action cannot be undone.</value>
-  </data>
-    <data name="DeleteConfirmation_Delete" xml:space="preserve">
-    <value>Delete</value>
-  </data>
-    <data name="DeleteConfirmation_Cancel" xml:space="preserve">
-    <value>Cancel</value>
-  </data>
-
-    <!-- Update -->
-    <data name="UpdateWarningTitle" xml:space="preserve">
-    <value>Please wait, updating</value>
-  </data>
-    <data name="UpdateWarningContent" xml:space="preserve">
-    <value>We are installing the latest updates. Please do not turn off your device
-or close the application — this will only take a moment.</value>
-  </data>
-
-    <!-- StatsView -->
+    <!-- ==========================================
+         STATS VIEW STRINGS
+         ========================================== -->
     <data name="StatsView_SizesArchives" xml:space="preserve">
-    <value>Size of all archives:</value>
-  </data>
+        <value>Size of all archives:</value>
+    </data>
     <data name="StatsView_ArchivesCounts" xml:space="preserve">
-    <value>Number of all archives:</value>
-  </data>
+        <value>Number of all archives:</value>
+    </data>
     <data name="StatsView_GamesCountArchives" xml:space="preserve">
-    <value>Number of archives</value>
-  </data>
+        <value>Number of archives</value>
+    </data>
     <data name="StatsView_GamesSizesArchives" xml:space="preserve">
-    <value>Total size</value>
-  </data>
+        <value>Total size</value>
+    </data>
 
-    <!-- New strings -->
+    <!-- ==========================================
+         STATUS STRINGS
+         ========================================== -->
+    <data name="StatusSuccess" xml:space="preserve">
+        <value>Success</value>
+    </data>
+    <data name="StatusWaiting" xml:space="preserve">
+        <value>Waiting</value>
+    </data>
+    <data name="StatusBackingUp" xml:space="preserve">
+        <value>Backing up</value>
+    </data>
+    <data name="StatusCleaning" xml:space="preserve">
+        <value>Cleaning old backups</value>
+    </data>
+    <data name="StatusDisabled" xml:space="preserve">
+        <value>Disabled</value>
+    </data>
+    <data name="StatusRunning" xml:space="preserve">
+        <value>Running</value>
+    </data>
+    <data name="StatusStopped" xml:space="preserve">
+        <value>Stopped</value>
+    </data>
+    <data name="StatusUnknown" xml:space="preserve">
+        <value>Unknown</value>
+    </data>
+    <data name="StatusError" xml:space="preserve">
+        <value>Error</value>
+    </data>
+    <data name="StatusPathError" xml:space="preserve">
+        <value>Path Error</value>
+    </data>
+    <data name="StatusGameNotRunning" xml:space="preserve">
+        <value>Game Not Running</value>
+    </data>
+    <data name="StatusConnectionError" xml:space="preserve">
+        <value>Connection error: {0}</value>
+    </data>
+    <data name="NoData" xml:space="preserve">
+        <value>No data</value>
+    </data>
+    <data name="NotScheduled" xml:space="preserve">
+        <value>Not scheduled</value>
+    </data>
+
+    <!-- ==========================================
+         ERROR MESSAGES
+         ========================================== -->
+    <data name="ErrorGameNameRequired" xml:space="preserve">
+        <value>Game name is required</value>
+    </data>
+    <data name="ErrorGameExeRequired" xml:space="preserve">
+        <value>Game executable path is required</value>
+    </data>
+    <data name="ErrorSaveLocationRequired" xml:space="preserve">
+        <value>Save location is required</value>
+    </data>
+
+    <!-- ==========================================
+         COMPRESSION LEVEL STRINGS
+         ========================================== -->
+    <data name="CompressionLevel_Fast" xml:space="preserve">
+        <value>Fast</value>
+    </data>
+    <data name="CompressionLevel_Optimal" xml:space="preserve">
+        <value>Optimal</value>
+    </data>
+    <data name="CompressionLevel_SmallestSize" xml:space="preserve">
+        <value>Smallest Size</value>
+    </data>
+
+    <!-- ==========================================
+         DIALOG STRINGS
+         ========================================== -->
+    <data name="DeleteConfirmation_Title" xml:space="preserve">
+        <value>Confirming deletion</value>
+    </data>
+    <data name="DeleteConfirmation_Message" xml:space="preserve">
+        <value>Are you sure you want to uninstall the game '{0}'?
+This action cannot be undone.</value>
+    </data>
+    <data name="DeleteConfirmation_Delete" xml:space="preserve">
+        <value>Delete</value>
+    </data>
+    <data name="DeleteConfirmation_Cancel" xml:space="preserve">
+        <value>Cancel</value>
+    </data>
+
+    <!-- ==========================================
+         UPDATE STRINGS
+         ========================================== -->
+    <data name="UpdateWarningTitle" xml:space="preserve">
+        <value>Please wait, updating</value>
+    </data>
+    <data name="UpdateWarningContent" xml:space="preserve">
+        <value>We are installing the latest updates. Please do not turn off your device
+or close the application — this will only take a moment.</value>
+    </data>
+
+    <!-- ==========================================
+         TRAY MENU STRINGS
+         ========================================== -->
     <data name="CurrentGameNotRunning" xml:space="preserve">
-    <value>Game is not running</value>
-  </data>
-    <data name="CreateBackup" xml:space="preserve">
-    <value>Create Backup</value>
-  </data>
-    <data name="CreateProtectedBackup" xml:space="preserve">
-    <value>Create Protected Backup</value>
-  </data>
-    <data name="ShowHide" xml:space="preserve">
-    <value>Show / Hide</value>
-  </data>
-    <data name="Settings" xml:space="preserve">
-    <value>Settings</value>
-  </data>
-    <data name="Exit" xml:space="preserve">
-    <value>Exit</value>
-  </data>
+        <value>Game is not running</value>
+    </data>
     <data name="CurrentGameRunning" xml:space="preserve">
-    <value>Game is running: {0}</value>
-  </data>
-    <data name="BackupCreated" xml:space="preserve">
-    <value>Backup created</value>
-  </data>
-    <data name="ProtectedBackupCreated" xml:space="preserve">
-    <value>Protected backup created</value>
-  </data>
-    <data name="RegularBackupCreated" xml:space="preserve">
-    <value>Regular backup created</value>
-  </data>
+        <value>Game is running: {0}</value>
+    </data>
+    <data name="CreateBackup" xml:space="preserve">
+        <value>Create Backup</value>
+    </data>
+    <data name="CreateProtectedBackup" xml:space="preserve">
+        <value>Create Protected Backup</value>
+    </data>
+    <data name="ShowHide" xml:space="preserve">
+        <value>Show / Hide</value>
+    </data>
+    <data name="Settings" xml:space="preserve">
+        <value>Settings</value>
+    </data>
+    <data name="Exit" xml:space="preserve">
+        <value>Exit</value>
+    </data>
+
+    <!-- ==========================================
+         PC GAMING WIKI STRINGS
+         ========================================== -->
     <data name="PCGamingWikiSaveParser_PageNotFound" xml:space="preserve">
-    <value>PCGamingWiki page not found.</value>
-  </data>
+        <value>PCGamingWiki page not found.</value>
+    </data>
     <data name="PCGamingWikiSaveParser_SavePathNotFound" xml:space="preserve">
-    <value>Save path not found on PCGamingWiki.</value>
-  </data>
+        <value>Save path not found on PCGamingWiki.</value>
+    </data>
     <data name="PCGamingWikiSaveParser_Error" xml:space="preserve">
-    <value>Error retrieving data from PCGamingWiki</value>
-  </data>
+        <value>Error retrieving data from PCGamingWiki</value>
+    </data>
 </root>

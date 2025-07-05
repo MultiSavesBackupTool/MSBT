@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 
 namespace Multi_Saves_Backup_Tool.Models;
@@ -22,7 +24,12 @@ public class GameModel : INotifyPropertyChanged
     public string GameName
     {
         get => _gameName;
-        set => SetField(ref _gameName, value);
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Game name cannot be null or whitespace", nameof(value));
+            SetField(ref _gameName, value);
+        }
     }
 
     public string GameExe
@@ -58,7 +65,12 @@ public class GameModel : INotifyPropertyChanged
     public int DaysForKeep
     {
         get => _daysForKeep;
-        set => SetField(ref _daysForKeep, value);
+        set
+        {
+            if (value < 0)
+                throw new ArgumentException("Days for keep cannot be negative", nameof(value));
+            SetField(ref _daysForKeep, value);
+        }
     }
 
     public int SetOldFilesStatus
@@ -76,13 +88,23 @@ public class GameModel : INotifyPropertyChanged
     public int BackupInterval
     {
         get => _backupInterval;
-        set => SetField(ref _backupInterval, value);
+        set
+        {
+            if (value <= 0)
+                throw new ArgumentException("Backup interval must be greater than 0", nameof(value));
+            SetField(ref _backupInterval, value);
+        }
     }
 
     public int BackupCount
     {
         get => _backupCount;
-        set => SetField(ref _backupCount, value);
+        set
+        {
+            if (value < 0)
+                throw new ArgumentException("Backup count cannot be negative", nameof(value));
+            SetField(ref _backupCount, value);
+        }
     }
 
     public bool SpecialBackupMark
@@ -104,5 +126,62 @@ public class GameModel : INotifyPropertyChanged
         field = value;
         OnPropertyChanged(propertyName);
         return true;
+    }
+
+    public bool IsValid()
+    {
+        return !string.IsNullOrWhiteSpace(_gameName) && !string.IsNullOrWhiteSpace(_gameExe);
+    }
+
+    public bool IsValidForBackup()
+    {
+        return IsValid() &&
+               !string.IsNullOrWhiteSpace(_savePath) &&
+               Directory.Exists(_savePath);
+    }
+
+    public bool HasValidPaths()
+    {
+        var hasValidPath = (!string.IsNullOrWhiteSpace(_savePath) && Directory.Exists(_savePath)) ||
+                           (!string.IsNullOrWhiteSpace(_modPath) && Directory.Exists(_modPath)) ||
+                           (!string.IsNullOrWhiteSpace(_addPath) && Directory.Exists(_addPath));
+
+        return hasValidPath;
+    }
+
+    public GameModel Clone()
+    {
+        return new GameModel
+        {
+            GameName = GameName,
+            GameExe = GameExe,
+            GameExeAlt = GameExeAlt,
+            SavePath = SavePath,
+            ModPath = ModPath,
+            AddPath = AddPath,
+            DaysForKeep = DaysForKeep,
+            SetOldFilesStatus = SetOldFilesStatus,
+            IsEnabled = IsEnabled,
+            BackupInterval = BackupInterval,
+            BackupCount = BackupCount,
+            SpecialBackupMark = SpecialBackupMark
+        };
+    }
+
+    public override string ToString()
+    {
+        return $"{GameName} ({GameExe})";
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is not GameModel other) return false;
+        return GameName.Equals(other.GameName, StringComparison.OrdinalIgnoreCase) &&
+               GameExe.Equals(other.GameExe, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(GameName.ToLowerInvariant(), GameExe.ToLowerInvariant());
     }
 }

@@ -30,6 +30,20 @@ public static class FolderOpener
                     Arguments = $"\"{path}\"",
                     UseShellExecute = true
                 });
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "xdg-open",
+                    Arguments = $"\"{path}\"",
+                    UseShellExecute = true
+                });
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "open",
+                    Arguments = $"\"{path}\"",
+                    UseShellExecute = true
+                });
             else
                 Debug.WriteLine("Unsupported operating system");
         }

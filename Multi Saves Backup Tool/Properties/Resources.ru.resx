@@ -65,361 +65,341 @@
         </value>
     </resheader>
 
-    <!-- MainWindow strings -->
+    <!-- ==========================================
+         СТРОКИ ГЛАВНОГО ОКНА
+         ========================================== -->
     <data name="MainWindow_Title" xml:space="preserve">
-    <value>Инструмент резервного копирования сохранений</value>
-  </data>
+        <value>Инструмент резервного копирования сохранений</value>
+    </data>
     <data name="MainWindow_Monitoring" xml:space="preserve">
-    <value>Мониторинг</value>
-  </data>
+        <value>Мониторинг</value>
+    </data>
     <data name="MainWindow_Games" xml:space="preserve">
-    <value>Игры</value>
-  </data>
+        <value>Игры</value>
+    </data>
     <data name="MainWindow_Stats" xml:space="preserve">
-    <value>Статистика</value>
-  </data>
+        <value>Статистика</value>
+    </data>
     <data name="MainWindow_Settings" xml:space="preserve">
-    <value>Настройки</value>
-  </data>
+        <value>Настройки</value>
+    </data>
 
-    <!-- GamesView strings -->
+    <!-- ==========================================
+         СТРОКИ ПРОСМОТРА МОНИТОРИНГА
+         ========================================== -->
+    <data name="MonitoringView_ServiceStatus" xml:space="preserve">
+        <value>Статус службы:</value>
+    </data>
+    <data name="MonitoringView_LastUpdate" xml:space="preserve">
+        <value>Последнее обновление:</value>
+    </data>
+    <data name="MonitoringView_GameName" xml:space="preserve">
+        <value>Название игры</value>
+    </data>
+    <data name="MonitoringView_Status" xml:space="preserve">
+        <value>Статус</value>
+    </data>
+    <data name="MonitoringView_LastBackup" xml:space="preserve">
+        <value>Последнее резервное копирование</value>
+    </data>
+    <data name="MonitoringView_NextBackup" xml:space="preserve">
+        <value>Следующее резервное копирование</value>
+    </data>
+
+    <!-- ==========================================
+         СТРОКИ ПРОСМОТРА ИГР
+         ========================================== -->
     <data name="GamesView_AddGame" xml:space="preserve">
-    <value>Добавить игру</value>
-  </data>
+        <value>Добавить игру</value>
+    </data>
     <data name="GamesView_Delete" xml:space="preserve">
-    <value>Удалить</value>
-  </data>
+        <value>Удалить</value>
+    </data>
     <data name="GamesView_BackupCount" xml:space="preserve">
-    <value>Архивов: {0}</value>
-  </data>
+        <value>Архивов: {0}</value>
+    </data>
     <data name="GamesView_EditGame" xml:space="preserve">
-    <value>Редактировать</value>
-  </data>
+        <value>Редактировать</value>
+    </data>
     <data name="GamesView_OpenGameFolder" xml:space="preserve">
-    <value>Открыть папку сохранений</value>
-  </data>
+        <value>Открыть папку сохранений</value>
+    </data>
     <data name="GamesView_RestoreBackup" xml:space="preserve">
-    <value>Восстановить сохранение</value>
-  </data>
+        <value>Восстановить сохранение</value>
+    </data>
     <data name="GamesView_ScanInstalledGames" xml:space="preserve">
-    <value>Сканировать установленные игры</value>
-  </data>
+        <value>Сканировать установленные игры</value>
+    </data>
 
-    <!-- AddGameOverlay strings -->
+    <!-- ==========================================
+         СТРОКИ ОКНА ДОБАВЛЕНИЯ ИГРЫ
+         ========================================== -->
     <data name="AddGameOverlay_AddGame" xml:space="preserve">
-    <value>Добавить новую игру</value>
-  </data>
+        <value>Добавить новую игру</value>
+    </data>
+    <data name="AddGameOverlay_EditGame" xml:space="preserve">
+        <value>Редактировать игру</value>
+    </data>
     <data name="AddGameOverlay_GameName" xml:space="preserve">
-    <value>Название игры:</value>
-  </data>
+        <value>Название игры:</value>
+    </data>
     <data name="AddGameOverlay_GameExe" xml:space="preserve">
-    <value>Исполняемый файл игры:</value>
-  </data>
-    <data name="AddGameOverlay_Browse" xml:space="preserve">
-    <value>Обзор</value>
-  </data>
+        <value>Исполняемый файл игры:</value>
+    </data>
     <data name="AddGameOverlay_GameExeAlt" xml:space="preserve">
-    <value>Альтернативный исполняемый файл игры:</value>
-  </data>
+        <value>Альтернативный исполняемый файл игры:</value>
+    </data>
     <data name="AddGameOverlay_SaveLocation" xml:space="preserve">
-    <value>Расположение сохранений:</value>
-  </data>
+        <value>Расположение сохранений:</value>
+    </data>
     <data name="AddGameOverlay_ModPath" xml:space="preserve">
-    <value>Путь к модам:</value>
-  </data>
+        <value>Путь к модам:</value>
+    </data>
     <data name="AddGameOverlay_AddPath" xml:space="preserve">
-    <value>Добавить путь</value>
-  </data>
+        <value>Добавить путь</value>
+    </data>
+    <data name="AddGameOverlay_Browse" xml:space="preserve">
+        <value>Обзор</value>
+    </data>
+    <data name="AddGameOverlay_Add" xml:space="preserve">
+        <value>Добавить</value>
+    </data>
+    <data name="AddGameOverlay_Save" xml:space="preserve">
+        <value>Сохранить</value>
+    </data>
+    <data name="AddGameOverlay_Cancel" xml:space="preserve">
+        <value>Отмена</value>
+    </data>
+    <data name="AddGameOverlay_GameNameExists" xml:space="preserve">
+        <value>Игра с таким названием уже существует.</value>
+    </data>
+
+    <!-- Настройки резервного копирования -->
+    <data name="AddGameOverlay_BackupSettings" xml:space="preserve">
+        <value>Настройки резервного копирования</value>
+    </data>
     <data name="AddGameOverlay_BackupInterval" xml:space="preserve">
-      <value>Интервал резервного копирования (минуты):</value>
+        <value>Интервал резервного копирования (минуты):</value>
     </data>
     <data name="AddGameOverlay_BackupIntervalHint" xml:space="preserve">
-    <value>Как часто проверять изменения и создавать резервные копии</value>
-  </data>
-    <data name="AddGameOverlay_BackupSettings" xml:space="preserve">
-    <value>Настройки резервного копирования</value>
-  </data>
+        <value>Как часто проверять изменения и создавать резервные копии</value>
+    </data>
     <data name="AddGameOverlay_DaysToKeep" xml:space="preserve">
-    <value>Дней хранения резервных копий (0 - хранить все)</value>
-  </data>
+        <value>Дней хранения резервных копий (0 - хранить все)</value>
+    </data>
     <data name="AddGameOverlay_KeepAllFiles" xml:space="preserve">
-    <value>Хранить все файлы</value>
-  </data>
+        <value>Хранить все файлы</value>
+    </data>
     <data name="AddGameOverlay_MoveToArchive" xml:space="preserve">
-    <value>Переместить в архив</value>
-  </data>
+        <value>Переместить в архив</value>
+    </data>
     <data name="AddGameOverlay_DeletePermanently" xml:space="preserve">
-    <value>Удалить навсегда</value>
-  </data>
+        <value>Удалить навсегда</value>
+    </data>
     <data name="AddGameOverlay_IncludeTimestamp" xml:space="preserve">
-    <value>Включить временную метку в имя архива</value>
-  </data>
+        <value>Включить временную метку в имя архива</value>
+    </data>
     <data name="AddGameOverlay_BackupAllFiles" xml:space="preserve">
-    <value>Резервное копирование всех файлов</value>
-  </data>
+        <value>Резервное копирование всех файлов</value>
+    </data>
     <data name="AddGameOverlay_BackupChangedFiles" xml:space="preserve">
-    <value>Резервное копирование только измененных файлов</value>
-  </data>
-    <data name="AddGameOverlay_Add" xml:space="preserve">
-    <value>Добавить</value>
-  </data>
-    <data name="AddGameOverlay_Cancel" xml:space="preserve">
-    <value>Отмена</value>
-  </data>
+        <value>Резервное копирование только измененных файлов</value>
+    </data>
     <data name="AddGameOverlay_SpecialBackupMark" xml:space="preserve">
-    <value>Специальный бэкап</value>
-  </data>
-    <data name="AddGameOverlay_EditGame" xml:space="preserve">
-    <value>Редактировать игру</value>
-  </data>
-    <data name="AddGameOverlay_GameNameExists" xml:space="preserve">
-    <value>Игра с таким названием уже существует.</value>
-  </data>
-    <data name="AddGameOverlay_Save" xml:space="preserve">
-    <value>Сохранить</value>
-  </data>
+        <value>Специальный бэкап</value>
+    </data>
 
-    <!-- MonitoringView strings -->
-    <data name="MonitoringView_ServiceStatus" xml:space="preserve">
-    <value>Статус службы:</value>
-  </data>
-    <data name="MonitoringView_LastUpdate" xml:space="preserve">
-    <value>Последнее обновление:</value>
-  </data>
-    <data name="MonitoringView_GameName" xml:space="preserve">
-    <value>Название игры</value>
-  </data>
-    <data name="MonitoringView_Status" xml:space="preserve">
-    <value>Статус</value>
-  </data>
-    <data name="MonitoringView_LastBackup" xml:space="preserve">
-    <value>Последнее резервное копирование</value>
-  </data>
-    <data name="MonitoringView_NextBackup" xml:space="preserve">
-    <value>Следующее резервное копирование</value>
-  </data>
-
-    <!-- SettingsView strings -->
+    <!-- ==========================================
+         СТРОКИ ПРОСМОТРА НАСТРОЕК
+         ========================================== -->
     <data name="SettingsView_BackupSettings" xml:space="preserve">
-    <value>Настройки резервного копирования</value>
-  </data>
+        <value>Настройки резервного копирования</value>
+    </data>
     <data name="SettingsView_BackupFolder" xml:space="preserve">
-    <value>Папка резервных копий:</value>
-  </data>
+        <value>Папка резервных копий:</value>
+    </data>
     <data name="SettingsView_Browse" xml:space="preserve">
-    <value>Обзор</value>
-  </data>
+        <value>Обзор</value>
+    </data>
     <data name="SettingsView_ScanInterval" xml:space="preserve">
-    <value>Интервал сканирования (минуты):</value>
-  </data>
+        <value>Интервал сканирования (минуты):</value>
+    </data>
     <data name="SettingsView_MaxParallelOperations" xml:space="preserve">
-    <value>Максимальное количество параллельных операций:</value>
-  </data>
+        <value>Максимальное количество параллельных операций:</value>
+    </data>
     <data name="SettingsView_CompressionLevel" xml:space="preserve">
-    <value>Уровень сжатия:</value>
-  </data>
+        <value>Уровень сжатия:</value>
+    </data>
     <data name="SettingsView_LoggingSettings" xml:space="preserve">
-    <value>Настройки журналирования</value>
-  </data>
+        <value>Настройки журналирования</value>
+    </data>
     <data name="SettingsView_EnableLogging" xml:space="preserve">
-    <value>Включить журналирование</value>
-  </data>
+        <value>Включить журналирование</value>
+    </data>
     <data name="SettingsView_Save" xml:space="preserve">
-    <value>Сохранить</value>
-  </data>
+        <value>Сохранить</value>
+    </data>
+    <data name="BrowseBackupFolderTitle" xml:space="preserve">
+        <value>Выбрать папку бэкапа</value>
+    </data>
     <data name="ExportTitle" xml:space="preserve">
-    <value>Экспортировать настройки</value>
-  </data>
+        <value>Экспортировать настройки</value>
+    </data>
     <data name="ImportTitle" xml:space="preserve">
-    <value>Импортировать настройки</value>
-  </data>
+        <value>Импортировать настройки</value>
+    </data>
 
-    <!-- Status strings -->
+    <!-- ==========================================
+         СТРОКИ ПРОСМОТРА СТАТИСТИКИ
+         ========================================== -->
+    <data name="StatsView_SizesArchives" xml:space="preserve">
+        <value>Размер всех архивов:</value>
+    </data>
+    <data name="StatsView_ArchivesCounts" xml:space="preserve">
+        <value>Количество всех архивов:</value>
+    </data>
+    <data name="StatsView_GamesCountArchives" xml:space="preserve">
+        <value>Количество архивов</value>
+    </data>
+    <data name="StatsView_GamesSizesArchives" xml:space="preserve">
+        <value>Общий размер</value>
+    </data>
+
+    <!-- ==========================================
+         СТРОКИ СТАТУСА
+         ========================================== -->
     <data name="StatusSuccess" xml:space="preserve">
-    <value>Успешно</value>
-  </data>
+        <value>Успешно</value>
+    </data>
     <data name="StatusWaiting" xml:space="preserve">
-    <value>Ожидание</value>
-  </data>
+        <value>Ожидание</value>
+    </data>
     <data name="StatusBackingUp" xml:space="preserve">
-    <value>Резервное копирование</value>
-  </data>
+        <value>Резервное копирование</value>
+    </data>
     <data name="StatusCleaning" xml:space="preserve">
-    <value>Очистка старых резервных копий</value>
-  </data>
+        <value>Очистка старых резервных копий</value>
+    </data>
     <data name="StatusDisabled" xml:space="preserve">
-    <value>Отключено</value>
-  </data>
+        <value>Отключено</value>
+    </data>
     <data name="StatusRunning" xml:space="preserve">
-    <value>Выполняется</value>
-  </data>
+        <value>Выполняется</value>
+    </data>
     <data name="StatusStopped" xml:space="preserve">
-    <value>Остановлено</value>
-  </data>
+        <value>Остановлено</value>
+    </data>
     <data name="StatusUnknown" xml:space="preserve">
-    <value>Неизвестно</value>
-  </data>
-    <data name="StatusServiceNotRunning" xml:space="preserve">
-    <value>Служба не запущена</value>
-  </data>
-    <data name="StatusServiceRunning" xml:space="preserve">
-    <value>Выполняется</value>
-  </data>
-    <data name="StatusServiceWaiting" xml:space="preserve">
-    <value>Ожидание</value>
-  </data>
-    <data name="StatusServiceStopped" xml:space="preserve">
-    <value>Остановлено</value>
-  </data>
-    <data name="StatusServiceSuccess" xml:space="preserve">
-    <value>Успешно</value>
-  </data>
-    <data name="StatusServiceBackingUp" xml:space="preserve">
-    <value>Резервное копирование</value>
-  </data>
-    <data name="StatusServiceCleaning" xml:space="preserve">
-    <value>Очистка</value>
-  </data>
+        <value>Неизвестно</value>
+    </data>
     <data name="StatusError" xml:space="preserve">
-    <value>Ошибка</value>
-  </data>
+        <value>Ошибка</value>
+    </data>
     <data name="StatusPathError" xml:space="preserve">
-      <value>Ошибка пути</value>
+        <value>Ошибка пути</value>
+    </data>
+    <data name="StatusGameNotRunning" xml:space="preserve">
+        <value>Игра не запущена</value>
     </data>
     <data name="StatusConnectionError" xml:space="preserve">
-    <value>Ошибка соединения: {0}</value>
-  </data>
+        <value>Ошибка соединения: {0}</value>
+    </data>
     <data name="NoData" xml:space="preserve">
-    <value>Нет данных</value>
-  </data>
+        <value>Нет данных</value>
+    </data>
     <data name="NotScheduled" xml:space="preserve">
-    <value>Не запланировано</value>
-  </data>
-    <data name="StatusGameNotRunning" xml:space="preserve">
-    <value>Игра не запущена</value>
-  </data>
+        <value>Не запланировано</value>
+    </data>
 
-    <!-- Error messages -->
+    <!-- ==========================================
+         СООБЩЕНИЯ ОБ ОШИБКАХ
+         ========================================== -->
     <data name="ErrorGameNameRequired" xml:space="preserve">
-    <value>Требуется указать название игры</value>
-  </data>
+        <value>Требуется указать название игры</value>
+    </data>
     <data name="ErrorGameExeRequired" xml:space="preserve">
-    <value>Требуется указать путь к исполняемому файлу игры</value>
-  </data>
+        <value>Требуется указать путь к исполняемому файлу игры</value>
+    </data>
     <data name="ErrorSaveLocationRequired" xml:space="preserve">
-    <value>Требуется указать расположение сохранений</value>
-  </data>
-    <data name="ErrorLoadingSettings" xml:space="preserve">
-    <value>Ошибка загрузки настроек</value>
-  </data>
-    <data name="ErrorSavingSettings" xml:space="preserve">
-    <value>Ошибка сохранения настроек</value>
-  </data>
+        <value>Требуется указать расположение сохранений</value>
+    </data>
 
-    <!-- Dialog strings -->
-    <data name="DialogSelectGameExe" xml:space="preserve">
-    <value>Выберите исполняемый файл игры</value>
-  </data>
-    <data name="DialogExecutableFiles" xml:space="preserve">
-    <value>Исполняемые файлы (*.exe)|*.exe|Все файлы (*.*)|*.*</value>
-  </data>
-    <data name="DialogSelectFolder" xml:space="preserve">
-    <value>Выберите папку</value>
-  </data>
-    <data name="DialogSelectBackupFolder" xml:space="preserve">
-    <value>Выберите папку для резервных копий</value>
-  </data>
-
-    <!-- Compression level strings -->
+    <!-- ==========================================
+         СТРОКИ УРОВНЯ СЖАТИЯ
+         ========================================== -->
     <data name="CompressionLevel_Fast" xml:space="preserve">
-    <value>Быстрое</value>
-  </data>
+        <value>Быстрое</value>
+    </data>
     <data name="CompressionLevel_Optimal" xml:space="preserve">
-    <value>Оптимальное</value>
-  </data>
+        <value>Оптимальное</value>
+    </data>
     <data name="CompressionLevel_SmallestSize" xml:space="preserve">
-    <value>Минимальный размер</value>
-  </data>
+        <value>Минимальный размер</value>
+    </data>
 
-    <!-- Delete Confirmation -->
+    <!-- ==========================================
+         СТРОКИ ДИАЛОГОВ
+         ========================================== -->
     <data name="DeleteConfirmation_Title" xml:space="preserve">
-    <value>Подтверждение удаления</value>
-  </data>
+        <value>Подтверждение удаления</value>
+    </data>
     <data name="DeleteConfirmation_Message" xml:space="preserve">
-    <value>Вы уверены, что хотите удалить игру '{0}'?
+        <value>Вы уверены, что хотите удалить игру '{0}'?
 Это действие нельзя отменить.</value>
-  </data>
+    </data>
     <data name="DeleteConfirmation_Delete" xml:space="preserve">
-    <value>Удалить</value>
-  </data>
+        <value>Удалить</value>
+    </data>
     <data name="DeleteConfirmation_Cancel" xml:space="preserve">
-    <value>Отмена</value>
-  </data>
+        <value>Отмена</value>
+    </data>
 
-    <!-- Update -->
+    <!-- ==========================================
+         СТРОКИ ОБНОВЛЕНИЯ
+         ========================================== -->
     <data name="UpdateWarningTitle" xml:space="preserve">
-    <value>Подождите, идёт обновление</value>
-  </data>
+        <value>Подождите, идёт обновление</value>
+    </data>
     <data name="UpdateWarningContent" xml:space="preserve">
-    <value>Мы устанавливаем последние обновления. Пожалуйста, не выключайте устройство
+        <value>Мы устанавливаем последние обновления. Пожалуйста, не выключайте устройство
 и не закрывайте приложение — это займёт всего немного времени.</value>
-  </data>
+    </data>
 
-    <!-- StatsView -->
-    <data name="StatsView_SizesArchives" xml:space="preserve">
-    <value>Размер всех архивов:</value>
-  </data>
-    <data name="StatsView_ArchivesCounts" xml:space="preserve">
-    <value>Количество всех архивов:</value>
-  </data>
-    <data name="StatsView_GamesCountArchives" xml:space="preserve">
-    <value>Количество архивов</value>
-  </data>
-    <data name="StatsView_GamesSizesArchives" xml:space="preserve">
-    <value>Общий размер</value>
-  </data>
-    <data name="BrowseBackupFolderTitle" xml:space="preserve">
-    <value>Выбрать папку бэкапа</value>
-  </data>
-
-    <!-- New strings -->
+    <!-- ==========================================
+         СТРОКИ МЕНЮ ТРЕЯ
+         ========================================== -->
     <data name="CurrentGameNotRunning" xml:space="preserve">
-    <value>Игра не запущена</value>
-  </data>
-    <data name="CreateBackup" xml:space="preserve">
-    <value>Создать резервную копию</value>
-  </data>
-    <data name="CreateProtectedBackup" xml:space="preserve">
-    <value>Создать защищенную резервную копию</value>
-  </data>
-    <data name="ShowHide" xml:space="preserve">
-    <value>Показать / Скрыть</value>
-  </data>
-    <data name="Settings" xml:space="preserve">
-    <value>Настройки</value>
-  </data>
-    <data name="Exit" xml:space="preserve">
-    <value>Выход</value>
-  </data>
+        <value>Игра не запущена</value>
+    </data>
     <data name="CurrentGameRunning" xml:space="preserve">
-    <value>Игра запущена: {0}</value>
-  </data>
-    <data name="BackupCreated" xml:space="preserve">
-    <value>Резервная копия создана</value>
-  </data>
-    <data name="ProtectedBackupCreated" xml:space="preserve">
-    <value>Защищенная резервная копия создана</value>
-  </data>
-    <data name="RegularBackupCreated" xml:space="preserve">
-    <value>Обычная резервная копия создана</value>
-  </data>
+        <value>Игра запущена: {0}</value>
+    </data>
+    <data name="CreateBackup" xml:space="preserve">
+        <value>Создать резервную копию</value>
+    </data>
+    <data name="CreateProtectedBackup" xml:space="preserve">
+        <value>Создать защищенную резервную копию</value>
+    </data>
+    <data name="ShowHide" xml:space="preserve">
+        <value>Показать / Скрыть</value>
+    </data>
+    <data name="Settings" xml:space="preserve">
+        <value>Настройки</value>
+    </data>
+    <data name="Exit" xml:space="preserve">
+        <value>Выход</value>
+    </data>
+
+    <!-- ==========================================
+         СТРОКИ PC GAMING WIKI
+         ========================================== -->
     <data name="PCGamingWikiSaveParser_PageNotFound" xml:space="preserve">
-    <value>Страница PCGamingWiki не найдена.</value>
-  </data>
+        <value>Страница PCGamingWiki не найдена.</value>
+    </data>
     <data name="PCGamingWikiSaveParser_SavePathNotFound" xml:space="preserve">
-    <value>Путь к сохранениям не найден на PCGamingWiki.</value>
-  </data>
+        <value>Путь к сохранениям не найден на PCGamingWiki.</value>
+    </data>
     <data name="PCGamingWikiSaveParser_Error" xml:space="preserve">
-    <value>Ошибка при получении данных с PCGamingWiki</value>
-  </data>
+        <value>Ошибка при получении данных с PCGamingWiki</value>
+    </data>
 </root>

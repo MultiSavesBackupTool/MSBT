@@ -16,13 +16,11 @@ public class GamesService : IGamesService, IDisposable
 {
     private readonly SemaphoreSlim _cacheLock = new(1, 1);
     private readonly ILogger<GamesService> _logger;
-    private readonly ISettingsService _settingsService;
     private readonly FileSystemWatcher? _watcher;
     private IReadOnlyList<GameModel>? _cachedGames;
 
-    public GamesService(ISettingsService settingsService, ILogger<GamesService> logger)
+    public GamesService(ILogger<GamesService> logger)
     {
-        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         var gamesPath = AppPaths.GamesFilePath;
@@ -102,7 +100,7 @@ public class GamesService : IGamesService, IDisposable
                 if (!File.Exists(gamesPath))
                 {
                     _logger.LogWarning("Games configuration file not found at {Path}", gamesPath);
-                    return Array.Empty<GameModel>();
+                    return [];
                 }
 
                 var json = await File.ReadAllTextAsync(gamesPath);
@@ -114,7 +112,7 @@ public class GamesService : IGamesService, IDisposable
                 if (gameDict == null)
                 {
                     _logger.LogError("Failed to deserialize games from {Path}", gamesPath);
-                    return Array.Empty<GameModel>();
+                    return [];
                 }
 
                 var games = gameDict.Values.ToList();
@@ -130,7 +128,7 @@ public class GamesService : IGamesService, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading games configuration");
-            return Array.Empty<GameModel>();
+            return [];
         }
     }
 
@@ -143,12 +141,16 @@ public class GamesService : IGamesService, IDisposable
         return games.FirstOrDefault(g => g.GameName.Equals(gameName, StringComparison.OrdinalIgnoreCase));
     }
 
-    public async Task SaveGamesAsync(IEnumerable<GameModel> games)
+    public async Task SaveGamesAsync(IEnumerable<GameModel>? games)
     {
+        if (games == null)
+            throw new ArgumentNullException(nameof(games));
+
         try
         {
             var gamesPath = AppPaths.GamesFilePath;
-            var gamesDict = games.ToDictionary(game => game.GameName, game => game);
+            var gamesDict = games.Where(g => !string.IsNullOrWhiteSpace(g.GameName))
+                .ToDictionary(game => game.GameName, game => game);
 
             var json = JsonSerializer.Serialize(gamesDict, new JsonSerializerOptions
             {
@@ -162,6 +164,7 @@ public class GamesService : IGamesService, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error saving games configuration");
+            throw;
         }
     }
 
@@ -170,10 +173,23 @@ public class GamesService : IGamesService, IDisposable
         if (game == null)
             throw new ArgumentNullException(nameof(game));
 
+        if (string.IsNullOrWhiteSpace(game.GameExe))
+        {
+            _logger.LogWarning("Game executable path is empty for game {GameName}", game.GameName);
+            return false;
+        }
+
         try
         {
             var processes = Process.GetProcesses();
             var gameExeName = Path.GetFileNameWithoutExtension(game.GameExe);
+
+            if (string.IsNullOrWhiteSpace(gameExeName))
+            {
+                _logger.LogWarning("Invalid executable name for game {GameName}: {ExePath}", game.GameName,
+                    game.GameExe);
+                return false;
+            }
 
             var isMainExeRunning = processes.Any(p =>
             {
@@ -194,28 +210,31 @@ public class GamesService : IGamesService, IDisposable
             if (!string.IsNullOrEmpty(game.GameExeAlt))
             {
                 var altExeName = Path.GetFileNameWithoutExtension(game.GameExeAlt);
-                var isAltExeRunning = processes.Any(p =>
+                if (!string.IsNullOrWhiteSpace(altExeName))
                 {
-                    try
+                    var isAltExeRunning = processes.Any(p =>
                     {
-                        var isMatch = p.ProcessName.Equals(altExeName, StringComparison.OrdinalIgnoreCase);
-                        return isMatch;
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Error checking process {ProcessName}", p.ProcessName);
-                        return false;
-                    }
-                });
+                        try
+                        {
+                            var isMatch = p.ProcessName.Equals(altExeName, StringComparison.OrdinalIgnoreCase);
+                            return isMatch;
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "Error checking process {ProcessName}", p.ProcessName);
+                            return false;
+                        }
+                    });
 
-                if (isAltExeRunning) return true;
+                    if (isAltExeRunning) return true;
+                }
             }
 
             return false;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error checking if game is running");
+            _logger.LogError(ex, "Error checking if game is running for {GameName}", game.GameName);
             return false;
         }
     }

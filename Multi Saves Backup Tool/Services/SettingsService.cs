@@ -107,7 +107,13 @@ public class SettingsService : ISettingsService, IDisposable
         await _settingsLock.WaitAsync();
         try
         {
+            ValidateSettings(settings);
+
             var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
+
+            var directory = Path.GetDirectoryName(_settingsPath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory)) Directory.CreateDirectory(directory);
+
             await File.WriteAllTextAsync(_settingsPath, json);
             CurrentSettings = settings;
             _logger.LogInformation("Settings successfully saved to {Path}", _settingsPath);
@@ -133,25 +139,67 @@ public class SettingsService : ISettingsService, IDisposable
             if (!File.Exists(_settingsPath))
             {
                 _logger.LogWarning("Settings file not found at {Path}, using defaults", _settingsPath);
-                CurrentSettings = new ServiceSettings();
+                CurrentSettings = CreateDefaultSettings();
                 return;
             }
 
             var json = await File.ReadAllTextAsync(_settingsPath);
-            var newSettings = JsonSerializer.Deserialize<ServiceSettings>(json)
-                              ?? throw new InvalidOperationException("Failed to deserialize settings");
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                _logger.LogWarning("Settings file is empty at {Path}, using defaults", _settingsPath);
+                CurrentSettings = CreateDefaultSettings();
+                return;
+            }
+
+            var newSettings = JsonSerializer.Deserialize<ServiceSettings>(json);
+            if (newSettings == null)
+            {
+                _logger.LogWarning("Failed to deserialize settings from {Path}, using defaults", _settingsPath);
+                CurrentSettings = CreateDefaultSettings();
+                return;
+            }
+
+            ValidateSettings(newSettings);
 
             CurrentSettings = newSettings;
             _logger.LogInformation("Settings successfully reloaded from {Path}", _settingsPath);
         }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "JSON parsing error when reloading settings from {Path}, using defaults",
+                _settingsPath);
+            CurrentSettings = CreateDefaultSettings();
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to reload settings from {Path}", _settingsPath);
-            throw;
+            _logger.LogError(ex, "Failed to reload settings from {Path}, using defaults", _settingsPath);
+            CurrentSettings = CreateDefaultSettings();
         }
         finally
         {
             _settingsLock.Release();
         }
+    }
+
+    private void ValidateSettings(ServiceSettings settings)
+    {
+        if (settings.BackupSettings == null) throw new ArgumentException("BackupSettings cannot be null");
+
+        if (string.IsNullOrWhiteSpace(settings.BackupSettings.BackupRootFolder))
+            throw new ArgumentException("Backup root folder cannot be null or empty");
+    }
+
+    private ServiceSettings CreateDefaultSettings()
+    {
+        return new ServiceSettings
+        {
+            BackupSettings = new BackupSettings
+            {
+                BackupRootFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                    "GameBackups"),
+                CompressionLevel = CompressionLevel.Optimal,
+                GamesConfigPath = AppPaths.GamesFilePath
+            }
+        };
     }
 }

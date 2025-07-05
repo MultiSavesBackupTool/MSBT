@@ -19,6 +19,13 @@ A tool for backing up game saves with support for multiple games and automatic s
 - Support for mods and additional backup paths
 - Configurable backup retention
 - Localization support (English and Russian)
+- System tray integration for easy access and management
+- Automatic game detection to quickly add installed games
+- Restore functionality to recover lost progress
+- Statistics tab to track backup frequency and details
+- Non-deletable backups for critical saves
+- Parsing data from PCGamingWiki for enhanced game information
+- And more!
 
 ## Requirements
 
@@ -27,7 +34,7 @@ A tool for backing up game saves with support for multiple games and automatic s
 
 ## Installation
 
-1. Download the latest release from the Releases page
+1. Download the latest release from the [Releases page](https://github.com/TheNightlyGod/MSBT/releases)
 2. Run MultiSavesBackupSetup.exe
 
 ## Usage
@@ -70,16 +77,36 @@ Global settings in the Settings tab:
 - Compression Level: Choose between Fast, Optimal, or Smallest Size
 - Enable Logging: Toggle logging functionality
 
+## Community and Feedback
+
+Your feedback is valuable! Please share your suggestions or report issues via:
+
+- [GitHub Issues](https://github.com/TheNightlyGod/MSBT/issues)
+- [Feedback Form](https://feedback.lukiuwu.xyz/s/cmc8eps900015om012ayu33yh)
+
 ## Reporting Issues
 
-If you encounter any issues or have suggestions for improvements, please report them on the GitHub Issues page. Include
-the following information:
+If you encounter any issues or have suggestions for improvements, please report them on
+the [GitHub Issues page](https://github.com/TheNightlyGod/MSBT/issues). Include the following information:
 
-- Description of the issue
-- Steps to reproduce
-- Expected behavior
-- Actual behavior
-- Any relevant error messages or logs
+- **Description of the issue:**  
+  e.g., "Clicking the tray icon causes the application to crash."
+- **Steps to reproduce:**  
+  e.g., "Click the tray icon."
+- **Expected behavior:**  
+  e.g., "The application should open."
+- **Actual behavior:**  
+  e.g., "The application crashes."
+- **Attachments:**  
+  Please attach the following files located in "C:\Program Files (x86)\Multi Saves Backup Tool":
+    - backup_state.json
+    - games.json
+    - backup_serviceYYYYMMDD.log
+
+## Roadmap
+
+Check out our [public roadmap](https://plane.lukiuwu.xyz/spaces/issues/737ad55bb00441cf9219319ef0483a71) to see planned
+features and track development progress.
 
 ## Contributing
 
@@ -87,7 +114,12 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is open source. Please report any issues on GitHub Issues.
+This project is open source. Please report any issues on [GitHub Issues](https://github.com/TheNightlyGod/MSBT/issues).
+
+## Acknowledgments
+
+- Thank you to the community for 500 views on GitHub!
+- Special thanks to user Varset for their ideas and bug reports.
 
 ## Star History
 

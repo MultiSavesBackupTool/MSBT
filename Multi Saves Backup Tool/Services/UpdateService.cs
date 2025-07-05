@@ -16,13 +16,14 @@ using Properties;
 
 namespace Multi_Saves_Backup_Tool.Services;
 
-public class UpdateService
+public class UpdateService : IDisposable
 {
     private const string GithubApiUrl = "https://api.github.com/repos/{owner}/{repo}/releases/latest";
     private const string Owner = "TheNightlyGod";
     private const string Repo = "MSBT";
     private readonly string _currentVersion;
     private readonly HttpClient _httpClient;
+    private bool _disposed;
 
     public UpdateService()
     {
@@ -32,8 +33,16 @@ public class UpdateService
         Debug.WriteLine($"UpdateService initialized. Current version: {_currentVersion}");
     }
 
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
     public async Task<(bool hasUpdate, string latestVersion, string? downloadUrl)> CheckForUpdatesAsync()
     {
+        ThrowIfDisposed();
+
         try
         {
             var apiUrl = GithubApiUrl.Replace("{owner}", Owner).Replace("{repo}", Repo);
@@ -121,27 +130,7 @@ public class UpdateService
 
     public async Task<bool> DownloadAndInstallUpdateAsync(string downloadUrl)
     {
-        var dialog = new ContentDialog
-        {
-            Title = Resources.UpdateWarningTitle,
-            Content = new StackPanel
-            {
-                Spacing = 8,
-                Children =
-                {
-                    new TextBlock
-                    {
-                        Text = Resources.UpdateWarningContent,
-                        FontSize = 14
-                    },
-                    new ProgressBar
-                    {
-                        IsIndeterminate = true,
-                        Height = 16
-                    }
-                }
-            }
-        };
+        ThrowIfDisposed();
 
         if (string.IsNullOrWhiteSpace(downloadUrl))
         {
@@ -149,8 +138,31 @@ public class UpdateService
             return false;
         }
 
+        ContentDialog? dialog = null;
         try
         {
+            dialog = new ContentDialog
+            {
+                Title = Resources.UpdateWarningTitle,
+                Content = new StackPanel
+                {
+                    Spacing = 8,
+                    Children =
+                    {
+                        new TextBlock
+                        {
+                            Text = Resources.UpdateWarningContent,
+                            FontSize = 14
+                        },
+                        new ProgressBar
+                        {
+                            IsIndeterminate = true,
+                            Height = 16
+                        }
+                    }
+                }
+            };
+
             var fileName = Path.GetFileName(new Uri(downloadUrl).AbsolutePath);
             var tempFile = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}_{fileName}");
 
@@ -169,7 +181,8 @@ public class UpdateService
 
             Debug.WriteLine($"Download complete: {tempFile}");
 
-            if (OperatingSystem.IsWindows()) return await InstallUpdateOnWindows(tempFile);
+            if (OperatingSystem.IsWindows())
+                return await InstallUpdateOnWindows(tempFile);
 
             dialog.Hide();
             return false;
@@ -177,7 +190,7 @@ public class UpdateService
         catch (Exception ex)
         {
             Debug.WriteLine($"Error downloading or installing update: {ex.Message}");
-            dialog.Hide();
+            dialog?.Hide();
             return false;
         }
     }
@@ -206,6 +219,20 @@ public class UpdateService
             Debug.WriteLine($"Error starting Windows update installer: {ex.Message}");
             return Task.FromResult(false);
         }
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing) _httpClient.Dispose();
+            _disposed = true;
+        }
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (_disposed) throw new ObjectDisposedException(nameof(UpdateService));
     }
 }
 

@@ -30,7 +30,7 @@ public class App : Application
             }
             catch
             {
-                /* ignore logging errors */
+                // Ignore logging errors during shutdown
             }
         };
         TaskScheduler.UnobservedTaskException += (_, args) =>
@@ -42,7 +42,7 @@ public class App : Application
             }
             catch
             {
-                /* ignore logging errors */
+                // Ignore logging errors during shutdown
             }
         };
     }
@@ -73,8 +73,8 @@ public class App : Application
             new TrayService(
                 provider.GetRequiredService<MonitoringViewModel>(),
                 provider.GetRequiredService<IGamesService>(),
-                provider.GetRequiredService<IBackupService>(),
-                provider.GetRequiredService<BackupManager>()
+                provider.GetRequiredService<BackupManager>(),
+                provider.GetRequiredService<ILogger<TrayService>>()
             )
         );
     }
@@ -84,83 +84,107 @@ public class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            if (_serviceProvider == null) return;
-            var trayService = _serviceProvider.GetRequiredService<TrayService>();
-            var gamesService = _serviceProvider.GetRequiredService<IGamesService>();
-            var backupService = _serviceProvider.GetRequiredService<IBackupService>();
-            var settingsService = _serviceProvider.GetRequiredService<ISettingsService>();
-            var statsLogger = _serviceProvider.GetRequiredService<ILogger<StatsViewModel>>();
-            _backupManager = _serviceProvider.GetRequiredService<BackupManager>();
+            if (_serviceProvider == null) throw new InvalidOperationException("Service provider is not initialized");
 
-            var mainWindow = new MainWindow();
-            var mainViewModel = new MainWindowViewModel(mainWindow, trayService, gamesService, backupService,
-                _backupManager, settingsService, statsLogger);
-
-            mainWindow.DataContext = mainViewModel;
-            desktop.MainWindow = mainWindow;
-            trayService.Initialize();
-
-            await _backupManager.StartAsync();
-
-            desktop.ShutdownRequested += (_, e) =>
+            try
             {
-                if (_isShuttingDown) return;
-                _isShuttingDown = true;
-                var logger = _serviceProvider.GetRequiredService<ILogger<App>>();
-                logger.LogInformation("Shutdown requested. Starting cleanup...");
-                e.Cancel = true;
+                var trayService = _serviceProvider.GetRequiredService<TrayService>();
+                var gamesService = _serviceProvider.GetRequiredService<IGamesService>();
+                var backupService = _serviceProvider.GetRequiredService<IBackupService>();
+                var settingsService = _serviceProvider.GetRequiredService<ISettingsService>();
+                var statsLogger = _serviceProvider.GetRequiredService<ILogger<StatsViewModel>>();
+                var mainWindowLogger = _serviceProvider.GetRequiredService<ILogger<MainWindowViewModel>>();
+                var monitoringLogger = _serviceProvider.GetRequiredService<ILogger<MonitoringViewModel>>();
+                var gamesLogger = _serviceProvider.GetRequiredService<ILogger<GamesViewModel>>();
+                var settingsLogger = _serviceProvider.GetRequiredService<ILogger<SettingsViewModel>>();
+                _backupManager = _serviceProvider.GetRequiredService<BackupManager>();
+
+                var mainWindow = new MainWindow();
+                var mainViewModel = new MainWindowViewModel(mainWindow, gamesService, backupService,
+                    _backupManager, settingsService, statsLogger, mainWindowLogger, monitoringLogger, gamesLogger,
+                    settingsLogger);
+
+                mainWindow.DataContext = mainViewModel;
+                desktop.MainWindow = mainWindow;
+                trayService.Initialize();
+
                 try
                 {
-                    if (_backupManager != null)
-                        try
-                        {
-                            _backupManager.StopAsync().GetAwaiter().GetResult();
-                            _backupManager.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.LogError(ex, "Error during backup manager shutdown");
-                        }
-
-                    if (trayService is IDisposable disposableTray)
-                        try
-                        {
-                            disposableTray.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.LogError(ex, "Error disposing tray");
-                        }
-
-                    var disposableServices = _serviceProvider.GetServices<IDisposable>();
-                    foreach (var service in disposableServices)
-                        try
-                        {
-                            service.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.LogError(ex, "Error disposing service: {ServiceType}", service.GetType().Name);
-                        }
-
-                    if (_serviceProvider is IDisposable disposableProvider)
-                        try
-                        {
-                            disposableProvider.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.LogError(ex, "Error disposing service provider");
-                        }
+                    await _backupManager.StartAsync();
                 }
                 catch (Exception ex)
                 {
-                    logger.LogCritical(ex, "Critical error during shutdown");
+                    var logger = _serviceProvider.GetRequiredService<ILogger<App>>();
+                    logger.LogError(ex, "Failed to start backup manager");
                 }
 
-                logger.LogInformation("Cleanup complete. Exiting application.");
-                Environment.Exit(0);
-            };
+                desktop.ShutdownRequested += (_, e) =>
+                {
+                    if (_isShuttingDown) return;
+                    _isShuttingDown = true;
+                    var logger = _serviceProvider.GetRequiredService<ILogger<App>>();
+                    logger.LogInformation("Shutdown requested. Starting cleanup...");
+                    e.Cancel = true;
+
+                    try
+                    {
+                        if (_backupManager != null)
+                            try
+                            {
+                                _backupManager.StopAsync().GetAwaiter().GetResult();
+                                _backupManager.Dispose();
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.LogError(ex, "Error during backup manager shutdown");
+                            }
+
+                        if (trayService is IDisposable disposableTray)
+                            try
+                            {
+                                disposableTray.Dispose();
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.LogError(ex, "Error disposing tray");
+                            }
+
+                        var disposableServices = _serviceProvider.GetServices<IDisposable>();
+                        foreach (var service in disposableServices)
+                            try
+                            {
+                                service.Dispose();
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.LogError(ex, "Error disposing service: {ServiceType}", service.GetType().Name);
+                            }
+
+                        if (_serviceProvider is IDisposable disposableProvider)
+                            try
+                            {
+                                disposableProvider.Dispose();
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.LogError(ex, "Error disposing service provider");
+                            }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogCritical(ex, "Critical error during shutdown");
+                    }
+
+                    logger.LogInformation("Cleanup complete. Exiting application.");
+                    Environment.Exit(0);
+                };
+            }
+            catch (Exception ex)
+            {
+                var logger = _serviceProvider?.GetService<ILogger<App>>();
+                logger?.LogCritical(ex, "Critical error during MainWindow initialization");
+                throw;
+            }
         }
 
         base.OnFrameworkInitializationCompleted();

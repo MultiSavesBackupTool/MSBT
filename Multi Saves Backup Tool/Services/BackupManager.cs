@@ -12,32 +12,31 @@ using Multi_Saves_Backup_Tool.Paths;
 
 namespace Multi_Saves_Backup_Tool.Services;
 
-public class BackupManager : IDisposable
+public class BackupManager(
+    ILogger<BackupManager> logger,
+    ISettingsService settingsService,
+    IGamesService gamesService,
+    IBackupService backupService)
+    : IDisposable
 {
     private static readonly string StateFilePath = AppPaths.ServiceStateFilePath;
 
-    private readonly IBackupService _backupService;
-    private readonly IGamesService _gamesService;
-    private readonly ILogger<BackupManager> _logger;
-    private readonly ISettingsService _settingsService;
+    private readonly IBackupService _backupService =
+        backupService ?? throw new ArgumentNullException(nameof(backupService));
+
+    private readonly IGamesService
+        _gamesService = gamesService ?? throw new ArgumentNullException(nameof(gamesService));
+
+    private readonly ILogger<BackupManager> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+    private readonly ISettingsService _settingsService =
+        settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+
     private Task? _backupTask;
     private CancellationTokenSource? _cancellationTokenSource;
     private bool _disposed;
 
-    public BackupManager(
-        ILogger<BackupManager> logger,
-        ISettingsService settingsService,
-        IGamesService gamesService,
-        IBackupService backupService)
-    {
-        _logger = logger;
-        _settingsService = settingsService;
-        _gamesService = gamesService;
-        _backupService = backupService;
-        State = ServiceState.LoadFromFile(StateFilePath);
-    }
-
-    public ServiceState State { get; }
+    public ServiceState State { get; } = ServiceState.LoadFromFile(StateFilePath);
 
     public void Dispose()
     {
@@ -71,10 +70,23 @@ public class BackupManager : IDisposable
 
     public async Task StartAsync()
     {
+        if (_disposed) throw new ObjectDisposedException(nameof(BackupManager));
+
         _logger.LogInformation("Backup manager is starting...");
         State.ServiceStatus = "Starting";
         SaveServiceState();
-        await _settingsService.ReloadSettingsAsync();
+
+        try
+        {
+            await _settingsService.ReloadSettingsAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to reload settings during startup");
+            State.ServiceStatus = "Error: Failed to load settings";
+            SaveServiceState();
+            throw;
+        }
 
         _cancellationTokenSource = new CancellationTokenSource();
         _backupTask = Task.Run(() => ExecuteAsync(_cancellationTokenSource.Token));

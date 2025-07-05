@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform;
+using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.ViewModels;
 using Properties;
 
@@ -18,6 +19,7 @@ namespace Multi_Saves_Backup_Tool.Services
     {
         private readonly BackupManager _backupManager;
         private readonly IGamesService _gamesService;
+        private readonly ILogger<TrayService>? _logger;
         private readonly MonitoringViewModel _monitoringViewModel;
         private NativeMenuItem? _backupMenuItem;
         private NativeMenuItem? _backupProtectedMenuItem;
@@ -28,11 +30,12 @@ namespace Multi_Saves_Backup_Tool.Services
         private TrayIcon? _trayIcon;
 
         public TrayService(MonitoringViewModel monitoringViewModel, IGamesService gamesService,
-            IBackupService backupService, BackupManager backupManager)
+            BackupManager backupManager, ILogger<TrayService> logger)
         {
-            _monitoringViewModel = monitoringViewModel;
-            _gamesService = gamesService;
-            _backupManager = backupManager;
+            _monitoringViewModel = monitoringViewModel ?? throw new ArgumentNullException(nameof(monitoringViewModel));
+            _gamesService = gamesService ?? throw new ArgumentNullException(nameof(gamesService));
+            _backupManager = backupManager ?? throw new ArgumentNullException(nameof(backupManager));
+            _logger = logger;
             _monitoringViewModel.PropertyChanged += MonitoringViewModelOnPropertyChanged;
         }
 
@@ -46,97 +49,151 @@ namespace Multi_Saves_Backup_Tool.Services
 
         public void Initialize()
         {
-            if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)
-                return;
-
-            _mainWindow = desktop.MainWindow;
-            if (_mainWindow == null) return;
-
-            var trayIcon = new TrayIcon
+            try
             {
-                Icon = new WindowIcon(
-                    AssetLoader.Open(new Uri("avares://Multi Saves Backup Tool/Assets/msbt.ico"))),
-                ToolTipText = "Multi Saves Backup Tool",
-                IsVisible = true
-            };
-
-            _currentGameMenuItem = new NativeMenuItem(Resources.CurrentGameNotRunning) { IsEnabled = false };
-            _backupMenuItem = new NativeMenuItem(Resources.CreateBackup);
-            _backupMenuItem.Click += (s, e) => CreateBackup(false);
-            _backupProtectedMenuItem = new NativeMenuItem(Resources.CreateProtectedBackup);
-            _backupProtectedMenuItem.Click += (s, e) => CreateBackup(true);
-
-            trayIcon.Menu = new NativeMenu
-            {
-                Items =
+                if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)
                 {
-                    _currentGameMenuItem,
-                    new NativeMenuItemSeparator(),
-                    _backupMenuItem,
-                    _backupProtectedMenuItem,
-                    new NativeMenuItemSeparator(),
-                    new NativeMenuItem(Resources.ShowHide)
-                    {
-                        Command = new RelayCommand(ToggleWindowVisibility)
-                    },
-                    new NativeMenuItemSeparator(),
-                    new NativeMenuItem(Resources.Settings)
-                    {
-                        Command = new RelayCommand(OpenSettings)
-                    },
-                    new NativeMenuItemSeparator(),
-                    new NativeMenuItem(Resources.Exit)
-                    {
-                        Command = new RelayCommand(ExitApplication)
-                    }
+                    _logger?.LogWarning("Application lifetime is not IClassicDesktopStyleApplicationLifetime");
+                    return;
                 }
-            };
 
-            trayIcon.Clicked += (_, _) => ToggleWindowVisibility();
+                _mainWindow = desktop.MainWindow;
+                if (_mainWindow == null)
+                {
+                    _logger?.LogWarning("Main window is null");
+                    return;
+                }
 
-            _trayIcon = trayIcon;
+                var trayIcon = new TrayIcon
+                {
+                    Icon = new WindowIcon(
+                        AssetLoader.Open(new Uri("avares://Multi Saves Backup Tool/Assets/msbt.ico"))),
+                    ToolTipText = "Multi Saves Backup Tool",
+                    IsVisible = true
+                };
 
-            _mainWindow.Closing += OnMainWindowClosing;
-            UpdateCurrentGameMenu();
+                _currentGameMenuItem = new NativeMenuItem(Resources.CurrentGameNotRunning) { IsEnabled = false };
+                _backupMenuItem = new NativeMenuItem(Resources.CreateBackup);
+                _backupMenuItem.Click += (_, _) => CreateBackup(false);
+                _backupProtectedMenuItem = new NativeMenuItem(Resources.CreateProtectedBackup);
+                _backupProtectedMenuItem.Click += (_, _) => CreateBackup(true);
+
+                trayIcon.Menu = new NativeMenu
+                {
+                    Items =
+                    {
+                        _currentGameMenuItem,
+                        new NativeMenuItemSeparator(),
+                        _backupMenuItem,
+                        _backupProtectedMenuItem,
+                        new NativeMenuItemSeparator(),
+                        new NativeMenuItem(Resources.ShowHide)
+                        {
+                            Command = new RelayCommand(ToggleWindowVisibility)
+                        },
+                        new NativeMenuItemSeparator(),
+                        new NativeMenuItem(Resources.Settings)
+                        {
+                            Command = new RelayCommand(OpenSettings)
+                        },
+                        new NativeMenuItemSeparator(),
+                        new NativeMenuItem(Resources.Exit)
+                        {
+                            Command = new RelayCommand(ExitApplication)
+                        }
+                    }
+                };
+
+                trayIcon.Clicked += (_, _) => ToggleWindowVisibility();
+
+                _trayIcon = trayIcon;
+
+                _mainWindow.Closing += OnMainWindowClosing;
+                UpdateCurrentGameMenu();
+
+                _logger?.LogInformation("Tray service initialized successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error initializing tray service");
+            }
         }
 
         public void UpdateTooltip(string tooltip)
         {
-            if (_trayIcon != null) _trayIcon.ToolTipText = tooltip;
+            try
+            {
+                if (_trayIcon != null && !string.IsNullOrWhiteSpace(tooltip)) _trayIcon.ToolTipText = tooltip;
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error updating tray tooltip");
+            }
         }
 
         private void MonitoringViewModelOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(MonitoringViewModel.CurrentGameName))
-                UpdateCurrentGameMenu();
+            try
+            {
+                if (e.PropertyName == nameof(MonitoringViewModel.CurrentGameName)) UpdateCurrentGameMenu();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error handling monitoring view model property change");
+            }
         }
 
         private void UpdateCurrentGameMenu()
         {
-            if (_currentGameMenuItem == null) return;
-            var gameName = _monitoringViewModel.CurrentGameName;
+            try
+            {
+                if (_currentGameMenuItem == null) return;
+                var gameName = _monitoringViewModel.CurrentGameName;
 
-            var notRunningText = Resources.CurrentGameNotRunning;
-            var runningFormatText = Resources.CurrentGameRunning;
+                var notRunningText = Resources.CurrentGameNotRunning;
+                var runningFormatText = Resources.CurrentGameRunning;
 
-            var headerText = string.IsNullOrEmpty(gameName)
-                ? notRunningText
-                : string.Format(runningFormatText, gameName);
+                var headerText = string.IsNullOrEmpty(gameName)
+                    ? notRunningText
+                    : string.Format(runningFormatText, gameName);
 
-            _currentGameMenuItem.Header = headerText;
-            _backupMenuItem!.IsEnabled = !string.IsNullOrEmpty(gameName);
-            _backupProtectedMenuItem!.IsEnabled = !string.IsNullOrEmpty(gameName);
+                _currentGameMenuItem.Header = headerText;
+                _backupMenuItem!.IsEnabled = !string.IsNullOrEmpty(gameName);
+                _backupProtectedMenuItem!.IsEnabled = !string.IsNullOrEmpty(gameName);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error updating current game menu");
+            }
         }
 
         private async void CreateBackup(bool isProtected)
         {
-            var gameName = _monitoringViewModel.CurrentGameName;
-            if (string.IsNullOrEmpty(gameName)) return;
+            try
+            {
+                var gameName = _monitoringViewModel.CurrentGameName;
+                if (string.IsNullOrEmpty(gameName))
+                {
+                    _logger?.LogWarning("Cannot create backup: no current game");
+                    return;
+                }
 
-            var game = await _gamesService.GetGameByNameAsync(gameName);
+                var game = await _gamesService.GetGameByNameAsync(gameName);
 
-            if (game == null) return;
-            await _backupManager.ProcessGameBackupAsync(game, isProtected);
+                if (game == null)
+                {
+                    _logger?.LogWarning("Game not found: {GameName}", gameName);
+                    return;
+                }
+
+                await _backupManager.ProcessGameBackupAsync(game, isProtected);
+                _logger?.LogInformation("Backup created for game {GameName}, protected: {IsProtected}", gameName,
+                    isProtected);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error creating backup");
+            }
         }
 
         private void OnMainWindowClosing(object? sender, WindowClosingEventArgs e)

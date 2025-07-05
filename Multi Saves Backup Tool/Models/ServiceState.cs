@@ -34,5 +34,5 @@ public class GameState
     public string Status { get; set; } = "Waiting";
     public DateTime? NextBackupScheduled { get; set; }
     public string LastError { get; set; } = "";
-    public bool IsRun { get; set; } = false;
+    public bool IsRun { get; set; }
 }

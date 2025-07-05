@@ -19,14 +19,15 @@ public partial class GamesView : UserControl
 
         viewModel.EditGameRequested += OnEditGameRequested;
 
-        foreach (var game in viewModel.Games)
-            viewModel.UpdateBackupCount(game);
+        if (viewModel.Games != null)
+            foreach (var game in viewModel.Games)
+                viewModel.UpdateBackupCount(game);
     }
 
     private void OnEditGameRequested(object? sender, GameModel game)
     {
         if (DataContext is not GamesViewModel viewModel) return;
-        if (TopLevel.GetTopLevel(this) is MainWindow mainWindow && mainWindow.AddGameOverlay != null)
+        if (TopLevel.GetTopLevel(this) is MainWindow { AddGameOverlay: not null } mainWindow)
         {
             var overlay = mainWindow.AddGameOverlay;
             overlay.ShowForEdit(viewModel, game);
@@ -36,7 +37,7 @@ public partial class GamesView : UserControl
     private void AddGameButton_Click(object sender, RoutedEventArgs e)
     {
         if (DataContext is not GamesViewModel viewModel) return;
-        if (TopLevel.GetTopLevel(this) is MainWindow mainWindow && mainWindow.AddGameOverlay != null)
+        if (TopLevel.GetTopLevel(this) is MainWindow { AddGameOverlay: not null } mainWindow)
         {
             var overlay = mainWindow.AddGameOverlay;
             overlay.ShowForAdd(viewModel);

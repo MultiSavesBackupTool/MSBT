@@ -40,7 +40,9 @@ namespace Properties
             }
         }
 
-        #region MainWindow strings
+        // ==========================================
+        // MAIN WINDOW STRINGS
+        // ==========================================
         public static string MainWindow_Title
         {
             get
@@ -80,9 +82,10 @@ namespace Properties
                 return ResourceManager.GetString("MainWindow_Settings", resourceCulture);
             }
         }
-        #endregion
 
-        #region MonitoringView strings
+        // ==========================================
+        // MONITORING VIEW STRINGS
+        // ==========================================
         public static string MonitoringView_ServiceStatus
         {
             get
@@ -130,9 +133,10 @@ namespace Properties
                 return ResourceManager.GetString("MonitoringView_NextBackup", resourceCulture);
             }
         }
-        #endregion
 
-        #region GamesView strings
+        // ==========================================
+        // GAMES VIEW STRINGS
+        // ==========================================
         public static string GamesView_AddGame
         {
             get
@@ -188,9 +192,26 @@ namespace Properties
                 return ResourceManager.GetString("GamesView_ScanInstalledGames", resourceCulture);
             }
         }
-        #endregion
 
-        #region AddGameOverlay strings
+        // ==========================================
+        // ADD GAME OVERLAY STRINGS
+        // ==========================================
+        public static string AddGameOverlay_AddGame
+        {
+            get
+            {
+                return ResourceManager.GetString("AddGameOverlay_AddGame", resourceCulture);
+            }
+        }
+
+        public static string AddGameOverlay_EditGame
+        {
+            get
+            {
+                return ResourceManager.GetString("AddGameOverlay_EditGame", resourceCulture);
+            }
+        }
+
         public static string AddGameOverlay_GameName
         {
             get
@@ -204,14 +225,6 @@ namespace Properties
             get
             {
                 return ResourceManager.GetString("AddGameOverlay_GameExe", resourceCulture);
-            }
-        }
-
-        public static string AddGameOverlay_Browse
-        {
-            get
-            {
-                return ResourceManager.GetString("AddGameOverlay_Browse", resourceCulture);
             }
         }
 
@@ -247,6 +260,55 @@ namespace Properties
             }
         }
 
+        public static string AddGameOverlay_Browse
+        {
+            get
+            {
+                return ResourceManager.GetString("AddGameOverlay_Browse", resourceCulture);
+            }
+        }
+
+        public static string AddGameOverlay_Add
+        {
+            get
+            {
+                return ResourceManager.GetString("AddGameOverlay_Add", resourceCulture);
+            }
+        }
+
+        public static string AddGameOverlay_Save
+        {
+            get
+            {
+                return ResourceManager.GetString("AddGameOverlay_Save", resourceCulture);
+            }
+        }
+
+        public static string AddGameOverlay_Cancel
+        {
+            get
+            {
+                return ResourceManager.GetString("AddGameOverlay_Cancel", resourceCulture);
+            }
+        }
+
+        public static string AddGameOverlay_GameNameExists
+        {
+            get
+            {
+                return ResourceManager.GetString("AddGameOverlay_GameNameExists", resourceCulture);
+            }
+        }
+
+        // Backup Settings
+        public static string AddGameOverlay_BackupSettings
+        {
+            get
+            {
+                return ResourceManager.GetString("AddGameOverlay_BackupSettings", resourceCulture);
+            }
+        }
+
         public static string AddGameOverlay_BackupInterval
         {
             get
@@ -260,14 +322,6 @@ namespace Properties
             get
             {
                 return ResourceManager.GetString("AddGameOverlay_BackupIntervalHint", resourceCulture);
-            }
-        }
-
-        public static string AddGameOverlay_BackupSettings
-        {
-            get
-            {
-                return ResourceManager.GetString("AddGameOverlay_BackupSettings", resourceCulture);
             }
         }
 
@@ -327,22 +381,6 @@ namespace Properties
             }
         }
 
-        public static string AddGameOverlay_Add
-        {
-            get
-            {
-                return ResourceManager.GetString("AddGameOverlay_Add", resourceCulture);
-            }
-        }
-
-        public static string AddGameOverlay_Cancel
-        {
-            get
-            {
-                return ResourceManager.GetString("AddGameOverlay_Cancel", resourceCulture);
-            }
-        }
-
         public static string AddGameOverlay_SpecialBackupMark
         {
             get
@@ -351,40 +389,9 @@ namespace Properties
             }
         }
 
-        public static string AddGameOverlay_EditGame
-        {
-            get
-            {
-                return ResourceManager.GetString("AddGameOverlay_EditGame", resourceCulture);
-            }
-        }
-
-        public static string AddGameOverlay_AddGame
-        {
-            get
-            {
-                return ResourceManager.GetString("AddGameOverlay_AddGame", resourceCulture);
-            }
-        }
-
-        public static string AddGameOverlay_GameNameExists
-        {
-            get
-            {
-                return ResourceManager.GetString("AddGameOverlay_GameNameExists", resourceCulture);
-            }
-        }
-
-        public static string AddGameOverlay_Save
-        {
-            get
-            {
-                return ResourceManager.GetString("AddGameOverlay_Save", resourceCulture);
-            }
-        }
-        #endregion
-
-        #region SettingsView strings
+        // ==========================================
+        // SETTINGS VIEW STRINGS
+        // ==========================================
         public static string SettingsView_BackupSettings
         {
             get
@@ -457,22 +464,6 @@ namespace Properties
             }
         }
 
-        public static string SettingsView_UpdateSettings
-        {
-            get
-            {
-                return ResourceManager.GetString("SettingsView_UpdateSettings", resourceCulture);
-            }
-        }
-
-        public static string SettingsView_CurrentVersion
-        {
-            get
-            {
-                return ResourceManager.GetString("SettingsView_CurrentVersion", resourceCulture);
-            }
-        }
-        
         public static string BrowseBackupFolderTitle
         {
             get
@@ -496,9 +487,45 @@ namespace Properties
                 return ResourceManager.GetString("ImportTitle", resourceCulture);
             }
         }
-        #endregion
 
-        #region Status strings
+        // ==========================================
+        // STATS VIEW STRINGS
+        // ==========================================
+        public static string StatsView_SizesArchives
+        {
+            get
+            {
+                return ResourceManager.GetString("StatsView_SizesArchives", resourceCulture);
+            }
+        }
+
+        public static string StatsView_ArchivesCounts
+        {
+            get
+            {
+                return ResourceManager.GetString("StatsView_ArchivesCounts", resourceCulture);
+            }
+        }
+
+        public static string StatsView_GamesCountArchives
+        {
+            get
+            {
+                return ResourceManager.GetString("StatsView_GamesCountArchives", resourceCulture);
+            }
+        }
+
+        public static string StatsView_GamesSizesArchives
+        {
+            get
+            {
+                return ResourceManager.GetString("StatsView_GamesSizesArchives", resourceCulture);
+            }
+        }
+
+        // ==========================================
+        // STATUS STRINGS
+        // ==========================================
         public static string StatusSuccess
         {
             get
@@ -563,62 +590,6 @@ namespace Properties
             }
         }
 
-        public static string StatusServiceNotRunning
-        {
-            get
-            {
-                return ResourceManager.GetString("StatusServiceNotRunning", resourceCulture);
-            }
-        }
-
-        public static string StatusServiceRunning
-        {
-            get
-            {
-                return ResourceManager.GetString("StatusServiceRunning", resourceCulture);
-            }
-        }
-
-        public static string StatusServiceWaiting
-        {
-            get
-            {
-                return ResourceManager.GetString("StatusServiceWaiting", resourceCulture);
-            }
-        }
-
-        public static string StatusServiceStopped
-        {
-            get
-            {
-                return ResourceManager.GetString("StatusServiceStopped", resourceCulture);
-            }
-        }
-
-        public static string StatusServiceSuccess
-        {
-            get
-            {
-                return ResourceManager.GetString("StatusServiceSuccess", resourceCulture);
-            }
-        }
-
-        public static string StatusServiceBackingUp
-        {
-            get
-            {
-                return ResourceManager.GetString("StatusServiceBackingUp", resourceCulture);
-            }
-        }
-
-        public static string StatusServiceCleaning
-        {
-            get
-            {
-                return ResourceManager.GetString("StatusServiceCleaning", resourceCulture);
-            }
-        }
-
         public static string StatusError
         {
             get
@@ -666,9 +637,10 @@ namespace Properties
                 return ResourceManager.GetString("NotScheduled", resourceCulture);
             }
         }
-        #endregion
 
-        #region Error messages
+        // ==========================================
+        // ERROR MESSAGES
+        // ==========================================
         public static string ErrorGameNameRequired
         {
             get
@@ -693,58 +665,9 @@ namespace Properties
             }
         }
 
-        public static string ErrorLoadingSettings
-        {
-            get
-            {
-                return ResourceManager.GetString("ErrorLoadingSettings", resourceCulture);
-            }
-        }
-
-        public static string ErrorSavingSettings
-        {
-            get
-            {
-                return ResourceManager.GetString("ErrorSavingSettings", resourceCulture);
-            }
-        }
-        #endregion
-
-        #region Dialog strings
-        public static string DialogSelectGameExe
-        {
-            get
-            {
-                return ResourceManager.GetString("DialogSelectGameExe", resourceCulture);
-            }
-        }
-
-        public static string DialogExecutableFiles
-        {
-            get
-            {
-                return ResourceManager.GetString("DialogExecutableFiles", resourceCulture);
-            }
-        }
-
-        public static string DialogSelectFolder
-        {
-            get
-            {
-                return ResourceManager.GetString("DialogSelectFolder", resourceCulture);
-            }
-        }
-
-        public static string DialogSelectBackupFolder
-        {
-            get
-            {
-                return ResourceManager.GetString("DialogSelectBackupFolder", resourceCulture);
-            }
-        }
-        #endregion
-
-        #region Compression level strings
+        // ==========================================
+        // COMPRESSION LEVEL STRINGS
+        // ==========================================
         public static string CompressionLevel_Fast
         {
             get
@@ -768,9 +691,10 @@ namespace Properties
                 return ResourceManager.GetString("CompressionLevel_SmallestSize", resourceCulture);
             }
         }
-        #endregion
-        
-        #region Delete Confirmation
+
+        // ==========================================
+        // DIALOG STRINGS
+        // ==========================================
         public static string DeleteConfirmation_Title
         {
             get
@@ -794,7 +718,7 @@ namespace Properties
                 return ResourceManager.GetString("DeleteConfirmation_Delete", resourceCulture);
             }
         }
-        
+
         public static string DeleteConfirmation_Cancel
         {
             get
@@ -802,9 +726,10 @@ namespace Properties
                 return ResourceManager.GetString("DeleteConfirmation_Cancel", resourceCulture);
             }
         }
-        #endregion
-        
-        #region Update
+
+        // ==========================================
+        // UPDATE STRINGS
+        // ==========================================
         public static string UpdateWarningTitle
         {
             get
@@ -820,47 +745,23 @@ namespace Properties
                 return ResourceManager.GetString("UpdateWarningContent", resourceCulture);
             }
         }
-        #endregion
-        
-        #region StatsView
-        public static string StatsView_SizesArchives
-        {
-            get
-            {
-                return ResourceManager.GetString("StatsView_SizesArchives", resourceCulture);
-            }
-        }
 
-        public static string StatsView_ArchivesCounts
-        {
-            get
-            {
-                return ResourceManager.GetString("StatsView_ArchivesCounts", resourceCulture);
-            }
-        }
-        public static string StatsView_GamesCountArchives
-        {
-            get
-            {
-                return ResourceManager.GetString("StatsView_GamesCountArchives", resourceCulture);
-            }
-        }
-
-        public static string StatsView_GamesSizesArchives
-        {
-            get
-            {
-                return ResourceManager.GetString("StatsView_GamesSizesArchives", resourceCulture);
-            }
-        }
-        #endregion
-
-        #region New strings
+        // ==========================================
+        // TRAY MENU STRINGS
+        // ==========================================
         public static string CurrentGameNotRunning
         {
             get
             {
                 return ResourceManager.GetString("CurrentGameNotRunning", resourceCulture);
+            }
+        }
+
+        public static string CurrentGameRunning
+        {
+            get
+            {
+                return ResourceManager.GetString("CurrentGameRunning", resourceCulture);
             }
         }
 
@@ -904,38 +805,9 @@ namespace Properties
             }
         }
 
-        public static string CurrentGameRunning
-        {
-            get
-            {
-                return ResourceManager.GetString("CurrentGameRunning", resourceCulture);
-            }
-        }
-
-        public static string BackupCreated
-        {
-            get
-            {
-                return ResourceManager.GetString("BackupCreated", resourceCulture);
-            }
-        }
-
-        public static string ProtectedBackupCreated
-        {
-            get
-            {
-                return ResourceManager.GetString("ProtectedBackupCreated", resourceCulture);
-            }
-        }
-
-        public static string RegularBackupCreated
-        {
-            get
-            {
-                return ResourceManager.GetString("RegularBackupCreated", resourceCulture);
-            }
-        }
-
+        // ==========================================
+        // PC GAMING WIKI STRINGS
+        // ==========================================
         public static string PCGamingWikiSaveParser_PageNotFound
         {
             get
@@ -959,6 +831,5 @@ namespace Properties
                 return ResourceManager.GetString("PCGamingWikiSaveParser_Error", resourceCulture);
             }
         }
-        #endregion
     }
 } 

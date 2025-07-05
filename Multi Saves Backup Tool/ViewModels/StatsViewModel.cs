@@ -160,7 +160,7 @@ public class StatsViewModel : ViewModelBase, IDisposable
 
     private string FormatSize(long bytes)
     {
-        string[] sizes = { "B", "KB", "MB", "GB" };
+        string[] sizes = ["B", "KB", "MB", "GB"];
         var order = 0;
         double size = bytes;
 
