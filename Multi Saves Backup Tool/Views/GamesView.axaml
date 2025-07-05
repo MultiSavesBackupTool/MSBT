@@ -45,7 +45,7 @@
                             <Grid ColumnDefinitions="Auto,*,Auto">
                                 <CheckBox IsChecked="{Binding IsEnabled}"
                                           VerticalAlignment="Center"
-                                          IsEnabled="{Binding DataContext.IsNotLoading, ElementName=RootControl}" />
+                                          IsEnabled="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).IsNotLoading}" />
                                 <StackPanel Grid.Column="1" Margin="10,0">
                                     <TextBlock Text="{Binding GameName}"
                                                FontWeight="Bold" />
@@ -61,25 +61,25 @@
                                         Text="{Binding BackupCount, StringFormat={x:Static properties:Resources.GamesView_BackupCount}}"
                                         VerticalAlignment="Center" />
                                     <Button Content="{x:Static properties:Resources.GamesView_OpenGameFolder}"
-                                            Command="{Binding DataContext.OpenSaveCommand, ElementName=RootControl}"
+                                            Command="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).OpenSaveCommand}"
                                             CommandParameter="{Binding}"
                                             Padding="8,4"
-                                            IsEnabled="{Binding DataContext.IsNotLoading, ElementName=RootControl}" />
+                                            IsEnabled="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).IsNotLoading}" />
                                     <Button Content="{x:Static properties:Resources.GamesView_RestoreBackup}"
-                                            Command="{Binding DataContext.RestoreBackupCommand, ElementName=RootControl}"
+                                            Command="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).RestoreBackupCommand}"
                                             CommandParameter="{Binding}"
                                             Padding="8,4"
-                                            IsEnabled="{Binding DataContext.IsNotLoading, ElementName=RootControl}" />
+                                            IsEnabled="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).IsNotLoading}" />
                                     <Button Content="{x:Static properties:Resources.GamesView_EditGame}"
-                                            Command="{Binding DataContext.EditGameCommand, ElementName=RootControl}"
+                                            Command="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).EditGameCommand}"
                                             CommandParameter="{Binding}"
                                             Padding="8,4"
-                                            IsEnabled="{Binding DataContext.IsNotLoading, ElementName=RootControl}" />
+                                            IsEnabled="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).IsNotLoading}" />
                                     <Button Content="{x:Static properties:Resources.GamesView_Delete}"
-                                            Command="{Binding DataContext.DeleteGameCommand, ElementName=RootControl}"
+                                            Command="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).DeleteGameCommand}"
                                             CommandParameter="{Binding}"
                                             Padding="8,4"
-                                            IsEnabled="{Binding DataContext.IsNotLoading, ElementName=RootControl}" />
+                                            IsEnabled="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).IsNotLoading}" />
                                 </StackPanel>
                             </Grid>
                         </Border>

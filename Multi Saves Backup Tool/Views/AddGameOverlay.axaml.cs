@@ -17,7 +17,7 @@ public partial class AddGameOverlay : UserControl
                                                  ?? throw new InvalidOperationException(
                                                      "DataContext is not AddGameOverlayViewModel");
 
-    public void Initialize(GamesViewModel gamesViewModel)
+    private void Initialize(GamesViewModel gamesViewModel)
     {
         var viewModel = new AddGameOverlayViewModel(gamesViewModel);
         viewModel.CloseRequested += (_, _) => IsVisible = false;

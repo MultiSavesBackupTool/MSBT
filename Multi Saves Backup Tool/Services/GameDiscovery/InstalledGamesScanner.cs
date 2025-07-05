@@ -41,7 +41,7 @@ public class InstalledGamesScanner
     }
 
     [SupportedOSPlatform("windows")]
-    public async Task<IEnumerable<GameModel>> ScanSteamGamesAsync(CancellationToken cancellationToken = default)
+    private async Task<IEnumerable<GameModel>> ScanSteamGamesAsync(CancellationToken cancellationToken = default)
     {
         var games = new List<GameModel>();
         try
@@ -77,7 +77,7 @@ public class InstalledGamesScanner
         return games;
     }
 
-    public async Task<IEnumerable<GameModel>> ScanEpicGamesAsync(CancellationToken cancellationToken = default)
+    private async Task<IEnumerable<GameModel>> ScanEpicGamesAsync(CancellationToken cancellationToken = default)
     {
         var games = new List<GameModel>();
         try
@@ -105,7 +105,7 @@ public class InstalledGamesScanner
     }
 
     [SupportedOSPlatform("windows")]
-    public async Task<IEnumerable<GameModel>> ScanFromRegistryAsync(CancellationToken cancellationToken = default)
+    private async Task<IEnumerable<GameModel>> ScanFromRegistryAsync(CancellationToken cancellationToken = default)
     {
         return await Task.Run(() =>
         {

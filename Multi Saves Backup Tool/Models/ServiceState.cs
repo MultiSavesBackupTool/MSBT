@@ -19,17 +19,29 @@ public class ServiceState
 
     public static ServiceState LoadFromFile(string path)
     {
-        if (!File.Exists(path))
-            return new ServiceState();
+        try
+        {
+            if (!File.Exists(path))
+                return new ServiceState();
 
-        var json = File.ReadAllText(path);
-        return JsonSerializer.Deserialize<ServiceState>(json) ?? new ServiceState();
+            var json = File.ReadAllText(path);
+            var state = JsonSerializer.Deserialize<ServiceState>(json);
+
+            if (state == null)
+                return new ServiceState();
+
+            return state;
+        }
+        catch (Exception)
+        {
+            return new ServiceState();
+        }
     }
 }
 
 public class GameState
 {
-    public string GameName { get; set; } = "";
+    public string? GameName { get; set; } = "";
     public DateTime? LastBackupTime { get; set; }
     public string Status { get; set; } = "Waiting";
     public DateTime? NextBackupScheduled { get; set; }

@@ -8,26 +8,26 @@ namespace Multi_Saves_Backup_Tool.ViewModels;
 
 public abstract class ViewModelBase(ILogger? logger = null) : ObservableObject
 {
-    protected readonly ILogger? Logger = logger;
+    private readonly ILogger? _logger = logger;
 
-    protected virtual void LogError(Exception ex, string message, params object[] args)
+    protected virtual void LogError(Exception ex, string message, params object?[] args)
     {
-        Logger?.LogError(ex, message, args);
+        _logger?.LogError(ex, message, args);
     }
 
     protected virtual void LogWarning(string message, params object[] args)
     {
-        Logger?.LogWarning(message, args);
+        _logger?.LogWarning(message, args);
     }
 
-    protected virtual void LogInformation(string message, params object[] args)
+    protected virtual void LogInformation(string message, params object?[] args)
     {
-        Logger?.LogInformation(message, args);
+        _logger?.LogInformation(message, args);
     }
 
     protected virtual void LogDebug(string message, params object[] args)
     {
-        Logger?.LogDebug(message, args);
+        _logger?.LogDebug(message, args);
     }
 
     protected new virtual bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)

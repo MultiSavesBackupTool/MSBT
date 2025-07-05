@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -53,10 +54,10 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         }
     }
 
-    public MonitoringViewModel MonitoringViewModel { get; }
-    public GamesViewModel GamesViewModel { get; }
-    public StatsViewModel StatsViewModel { get; }
-    public SettingsViewModel SettingsViewModel { get; }
+    private MonitoringViewModel MonitoringViewModel { get; }
+    private GamesViewModel GamesViewModel { get; }
+    private StatsViewModel StatsViewModel { get; }
+    private SettingsViewModel SettingsViewModel { get; }
 
     public void Dispose()
     {
@@ -97,6 +98,16 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
                 IsUpdateAvailable = false;
                 _logger.LogDebug("No updates available.");
             }
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogWarning(ex, "Network error while checking for updates - this is normal if offline");
+            IsUpdateAvailable = false;
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogWarning(ex, "Update check timed out");
+            IsUpdateAvailable = false;
         }
         catch (Exception ex)
         {

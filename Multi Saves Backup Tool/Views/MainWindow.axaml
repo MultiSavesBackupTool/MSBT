@@ -57,7 +57,7 @@
                         </DataTemplate>
 
                         <DataTemplate DataType="{x:Type vm:GamesViewModel}">
-                            <views:GamesView x:Name="GamesView" />
+                            <views:GamesView DataContext="{Binding}" />
                         </DataTemplate>
 
                         <DataTemplate DataType="{x:Type vm:SettingsViewModel}">

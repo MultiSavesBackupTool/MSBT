@@ -7,7 +7,7 @@ using Serilog;
 
 namespace Multi_Saves_Backup_Tool;
 
-internal sealed class Program
+internal static class Program
 {
     private static Mutex? _mutex;
 
@@ -51,7 +51,7 @@ internal sealed class Program
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
-    public static AppBuilder BuildAvaloniaApp()
+    private static AppBuilder BuildAvaloniaApp()
     {
         return AppBuilder.Configure<App>()
             .UsePlatformDetect()

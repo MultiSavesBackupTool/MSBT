@@ -23,7 +23,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
     [ObservableProperty] private string _gameExe = string.Empty;
     [ObservableProperty] private string _gameExeAlt = string.Empty;
     [ObservableProperty] private string _gameExeError = string.Empty;
-    [ObservableProperty] private string _gameName = string.Empty;
+    [ObservableProperty] private string? _gameName = string.Empty;
     [ObservableProperty] private string _gameNameError = string.Empty;
     [ObservableProperty] private bool _includeTimestamp = true;
     [ObservableProperty] private bool _isEditMode;
@@ -141,7 +141,8 @@ public partial class AddGameOverlayViewModel : ViewModelBase
 
         if (!IsEditMode || (_editingGame != null && _editingGame.GameName != GameName))
             if (_gamesViewModel.Games != null &&
-                _gamesViewModel.Games.Any(g => g.GameName.Equals(GameName, StringComparison.OrdinalIgnoreCase)))
+                _gamesViewModel.Games.Any(g =>
+                    g.GameName != null && g.GameName.Equals(GameName, StringComparison.OrdinalIgnoreCase)))
             {
                 ErrorMessage = Resources.AddGameOverlay_GameNameExists;
                 return false;
@@ -229,7 +230,7 @@ public partial class AddGameOverlayViewModel : ViewModelBase
         return string.Empty;
     }
 
-    public void ClearForm()
+    private void ClearForm()
     {
         GameName = string.Empty;
         GameExe = string.Empty;

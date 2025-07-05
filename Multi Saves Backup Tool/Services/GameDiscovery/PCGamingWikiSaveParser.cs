@@ -12,17 +12,17 @@ using Properties;
 
 namespace Multi_Saves_Backup_Tool.Services.GameDiscovery;
 
-public class PcGamingWikiSaveParser
+public static class PcGamingWikiSaveParser
 {
     private const string WikiApiUrl = "https://www.pcgamingwiki.com/w/api.php";
     private static readonly HttpClient HttpClient = new();
 
     [SupportedOSPlatform("windows")]
-    public static async Task<SavePathResult> GetWindowsSavePathsAsync(GameModel game)
+    public static async Task<SavePathResult> GetWindowsSavePathsAsync(GameModel? game)
     {
         try
         {
-            var wikitext = await GetWikitextAsync(game.GameName);
+            var wikitext = await GetWikitextAsync(game?.GameName);
             if (string.IsNullOrEmpty(wikitext))
                 return new SavePathResult { ErrorMessage = Resources.PCGamingWikiSaveParser_PageNotFound };
 
@@ -39,7 +39,7 @@ public class PcGamingWikiSaveParser
         }
     }
 
-    private static async Task<string> GetWikitextAsync(string gameName)
+    private static async Task<string> GetWikitextAsync(string? gameName)
     {
         var encodedGameName = HttpUtility.UrlEncode(gameName);
         var url =
@@ -67,7 +67,7 @@ public class PcGamingWikiSaveParser
     }
 
     [SupportedOSPlatform("windows")]
-    private static List<string> ParseWindowsSavePaths(string wikitext, GameModel game)
+    private static List<string> ParseWindowsSavePaths(string wikitext, GameModel? game)
     {
         var result = new List<string>();
         var saveDataMatch = Regex.Match(wikitext, @"===Save game data location===.*?(?=\n===|\n==|\z)",
@@ -91,7 +91,7 @@ public class PcGamingWikiSaveParser
     }
 
     [SupportedOSPlatform("windows")]
-    private static string ProcessWikiVariables(string path, GameModel game)
+    private static string ProcessWikiVariables(string path, GameModel? game)
     {
         var variables = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
         {
@@ -100,7 +100,7 @@ public class PcGamingWikiSaveParser
             { "userprofile", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) },
             { "programdata", Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) },
             { "documents", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) },
-            { "game", Path.GetDirectoryName(game.GameExe.Trim()) },
+            { "game", Path.GetDirectoryName(game?.GameExe.Trim()) },
             { "steam", InstalledGamesScanner.GetSteamInstallPath() },
             {
                 "steamuserdata",

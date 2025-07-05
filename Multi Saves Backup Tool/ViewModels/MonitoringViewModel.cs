@@ -11,7 +11,7 @@ namespace Multi_Saves_Backup_Tool.ViewModels;
 
 public class GameMonitoringInfo
 {
-    public string GameName { get; set; } = "";
+    public string? GameName { get; set; } = "";
     public string LastBackupTime { get; set; } = Resources.NoData;
     public string Status { get; set; } = Resources.StatusWaiting;
     public string NextBackupScheduled { get; set; } = Resources.NotScheduled;

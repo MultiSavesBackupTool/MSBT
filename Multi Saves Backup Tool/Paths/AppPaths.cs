@@ -8,7 +8,7 @@ public static class AppPaths
     private static string? _configPath;
     private static string? _dataPath;
 
-    public static string ConfigPath
+    private static string ConfigPath
     {
         get
         {

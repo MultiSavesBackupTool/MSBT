@@ -17,9 +17,11 @@ public static class FolderOpener
                 return;
             }
 
-            if (!Directory.Exists(path))
+            var normalizedPath = Path.GetFullPath(path);
+
+            if (!Directory.Exists(normalizedPath))
             {
-                Debug.WriteLine($"Folder not found: {path}");
+                Debug.WriteLine($"Folder not found: {normalizedPath}");
                 return;
             }
 
@@ -27,21 +29,21 @@ public static class FolderOpener
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = "explorer",
-                    Arguments = $"\"{path}\"",
+                    Arguments = $"\"{normalizedPath}\"",
                     UseShellExecute = true
                 });
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = "xdg-open",
-                    Arguments = $"\"{path}\"",
+                    Arguments = $"\"{normalizedPath}\"",
                     UseShellExecute = true
                 });
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = "open",
-                    Arguments = $"\"{path}\"",
+                    Arguments = $"\"{normalizedPath}\"",
                     UseShellExecute = true
                 });
             else

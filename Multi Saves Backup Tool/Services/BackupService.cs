@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -30,7 +31,7 @@ public class BackupService(ISettingsService settingsService, ILogger<BackupServi
         GC.SuppressFinalize(this);
     }
 
-    public async Task CreateBackupAsync(GameModel game, bool isPermanent)
+    public async Task CreateBackupAsync(GameModel? game, bool isPermanent)
     {
         ThrowIfDisposed();
 
@@ -38,6 +39,8 @@ public class BackupService(ISettingsService settingsService, ILogger<BackupServi
             throw new ArgumentNullException(nameof(game));
 
         ZipArchive? archive = null;
+        List<FileStream> streams = new();
+
         try
         {
             var settings = _settingsService.CurrentSettings.BackupSettings;
@@ -61,7 +64,7 @@ public class BackupService(ISettingsService settingsService, ILogger<BackupServi
 
                 if (Directory.Exists(game.SavePath))
                 {
-                    await AddToArchiveAsync(archive, game.SavePath, "saves", _cancellationTokenSource.Token);
+                    await AddToArchiveAsync(archive, game.SavePath, "saves", _cancellationTokenSource.Token, streams);
                     backupSuccess = true;
                 }
                 else
@@ -70,10 +73,11 @@ public class BackupService(ISettingsService settingsService, ILogger<BackupServi
                 }
 
                 if (!string.IsNullOrEmpty(game.ModPath) && Directory.Exists(game.ModPath))
-                    await AddToArchiveAsync(archive, game.ModPath, "mods", _cancellationTokenSource.Token);
+                    await AddToArchiveAsync(archive, game.ModPath, "mods", _cancellationTokenSource.Token, streams);
 
                 if (!string.IsNullOrEmpty(game.AddPath) && Directory.Exists(game.AddPath))
-                    await AddToArchiveAsync(archive, game.AddPath, "additional", _cancellationTokenSource.Token);
+                    await AddToArchiveAsync(archive, game.AddPath, "additional", _cancellationTokenSource.Token,
+                        streams);
 
                 if (!backupSuccess)
                 {
@@ -105,7 +109,25 @@ public class BackupService(ISettingsService settingsService, ILogger<BackupServi
             }
             finally
             {
-                archive?.Dispose();
+                if (archive != null)
+                    try
+                    {
+                        archive.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error disposing archive");
+                    }
+
+                foreach (var stream in streams)
+                    try
+                    {
+                        stream.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error disposing file stream");
+                    }
             }
         }
         catch (OperationCanceledException)
@@ -115,6 +137,7 @@ public class BackupService(ISettingsService settingsService, ILogger<BackupServi
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating backup for {GameName}", game.GameName);
+            throw;
         }
     }
 
@@ -211,7 +234,7 @@ public class BackupService(ISettingsService settingsService, ILogger<BackupServi
         }
     }
 
-    public void CleanupOldBackups(GameModel game)
+    public void CleanupOldBackups(GameModel? game)
     {
         if (game == null)
             throw new ArgumentNullException(nameof(game));
@@ -267,7 +290,7 @@ public class BackupService(ISettingsService settingsService, ILogger<BackupServi
         }
     }
 
-    public async Task ProcessSpecialBackup(GameModel game)
+    public async Task ProcessSpecialBackup(GameModel? game)
     {
         if (game == null)
             throw new ArgumentNullException(nameof(game));
@@ -366,34 +389,69 @@ public class BackupService(ISettingsService settingsService, ILogger<BackupServi
         }
     }
 
-    public bool VerifyBackupPaths(GameModel game)
+    public bool VerifyBackupPaths(GameModel? game)
     {
         if (game == null)
             throw new ArgumentNullException(nameof(game));
 
         var hasValidPath = false;
 
-        if (!Directory.Exists(game.SavePath))
-            _logger.LogWarning("Save path not found for game {GameName}: {Path}",
-                game.GameName, game.SavePath);
-        else
-            hasValidPath = true;
+        if (!string.IsNullOrWhiteSpace(game.SavePath))
+            try
+            {
+                var fullPath = Path.GetFullPath(game.SavePath);
+                if (Directory.Exists(fullPath))
+                    hasValidPath = true;
+                else
+                    _logger.LogWarning("Save path not found for game {GameName}: {Path}",
+                        game.GameName, fullPath);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Invalid save path for game {GameName}: {Path}",
+                    game.GameName, game.SavePath);
+            }
 
-        if (!string.IsNullOrEmpty(game.ModPath) && !Directory.Exists(game.ModPath))
-            _logger.LogWarning("Mod path not found for game {GameName}: {Path}",
-                game.GameName, game.ModPath);
-        else if (!string.IsNullOrEmpty(game.ModPath)) hasValidPath = true;
+        if (!string.IsNullOrWhiteSpace(game.ModPath))
+            try
+            {
+                var fullPath = Path.GetFullPath(game.ModPath);
+                if (Directory.Exists(fullPath))
+                    hasValidPath = true;
+                else
+                    _logger.LogWarning("Mod path not found for game {GameName}: {Path}",
+                        game.GameName, fullPath);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Invalid mod path for game {GameName}: {Path}",
+                    game.GameName, game.ModPath);
+            }
 
-        if (!string.IsNullOrEmpty(game.AddPath) && !Directory.Exists(game.AddPath))
-            _logger.LogWarning("Additional path not found for game {GameName}: {Path}",
-                game.GameName, game.AddPath);
-        else if (!string.IsNullOrEmpty(game.AddPath)) hasValidPath = true;
+        if (!string.IsNullOrEmpty(game.AddPath))
+            try
+            {
+                var fullPath = Path.GetFullPath(game.AddPath);
+                if (Directory.Exists(fullPath))
+                    hasValidPath = true;
+                else
+                    _logger.LogWarning("Additional path not found for game {GameName}: {Path}",
+                        game.GameName, fullPath);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Invalid additional path for game {GameName}: {Path}",
+                    game.GameName, game.AddPath);
+            }
 
         return hasValidPath;
     }
 
-    public int GetBackupCount(GameModel game)
+    public int GetBackupCount(GameModel? game)
     {
+        if (game == null)
+            throw new ArgumentNullException(nameof(game));
+
         try
         {
             var safeName = GetSafeDirectoryName(game.GameName);
@@ -434,42 +492,40 @@ public class BackupService(ISettingsService settingsService, ILogger<BackupServi
         if (_disposed) throw new ObjectDisposedException(nameof(BackupService));
     }
 
-    private Task AddToArchiveAsync(ZipArchive archive, string? sourcePath, string entryPrefix,
-        CancellationToken cancellationToken)
+    private async Task AddToArchiveAsync(ZipArchive archive, string? sourcePath, string entryPrefix,
+        CancellationToken cancellationToken, List<FileStream> streams)
     {
-        if (sourcePath != null)
-            foreach (var file in Directory.GetFiles(sourcePath, "*", SearchOption.AllDirectories))
+        if (sourcePath == null) return;
+
+        foreach (var file in Directory.GetFiles(sourcePath, "*", SearchOption.AllDirectories))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var relativePath = Path.GetRelativePath(sourcePath, file);
+            var entryPath = Path.Combine(entryPrefix, relativePath).Replace('\\', '/');
+
+            try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                var relativePath = Path.GetRelativePath(sourcePath, file);
-                var entryPath = Path.Combine(entryPrefix, relativePath).Replace('\\', '/');
-
-                var added = false;
-                try
-                {
-                    var fileStream = new FileStream(file, FileMode.Open, FileAccess.Read,
-                        FileShare.Read | FileShare.Write);
-                    archive.AddEntry(entryPath, fileStream);
-                    added = true;
-                }
-                catch (IOException ioEx)
-                {
-                    _logger.LogWarning(ioEx, "File in use, skipping: {File}", file);
-                }
-                catch (UnauthorizedAccessException uaEx)
-                {
-                    _logger.LogWarning(uaEx, "Access denied, skipping: {File}", file);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error adding file to archive: {File}", file);
-                }
-
-                if (!added) _logger.LogWarning("File could not be backed up: {File}", file);
+                var fileStream = new FileStream(file, FileMode.Open, FileAccess.Read,
+                    FileShare.Read | FileShare.Write);
+                streams.Add(fileStream);
+                archive.AddEntry(entryPath, fileStream);
             }
+            catch (IOException ioEx)
+            {
+                _logger.LogWarning(ioEx, "File in use, skipping: {File}", file);
+            }
+            catch (UnauthorizedAccessException uaEx)
+            {
+                _logger.LogWarning(uaEx, "Access denied, skipping: {File}", file);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error adding file to archive: {File}", file);
+            }
+        }
 
-        return Task.CompletedTask;
+        await Task.CompletedTask;
     }
 
     private string? ExtractDateFromDirectoryName(string directoryName)
@@ -540,8 +596,11 @@ public class BackupService(ISettingsService settingsService, ILogger<BackupServi
         }
     }
 
-    private string GetSafeDirectoryName(string name)
+    private string GetSafeDirectoryName(string? name)
     {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Name cannot be null or empty", nameof(name));
+
         var invalid = Path.GetInvalidFileNameChars().Concat(Path.GetInvalidPathChars()).ToArray();
         return string.Join("_", name.Split(invalid));
     }

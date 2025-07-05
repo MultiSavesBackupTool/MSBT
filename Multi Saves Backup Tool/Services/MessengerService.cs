@@ -121,7 +121,7 @@ public class MessengerService
         }
     }
 
-    public int GetSubscriptionCount<T>() where T : class
+    private int GetSubscriptionCount<T>() where T : class
     {
         var messageType = typeof(T);
         if (_subscribers.TryGetValue(messageType, out var handlers))

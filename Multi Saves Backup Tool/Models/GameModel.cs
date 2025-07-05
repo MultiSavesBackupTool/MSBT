@@ -14,14 +14,14 @@ public class GameModel : INotifyPropertyChanged
     private int _daysForKeep;
     private string _gameExe = string.Empty;
     private string? _gameExeAlt;
-    private string _gameName = string.Empty;
+    private string? _gameName = string.Empty;
     private bool _isEnabled = true;
     private string? _modPath;
     private string? _savePath = string.Empty;
     private int _setOldFilesStatus;
     private bool _specialBackupMark;
 
-    public string GameName
+    public string? GameName
     {
         get => _gameName;
         set
@@ -47,7 +47,11 @@ public class GameModel : INotifyPropertyChanged
     public string? SavePath
     {
         get => _savePath;
-        set => SetField(ref _savePath, value);
+        set
+        {
+            if (!string.IsNullOrWhiteSpace(value) && !Path.IsPathRooted(value)) value = Path.GetFullPath(value);
+            SetField(ref _savePath, value);
+        }
     }
 
     public string? ModPath
@@ -90,8 +94,10 @@ public class GameModel : INotifyPropertyChanged
         get => _backupInterval;
         set
         {
-            if (value <= 0)
-                throw new ArgumentException("Backup interval must be greater than 0", nameof(value));
+            if (value < 1)
+                throw new ArgumentException("Backup interval must be at least 1 minute", nameof(value));
+            if (value > 1440)
+                throw new ArgumentException("Backup interval cannot exceed 24 hours (1440 minutes)", nameof(value));
             SetField(ref _backupInterval, value);
         }
     }
@@ -120,15 +126,14 @@ public class GameModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    private void SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        if (EqualityComparer<T>.Default.Equals(field, value)) return;
         field = value;
         OnPropertyChanged(propertyName);
-        return true;
     }
 
-    public bool IsValid()
+    private bool IsValid()
     {
         return !string.IsNullOrWhiteSpace(_gameName) && !string.IsNullOrWhiteSpace(_gameExe);
     }
@@ -176,12 +181,13 @@ public class GameModel : INotifyPropertyChanged
     public override bool Equals(object? obj)
     {
         if (obj is not GameModel other) return false;
-        return GameName.Equals(other.GameName, StringComparison.OrdinalIgnoreCase) &&
+        return GameName != null &&
+               GameName.Equals(other.GameName, StringComparison.OrdinalIgnoreCase) &&
                GameExe.Equals(other.GameExe, StringComparison.OrdinalIgnoreCase);
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(GameName.ToLowerInvariant(), GameExe.ToLowerInvariant());
+        return HashCode.Combine(GameName?.ToLowerInvariant(), GameExe.ToLowerInvariant());
     }
 }

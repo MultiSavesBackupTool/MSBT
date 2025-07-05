@@ -68,26 +68,27 @@ public class StatsViewModel : ViewModelBase, IDisposable
 
             Games.Clear();
             foreach (var game in games)
-            {
-                var backupCount = _backupService.GetBackupCount(game);
-                var gameSize = CalculateGameBackupsSize(game);
-
-                var specialArchivesCount = GetSpecialArchivesCount(game);
-                var specialArchivesSize = CalculateSpecialArchivesSize(game);
-
-                backupCount += specialArchivesCount;
-                gameSize += specialArchivesSize;
-
-                totalArchives += backupCount;
-                totalSize += gameSize;
-
-                Games.Add(new GameStatsInfo
+                if (game != null)
                 {
-                    GameName = game.GameName,
-                    GamesCountArchives = backupCount.ToString(),
-                    GamesSizesArchives = FormatSize(gameSize)
-                });
-            }
+                    var backupCount = _backupService.GetBackupCount(game);
+                    var gameSize = CalculateGameBackupsSize(game);
+
+                    var specialArchivesCount = GetSpecialArchivesCount(game);
+                    var specialArchivesSize = CalculateSpecialArchivesSize(game);
+
+                    backupCount += specialArchivesCount;
+                    gameSize += specialArchivesSize;
+
+                    totalArchives += backupCount;
+                    totalSize += gameSize;
+
+                    Games.Add(new GameStatsInfo
+                    {
+                        GameName = game.GameName,
+                        GamesCountArchives = backupCount.ToString(),
+                        GamesSizesArchives = FormatSize(gameSize)
+                    });
+                }
 
             ArchivesCounts = totalArchives.ToString();
             SizesArchives = FormatSize(totalSize);
@@ -173,15 +174,15 @@ public class StatsViewModel : ViewModelBase, IDisposable
         return $"{size:0.##} {sizes[order]}";
     }
 
-    private string GetSafeDirectoryName(string name)
+    private string GetSafeDirectoryName(string? name)
     {
-        return string.Join("_", name.Split(Path.GetInvalidFileNameChars()));
+        return string.Join("_", name?.Split(Path.GetInvalidFileNameChars()) ?? []);
     }
 }
 
 public class GameStatsInfo
 {
-    public string GameName { get; set; } = "";
+    public string? GameName { get; set; } = "";
     public string GamesCountArchives { get; set; } = "";
     public string GamesSizesArchives { get; set; } = "";
 }

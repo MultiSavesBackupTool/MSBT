@@ -112,7 +112,7 @@ public class GamesViewModel : ViewModelBase
         {
             IsLoading = true;
             var gamesList = await _gamesService.LoadGamesAsync();
-            Games = new ObservableCollection<GameModel>(gamesList);
+            Games = new ObservableCollection<GameModel>(gamesList!);
             foreach (var game in Games)
             {
                 game.PropertyChanged += Game_PropertyChanged;

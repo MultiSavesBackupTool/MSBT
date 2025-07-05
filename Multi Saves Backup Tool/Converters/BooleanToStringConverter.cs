@@ -20,11 +20,17 @@ public class BooleanToStringConverter : IValueConverter
                     var falseKey = options[1];
 
                     if (!string.IsNullOrWhiteSpace(trueKey) && !string.IsNullOrWhiteSpace(falseKey))
-                    {
-                        var trueValue = Resources.ResourceManager.GetString(trueKey, Resources.Culture) ?? trueKey;
-                        var falseValue = Resources.ResourceManager.GetString(falseKey, Resources.Culture) ?? falseKey;
-                        return boolValue ? trueValue : falseValue;
-                    }
+                        try
+                        {
+                            var trueValue = Resources.ResourceManager.GetString(trueKey, Resources.Culture) ?? trueKey;
+                            var falseValue = Resources.ResourceManager.GetString(falseKey, Resources.Culture) ??
+                                             falseKey;
+                            return boolValue ? trueValue : falseValue;
+                        }
+                        catch
+                        {
+                            return boolValue ? trueKey : falseKey;
+                        }
                 }
             }
 

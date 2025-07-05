@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -36,12 +35,24 @@ public class BackupManager(
     private CancellationTokenSource? _cancellationTokenSource;
     private bool _disposed;
 
-    public ServiceState State { get; } = ServiceState.LoadFromFile(StateFilePath);
+    public ServiceState State { get; private set; } = ServiceState.LoadFromFile(StateFilePath);
 
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    private void ReloadState()
+    {
+        State = ServiceState.LoadFromFile(StateFilePath);
+        StateChanged?.Invoke();
+    }
+
+    private void SaveServiceState()
+    {
+        State.SaveToFile(StateFilePath);
+        ReloadState();
     }
 
     public event Action? StateChanged;
@@ -79,6 +90,12 @@ public class BackupManager(
         try
         {
             await _settingsService.ReloadSettingsAsync();
+
+            if (_settingsService.CurrentSettings.BackupSettings == null)
+                throw new InvalidOperationException("Backup settings are null after reload");
+
+            if (string.IsNullOrWhiteSpace(_settingsService.CurrentSettings.BackupSettings.BackupRootFolder))
+                throw new InvalidOperationException("Backup root folder is not configured");
         }
         catch (Exception ex)
         {
@@ -198,26 +215,33 @@ public class BackupManager(
                 return;
             }
 
-            var enabledGames = games.Where(g => g.IsEnabled).ToList();
+            var enabledGames = games.Where(g => g is { IsEnabled: true }).ToList();
             _logger.LogInformation("Found {Count} enabled games for backup", enabledGames.Count);
 
-            var removedGames = new List<string>();
+            var removedGames = new List<string?>();
             foreach (var gameName in State.GamesState.Keys)
             {
                 var game = await _gamesService.GetGameByNameAsync(gameName);
-                if (game == null) removedGames.Add(gameName);
+                if (game == null)
+                    removedGames.Add(gameName);
             }
 
             foreach (var gameName in removedGames)
             {
                 _logger.LogInformation("Removing state for deleted game: {GameName}", gameName);
-                State.GamesState.Remove(gameName);
+                if (gameName != null) State.GamesState.Remove(gameName);
             }
 
             foreach (var game in games)
             {
-                if (!State.GamesState.ContainsKey(game.GameName))
-                    State.GamesState[game.GameName] = new GameState { GameName = game.GameName };
+                if (game?.GameName == null) continue;
+
+                if (!State.GamesState.ContainsKey(game.GameName!))
+                    State.GamesState[game.GameName!] = new GameState
+                    {
+                        GameName = game.GameName,
+                        Status = game is { IsEnabled: true } ? "Waiting" : "Disabled"
+                    };
 
                 var gameExeName = Path.GetFileNameWithoutExtension(game.GameExe);
                 var isRunning = Process.GetProcesses().Any(p =>
@@ -252,14 +276,28 @@ public class BackupManager(
                     });
                 }
 
-                State.GamesState[game.GameName].Status = game.IsEnabled ? "Waiting" : "Disabled";
-                State.GamesState[game.GameName].IsRun = isRunning;
-                SaveServiceState();
+                var gameState = State.GamesState[game.GameName!];
+                var statusChanged = gameState.IsRun != isRunning ||
+                                    gameState.Status != (game is { IsEnabled: true } ? "Waiting" : "Disabled");
+
+                gameState.IsRun = isRunning;
+                if (game is { IsEnabled: true })
+                {
+                    if (gameState.Status == "Disabled")
+                        gameState.Status = "Waiting";
+                }
+                else
+                {
+                    gameState.Status = "Disabled";
+                }
+
+                if (statusChanged)
+                    SaveServiceState();
             }
 
             var settings = _settingsService.CurrentSettings.BackupSettings;
             var tasks = new List<Task>();
-            var semaphore = new SemaphoreSlim(settings.MaxParallelBackups);
+            using var semaphore = new SemaphoreSlim(settings.MaxParallelBackups);
 
             foreach (var game in enabledGames)
             {
@@ -269,7 +307,9 @@ public class BackupManager(
                     break;
                 }
 
-                var gameState = State.GamesState[game.GameName];
+                if (game?.GameName == null) continue;
+
+                var gameState = State.GamesState[game.GameName!];
                 if (gameState.NextBackupScheduled > DateTime.Now)
                 {
                     _logger.LogInformation(
@@ -289,6 +329,7 @@ public class BackupManager(
                 try
                 {
                     await semaphore.WaitAsync(stoppingToken);
+                    var localSemaphore = semaphore;
 
                     tasks.Add(Task.Run(async () =>
                     {
@@ -298,15 +339,17 @@ public class BackupManager(
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError(ex, "Error processing backup for game {GameName}", game.GameName);
-                            var state = State.GamesState[game.GameName];
-                            state.Status = "Error";
-                            state.LastError = ex.Message;
-                            SaveServiceState();
+                            _logger.LogError(ex, "Error processing backup for game {GameName}", game.GameName!);
+                            if (State.GamesState.TryGetValue(game.GameName!, out var state))
+                            {
+                                state.Status = "Error";
+                                state.LastError = ex.Message;
+                                SaveServiceState();
+                            }
                         }
                         finally
                         {
-                            semaphore.Release();
+                            localSemaphore.Release();
                         }
                     }, stoppingToken));
                 }
@@ -348,12 +391,29 @@ public class BackupManager(
             return;
         }
 
-        var gameState = State.GamesState[game.GameName];
+        if (!State.GamesState.ContainsKey(game.GameName!))
+        {
+            var newState = new GameState
+            {
+                GameName = game.GameName,
+                Status = "Waiting",
+                LastBackupTime = null,
+                NextBackupScheduled = null,
+                LastError = ""
+            };
+            State.GamesState[game.GameName!] = newState;
+        }
+
+        var gameState = State.GamesState[game.GameName!];
+        var previousStatus = gameState.Status;
+        var previousError = gameState.LastError;
+
         try
         {
-            _logger.LogInformation("Processing backup for game: {GameName}", game.GameName);
+            _logger.LogInformation("Processing backup for game: {GameName}", game.GameName!);
             gameState.Status = "Processing";
-            SaveServiceState();
+            if (previousStatus != "Processing")
+                SaveServiceState();
 
             if (_backupService.VerifyBackupPaths(game))
             {
@@ -386,22 +446,8 @@ public class BackupManager(
         }
         finally
         {
-            SaveServiceState();
-        }
-    }
-
-    private void SaveServiceState()
-    {
-        try
-        {
-            State.LastUpdateTime = DateTime.Now;
-            var json = JsonSerializer.Serialize(State);
-            File.WriteAllText(StateFilePath, json);
-            StateChanged?.Invoke();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to save service state");
+            if (gameState.Status != previousStatus || gameState.LastError != previousError)
+                SaveServiceState();
         }
     }
 }

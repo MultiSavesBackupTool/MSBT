@@ -24,7 +24,7 @@ public partial class SettingsViewModel : ViewModelBase
 
     [ObservableProperty] private ServiceSettings _settings;
 
-    public SettingsViewModel(ILogger<SettingsViewModel>? logger = null) : base(logger)
+    private SettingsViewModel(ILogger<SettingsViewModel>? logger = null) : base(logger)
     {
         _settingsPath = AppPaths.SettingsFilePath;
         _gamesPath = AppPaths.GamesFilePath;
@@ -169,15 +169,10 @@ public partial class SettingsViewModel : ViewModelBase
 
                     if (targetPath != null)
                     {
-                        if (File.Exists(targetPath))
-                        {
-                            var backupPath = targetPath + $".backup_{DateTime.Now:yyyyMMdd_HHmmss}";
-                            File.Copy(targetPath, backupPath);
-                        }
-
                         await using var entryStream = entry.Open();
-                        await using var fileStream = File.Create(targetPath);
-                        await entryStream.CopyToAsync(fileStream);
+                        var buffer = new byte[entry.Length];
+                        await entryStream.ReadExactlyAsync(buffer);
+                        await File.WriteAllBytesAsync(targetPath, buffer);
 
                         importedFiles++;
                     }

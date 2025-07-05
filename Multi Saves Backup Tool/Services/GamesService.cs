@@ -86,7 +86,7 @@ public class GamesService : IGamesService, IDisposable
         _cacheLock.Dispose();
     }
 
-    public async Task<IReadOnlyList<GameModel>> LoadGamesAsync()
+    public async Task<IReadOnlyList<GameModel?>> LoadGamesAsync()
     {
         try
         {
@@ -132,16 +132,17 @@ public class GamesService : IGamesService, IDisposable
         }
     }
 
-    public async Task<GameModel?> GetGameByNameAsync(string gameName)
+    public async Task<GameModel?> GetGameByNameAsync(string? gameName)
     {
         if (string.IsNullOrWhiteSpace(gameName))
             throw new ArgumentException("Game name cannot be null or whitespace", nameof(gameName));
 
         var games = await LoadGamesAsync();
-        return games.FirstOrDefault(g => g.GameName.Equals(gameName, StringComparison.OrdinalIgnoreCase));
+        return games.FirstOrDefault(g =>
+            g is { GameName: not null } && g.GameName.Equals(gameName, StringComparison.OrdinalIgnoreCase));
     }
 
-    public async Task SaveGamesAsync(IEnumerable<GameModel>? games)
+    public async Task SaveGamesAsync(IEnumerable<GameModel?>? games)
     {
         if (games == null)
             throw new ArgumentNullException(nameof(games));
@@ -149,8 +150,8 @@ public class GamesService : IGamesService, IDisposable
         try
         {
             var gamesPath = AppPaths.GamesFilePath;
-            var gamesDict = games.Where(g => !string.IsNullOrWhiteSpace(g.GameName))
-                .ToDictionary(game => game.GameName, game => game);
+            var gamesDict = games.Where(g => !string.IsNullOrWhiteSpace(g?.GameName))
+                .ToDictionary(game => game!.GameName!, game => game);
 
             var json = JsonSerializer.Serialize(gamesDict, new JsonSerializerOptions
             {
@@ -168,7 +169,7 @@ public class GamesService : IGamesService, IDisposable
         }
     }
 
-    public bool IsGameRunning(GameModel game)
+    public bool IsGameRunning(GameModel? game)
     {
         if (game == null)
             throw new ArgumentNullException(nameof(game));
