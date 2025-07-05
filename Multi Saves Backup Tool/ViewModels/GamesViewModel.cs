@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -252,20 +253,32 @@ public class GamesViewModel : ViewModelBase
         {
             IsLoading = true;
             var foundGames = await _installedGamesScanner.ScanForInstalledGamesAsync();
-            var addedCount = 0;
-
+            var newGames = new List<GameModel>();
+            
             foreach (var game in foundGames)
+            {
                 if (Games != null && !Games.Any(g => g.GameName == game.GameName && g.GameExe == game.GameExe))
                 {
-                    Games.Add(game);
                     UpdateBackupCount(game);
-                    addedCount++;
+                    newGames.Add(game);
                 }
-
-            if (addedCount > 0)
+            }
+            
+            if (newGames.Count > 0)
             {
-                await SaveGamesAsync();
-                LogInformation("Added {Count} new games from scan", addedCount);
+                try
+                {
+                    foreach (var game in newGames)
+                    {
+                        Games?.Add(game);
+                    }
+                    await SaveGamesAsync();
+                    LogInformation("Added {Count} new games from scan", newGames.Count);
+                }
+                finally
+                {
+                    IsLoading = false;
+                }
             }
         }
         catch (Exception ex)

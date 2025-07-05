@@ -16,8 +16,9 @@ public class GamesService : IGamesService, IDisposable
 {
     private readonly SemaphoreSlim _cacheLock = new(1, 1);
     private readonly ILogger<GamesService> _logger;
-    private readonly FileSystemWatcher? _watcher;
-    private IReadOnlyList<GameModel>? _cachedGames;
+    private FileSystemWatcher? _watcher;
+    private IReadOnlyList<GameModel?>? _cachedGames;
+    private bool _isSaving;
 
     public GamesService(ILogger<GamesService> logger)
     {
@@ -30,47 +31,7 @@ public class GamesService : IGamesService, IDisposable
         if (directory != null)
             try
             {
-                if (!Directory.Exists(directory))
-                {
-                    Directory.CreateDirectory(directory);
-                    _logger.LogInformation("Created directory for games config: {Path}", directory);
-                }
-
-                _watcher = new FileSystemWatcher(directory)
-                {
-                    Filter = fileName,
-                    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Size,
-                    EnableRaisingEvents = true
-                };
-
-                _watcher.Changed += async (_, args) =>
-                {
-                    if (args.ChangeType == WatcherChangeTypes.Changed)
-                    {
-                        _logger.LogInformation("Games configuration file changed, reloading immediately");
-                        await ClearCacheAsync();
-                        await LoadGamesAsync();
-                    }
-                };
-
-                _watcher.Created += async (_, _) =>
-                {
-                    _logger.LogInformation("Games configuration file created, reloading immediately");
-                    await ClearCacheAsync();
-                    await LoadGamesAsync();
-                };
-
-                _watcher.Deleted += async (_, _) =>
-                {
-                    _logger.LogInformation("Games configuration file deleted, clearing cache");
-                    await ClearCacheAsync();
-                };
-
-                _watcher.Error += (_, ex) =>
-                {
-                    _logger.LogError("Error in FileSystemWatcher for games configuration: {Message}",
-                        ex.GetException().Message);
-                };
+                InitializeWatcherAsync(directory, fileName);
             }
             catch (Exception ex)
             {
@@ -104,18 +65,16 @@ public class GamesService : IGamesService, IDisposable
                 }
 
                 var json = await File.ReadAllTextAsync(gamesPath);
-                var gameDict = JsonSerializer.Deserialize<Dictionary<string, GameModel>>(json, new JsonSerializerOptions
+                var games = JsonSerializer.Deserialize<List<GameModel?>>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });
 
-                if (gameDict == null)
+                if (games == null)
                 {
                     _logger.LogError("Failed to deserialize games from {Path}", gamesPath);
                     return [];
                 }
-
-                var games = gameDict.Values.ToList();
                 _cachedGames = games;
                 _logger.LogInformation("Successfully loaded {Count} games from configuration", games.Count);
                 return games;
@@ -145,27 +104,25 @@ public class GamesService : IGamesService, IDisposable
     public async Task SaveGamesAsync(IEnumerable<GameModel?>? games)
     {
         if (games == null)
-            throw new ArgumentNullException(nameof(games));
+        {
+            _logger.LogWarning("Attempted to save null games collection");
+            return;
+        }
 
+        await _cacheLock.WaitAsync();
         try
         {
+            _isSaving = true;
             var gamesPath = AppPaths.GamesFilePath;
-            var gamesDict = games.Where(g => !string.IsNullOrWhiteSpace(g?.GameName))
-                .ToDictionary(game => game!.GameName!, game => game);
-
-            var json = JsonSerializer.Serialize(gamesDict, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
+            var gamesList = games.ToList();
+            var json = JsonSerializer.Serialize(gamesList, new JsonSerializerOptions { WriteIndented = true });
             await File.WriteAllTextAsync(gamesPath, json);
-            _logger.LogInformation("Saved {Count} games to configuration", gamesDict.Count);
-
-            await ClearCacheAsync();
+            _cachedGames = gamesList.AsReadOnly();
         }
-        catch (Exception ex)
+        finally
         {
-            _logger.LogError(ex, "Error saving games configuration");
-            throw;
+            _isSaving = false;
+            _cacheLock.Release();
         }
     }
 
@@ -251,5 +208,50 @@ public class GamesService : IGamesService, IDisposable
         {
             _cacheLock.Release();
         }
+    }
+
+    private void InitializeWatcherAsync(string directory, string fileName)
+    {
+        if (!Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+            _logger.LogInformation("Created directory for games config: {Path}", directory);
+        }
+
+        _watcher = new FileSystemWatcher(directory)
+        {
+            Filter = fileName,
+            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Size,
+            EnableRaisingEvents = true
+        };
+
+        _watcher.Changed += async (_, args) =>
+        {
+            if (args.ChangeType == WatcherChangeTypes.Changed && !_isSaving)
+            {
+                _logger.LogInformation("Games configuration file changed, reloading immediately");
+                await ClearCacheAsync();
+                await LoadGamesAsync();
+            }
+        };
+
+        _watcher.Created += async (_, _) =>
+        {
+            _logger.LogInformation("Games configuration file created, reloading immediately");
+            await ClearCacheAsync();
+            await LoadGamesAsync();
+        };
+
+        _watcher.Deleted += async (_, _) =>
+        {
+            _logger.LogInformation("Games configuration file deleted, clearing cache");
+            await ClearCacheAsync();
+        };
+
+        _watcher.Error += (_, ex) =>
+        {
+            _logger.LogError("Error in FileSystemWatcher for games configuration: {Message}",
+                ex.GetException().Message);
+        };
     }
 }
