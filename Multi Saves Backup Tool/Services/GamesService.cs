@@ -16,9 +16,9 @@ public class GamesService : IGamesService, IDisposable
 {
     private readonly SemaphoreSlim _cacheLock = new(1, 1);
     private readonly ILogger<GamesService> _logger;
-    private FileSystemWatcher? _watcher;
     private IReadOnlyList<GameModel?>? _cachedGames;
     private bool _isSaving;
+    private FileSystemWatcher? _watcher;
 
     public GamesService(ILogger<GamesService> logger)
     {
@@ -75,6 +75,7 @@ public class GamesService : IGamesService, IDisposable
                     _logger.LogError("Failed to deserialize games from {Path}", gamesPath);
                     return [];
                 }
+
                 _cachedGames = games;
                 _logger.LogInformation("Successfully loaded {Count} games from configuration", games.Count);
                 return games;

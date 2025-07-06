@@ -254,31 +254,20 @@ public class GamesViewModel : ViewModelBase
             IsLoading = true;
             var foundGames = await _installedGamesScanner.ScanForInstalledGamesAsync();
             var newGames = new List<GameModel>();
-            
+
             foreach (var game in foundGames)
-            {
                 if (Games != null && !Games.Any(g => g.GameName == game.GameName && g.GameExe == game.GameExe))
                 {
                     UpdateBackupCount(game);
                     newGames.Add(game);
                 }
-            }
-            
+
             if (newGames.Count > 0)
             {
-                try
-                {
-                    foreach (var game in newGames)
-                    {
-                        Games?.Add(game);
-                    }
-                    await SaveGamesAsync();
-                    LogInformation("Added {Count} new games from scan", newGames.Count);
-                }
-                finally
-                {
-                    IsLoading = false;
-                }
+                foreach (var game in newGames) Games?.Add(game);
+
+                await SaveGamesAsync();
+                LogInformation("Added {Count} new games from scan", newGames.Count);
             }
         }
         catch (Exception ex)

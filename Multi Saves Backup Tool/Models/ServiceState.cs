@@ -14,7 +14,7 @@ public class ServiceState
     public void SaveToFile(string path, ServiceState state)
     {
         var json = JsonSerializer.Serialize(state);
-        File.WriteAllText(path, json);;
+        File.WriteAllText(path, json);
     }
 
     public static ServiceState LoadFromFile(string path)

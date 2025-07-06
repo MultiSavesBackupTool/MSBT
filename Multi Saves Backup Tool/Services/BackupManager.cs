@@ -35,7 +35,7 @@ public class BackupManager(
     private CancellationTokenSource? _cancellationTokenSource;
     private bool _disposed;
 
-    public ServiceState State { get; private set; } = ServiceState.LoadFromFile(StateFilePath);
+    public ServiceState State { get; } = ServiceState.LoadFromFile(StateFilePath);
 
     public void Dispose()
     {
