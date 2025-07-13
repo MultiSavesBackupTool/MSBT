@@ -32,10 +32,13 @@
                                    Width="20"
                                    Height="20"
                                    VerticalAlignment="Center" />
+            <TextBox Width="250"
+                     Watermark="{x:Static properties:Resources.GamesView_SearchGames}"
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
 
         <ScrollViewer>
-            <ItemsControl ItemsSource="{Binding Games}">
+            <ItemsControl ItemsSource="{Binding FilteredGames}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="models:GameModel">
                         <Border Background="#22000000"

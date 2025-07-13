@@ -24,6 +24,8 @@ public class GamesViewModel : ViewModelBase
     private readonly IGamesService _gamesService;
     private readonly InstalledGamesScanner _installedGamesScanner = new();
     private ObservableCollection<GameModel>? _games;
+    private string _searchText = string.Empty;
+    private ObservableCollection<GameModel>? _filteredGames;
 
     private bool _isLoading;
 
@@ -58,6 +60,34 @@ public class GamesViewModel : ViewModelBase
                 if (_games != null)
                     _games.CollectionChanged += Games_CollectionChanged;
 
+                OnPropertyChanged();
+                UpdateFilteredGames();
+            }
+        }
+    }
+
+    public string SearchText
+    {
+        get => _searchText;
+        set
+        {
+            if (_searchText != value)
+            {
+                _searchText = value;
+                OnPropertyChanged();
+                UpdateFilteredGames();
+            }
+        }
+    }
+
+    public ObservableCollection<GameModel>? FilteredGames
+    {
+        get => _filteredGames;
+        private set
+        {
+            if (_filteredGames != value)
+            {
+                _filteredGames = value;
                 OnPropertyChanged();
             }
         }
@@ -100,6 +130,7 @@ public class GamesViewModel : ViewModelBase
                 foreach (GameModel item in e.NewItems)
                     if (item != null)
                         item.PropertyChanged += Game_PropertyChanged;
+            UpdateFilteredGames();
         }
         catch (Exception ex)
         {
@@ -160,6 +191,7 @@ public class GamesViewModel : ViewModelBase
     {
         Games?.Add(game);
         UpdateBackupCount(game);
+        UpdateFilteredGames();
     }
 
     public void UpdateGame(GameModel originalGame, GameModel updatedGame)
@@ -171,6 +203,7 @@ public class GamesViewModel : ViewModelBase
             {
                 Games[index] = updatedGame;
                 UpdateBackupCount(updatedGame);
+                UpdateFilteredGames();
             }
         }
     }
@@ -243,6 +276,30 @@ public class GamesViewModel : ViewModelBase
         {
             LogError(ex, "Error updating backup count for game {GameName}", game.GameName);
             game.BackupCount = 0;
+        }
+    }
+
+    private void UpdateFilteredGames()
+    {
+        if (Games == null)
+        {
+            FilteredGames = null;
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(SearchText))
+        {
+            FilteredGames = new ObservableCollection<GameModel>(Games);
+        }
+        else
+        {
+            var lower = SearchText.ToLowerInvariant();
+            FilteredGames = new ObservableCollection<GameModel>(
+                Games.Where(g =>
+                    (!string.IsNullOrEmpty(g.GameName) && g.GameName.ToLowerInvariant().Contains(lower)) ||
+                    (!string.IsNullOrEmpty(g.SavePath) && g.SavePath.ToLowerInvariant().Contains(lower)) ||
+                    (!string.IsNullOrEmpty(g.GameExe) && g.GameExe.ToLowerInvariant().Contains(lower))
+                )
+            );
         }
     }
 

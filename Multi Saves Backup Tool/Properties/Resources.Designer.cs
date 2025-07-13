@@ -193,6 +193,14 @@ namespace Properties
             }
         }
 
+        public static string GamesView_SearchGames
+        {
+            get
+            {
+                return ResourceManager.GetString("GamesView_SearchGames", resourceCulture);
+            }
+        }
+
         // ==========================================
         // ADD GAME OVERLAY STRINGS
         // ==========================================

@@ -130,6 +130,9 @@
     <data name="GamesView_ScanInstalledGames" xml:space="preserve">
         <value>Сканировать установленные игры</value>
     </data>
+    <data name="GamesView_SearchGames" xml:space="preserve">
+        <value>Поиск игр...</value>
+    </data>
 
     <!-- ==========================================
          СТРОКИ ОКНА ДОБАВЛЕНИЯ ИГРЫ

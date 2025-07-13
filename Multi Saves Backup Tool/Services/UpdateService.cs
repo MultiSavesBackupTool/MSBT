@@ -19,7 +19,7 @@ namespace Multi_Saves_Backup_Tool.Services;
 public class UpdateService : IDisposable
 {
     private const string GithubApiUrl = "https://api.github.com/repos/{owner}/{repo}/releases/latest";
-    private const string Owner = "TheNightlyGod";
+    private const string Owner = "MultiSavesBackupTool";
     private const string Repo = "MSBT";
     private readonly string _currentVersion;
     private readonly HttpClient _httpClient;
