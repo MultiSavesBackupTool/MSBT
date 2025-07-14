@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Authentication;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -23,7 +24,10 @@ public class WhitelistService : IWhitelistService
     public WhitelistService(ILogger<WhitelistService> logger, HttpClient? httpClient = null)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _httpClient = httpClient ?? new HttpClient();
+        _httpClient = httpClient ?? new HttpClient(new HttpClientHandler
+        {
+            SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13
+        });
         _whitelistPath = AppPaths.WhitelistFilePath;
         _whitelist = new Dictionary<string, WhitelistEntry>(StringComparer.OrdinalIgnoreCase);
 
@@ -71,28 +75,27 @@ public class WhitelistService : IWhitelistService
             var newEntries = new List<WhitelistEntry>();
 
             foreach (var entry in serverWhitelist)
-                if (entry.Length >= 6)
+                if (entry.Length >= 4)
                 {
                     var whitelistEntry = new WhitelistEntry(
                         entry[0],
                         entry[1],
                         entry.Length > 2 && !string.IsNullOrEmpty(entry[2]) ? entry[2] : null,
-                        entry[3],
-                        entry.Length > 4 && !string.IsNullOrEmpty(entry[4]) ? entry[4] : null,
-                        entry.Length > 5 && !string.IsNullOrEmpty(entry[5]) ? entry[5] : null,
-                        entry.Length > 6 && int.TryParse(entry[6], out var specialMark) && specialMark == 1
+                        entry.Length > 3 && !string.IsNullOrEmpty(entry[3]) ? entry[3] : null,
+                        entry.Length > 4 && int.TryParse(entry[4], out var specialMark) && specialMark == 1
                     );
 
-                    if (_whitelist.TryAdd(whitelistEntry.GameName, whitelistEntry))
-                    {
-                        newEntries.Add(whitelistEntry);
-                    }
+                    if (_whitelist.TryAdd(whitelistEntry.GameName, whitelistEntry)) newEntries.Add(whitelistEntry);
                 }
 
             if (newEntries.Count > 0)
             {
                 await SaveWhitelistAsync();
                 _logger.LogInformation("Added {Count} new entries from server to whitelist", newEntries.Count);
+            }
+            else
+            {
+                _logger.LogInformation("No new entries to add from server to whitelist.");
             }
         }
         catch (Exception ex)
@@ -112,11 +115,9 @@ public class WhitelistService : IWhitelistService
             var data = new
             {
                 gameName = entry.GameName,
-                gameExe = entry.GameExe,
-                gameExeAlt = entry.GameExeAlt,
-                savePath = entry.SavePath,
-                modPath = entry.ModPath,
-                addPath = entry.AddPath,
+                savePath = NormalizeUserPath(entry.SavePath),
+                modPath = NormalizeUserPath(entry.ModPath),
+                addPath = NormalizeUserPath(entry.AddPath),
                 specialBackupMark = entry.SpecialBackupMark ? 1 : 0
             };
 
@@ -164,6 +165,11 @@ public class WhitelistService : IWhitelistService
             if (!File.Exists(_whitelistPath))
             {
                 _whitelist = new Dictionary<string, WhitelistEntry>(StringComparer.OrdinalIgnoreCase);
+                var directory = Path.GetDirectoryName(_whitelistPath);
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+                await File.WriteAllTextAsync(_whitelistPath, "[]");
+                _logger.LogInformation("Created empty whitelist file at {Path}", _whitelistPath);
                 return;
             }
 
@@ -197,5 +203,26 @@ public class WhitelistService : IWhitelistService
         {
             _logger.LogError(ex, "Error saving whitelist to {Path}", _whitelistPath);
         }
+    }
+
+    private static string NormalizeUserPath(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return path ?? string.Empty;
+
+        var specialFolders = new Dictionary<string, string>
+        {
+            { Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "%appdata%" },
+            { Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "%localappdata%" },
+            { Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "%userprofile%" },
+            { Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "%documents%" },
+            { Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "%programdata%" }
+        };
+
+        foreach (var kvp in specialFolders)
+            if (path.StartsWith(kvp.Key, StringComparison.OrdinalIgnoreCase))
+                return path.Replace(kvp.Key, kvp.Value, StringComparison.OrdinalIgnoreCase);
+
+        return path;
     }
 }

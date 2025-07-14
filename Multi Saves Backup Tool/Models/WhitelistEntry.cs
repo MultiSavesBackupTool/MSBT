@@ -8,12 +8,10 @@ public class WhitelistEntry
     {
     }
 
-    public WhitelistEntry(string gameName, string gameExe, string? gameExeAlt, string savePath, string? modPath,
+    public WhitelistEntry(string gameName, string savePath, string? modPath,
         string? addPath, bool specialBackupMark)
     {
         GameName = gameName;
-        GameExe = gameExe;
-        GameExeAlt = gameExeAlt;
         SavePath = savePath;
         ModPath = modPath;
         AddPath = addPath;
@@ -21,10 +19,6 @@ public class WhitelistEntry
     }
 
     [JsonPropertyName("gameName")] public string GameName { get; set; } = string.Empty;
-
-    [JsonPropertyName("gameExe")] public string GameExe { get; set; } = string.Empty;
-
-    [JsonPropertyName("gameExeAlt")] public string? GameExeAlt { get; set; }
 
     [JsonPropertyName("savePath")] public string SavePath { get; set; } = string.Empty;
 
@@ -40,8 +34,6 @@ public class WhitelistEntry
         return new GameModel
         {
             GameName = GameName,
-            GameExe = GameExe,
-            GameExeAlt = GameExeAlt,
             SavePath = SavePath,
             ModPath = ModPath,
             AddPath = AddPath,
@@ -54,8 +46,6 @@ public class WhitelistEntry
     {
         return new WhitelistEntry(
             game.GameName ?? string.Empty,
-            game.GameExe,
-            game.GameExeAlt,
             game.SavePath ?? string.Empty,
             game.ModPath,
             game.AddPath,

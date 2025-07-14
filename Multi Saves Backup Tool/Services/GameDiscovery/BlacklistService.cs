@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Authentication;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -22,7 +23,10 @@ public class BlacklistService : IBlacklistService
     public BlacklistService(ILogger<BlacklistService> logger, HttpClient? httpClient = null)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _httpClient = httpClient ?? new HttpClient();
+        _httpClient = httpClient ?? new HttpClient(new HttpClientHandler
+        {
+            SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13
+        });
         _blacklistPath = AppPaths.BlacklistFilePath;
         _blacklist = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -82,6 +86,10 @@ public class BlacklistService : IBlacklistService
                 await SaveBlacklistAsync();
                 _logger.LogInformation("Added {Count} new entries from server to blacklist", newEntries.Count);
             }
+            else
+            {
+                _logger.LogInformation("No new entries to add from server to blacklist.");
+            }
         }
         catch (Exception ex)
         {
@@ -134,6 +142,11 @@ public class BlacklistService : IBlacklistService
             if (!File.Exists(_blacklistPath))
             {
                 _blacklist = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                var directory = Path.GetDirectoryName(_blacklistPath);
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+                await File.WriteAllTextAsync(_blacklistPath, "[]");
+                _logger.LogInformation("Created empty blacklist file at {Path}", _blacklistPath);
                 return;
             }
 

@@ -111,6 +111,7 @@ public class GamesViewModel : ViewModelBase
                 _isLoading = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsNotLoading));
+                RaiseAllCanExecuteChanged();
             }
         }
     }
@@ -420,6 +421,17 @@ public class GamesViewModel : ViewModelBase
         {
             LogError(ex, "Error adding {GameName} to whitelist", game.GameName);
         }
+    }
+
+    private void RaiseAllCanExecuteChanged()
+    {
+        DeleteGameCommand.NotifyCanExecuteChanged();
+        (EditGameCommand as Services.RelayCommand<GameModel>)?.RaiseCanExecuteChanged();
+        (OpenSaveCommand as Services.RelayCommand<GameModel>)?.RaiseCanExecuteChanged();
+        RestoreBackupCommand.NotifyCanExecuteChanged();
+        ScanInstalledGamesCommand.NotifyCanExecuteChanged();
+        AddToBlacklistCommand.NotifyCanExecuteChanged();
+        AddToWhitelistCommand.NotifyCanExecuteChanged();
     }
 
     private bool CanDeleteGame(GameModel? game)

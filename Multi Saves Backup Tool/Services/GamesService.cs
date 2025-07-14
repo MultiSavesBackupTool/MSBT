@@ -60,7 +60,11 @@ public class GamesService : IGamesService, IDisposable
 
                 if (!File.Exists(gamesPath))
                 {
-                    _logger.LogWarning("Games configuration file not found at {Path}", gamesPath);
+                    var directory = Path.GetDirectoryName(gamesPath);
+                    if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                        Directory.CreateDirectory(directory);
+                    await File.WriteAllTextAsync(gamesPath, "[]");
+                    _logger.LogInformation("Created empty games configuration file at {Path}", gamesPath);
                     return [];
                 }
 
