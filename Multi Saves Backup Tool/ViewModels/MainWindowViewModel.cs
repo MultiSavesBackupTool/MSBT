@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.UI.Controls;
 using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Services;
+using Multi_Saves_Backup_Tool.Services.GameDiscovery;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
 
@@ -29,7 +30,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [SupportedOSPlatform("windows")]
     public MainWindowViewModel(Window mainWindow, IGamesService gamesService,
         IBackupService backupService, BackupManager backupManager, ISettingsService settingsService,
-        ILogger<StatsViewModel> statsLogger, ILogger<MainWindowViewModel> logger,
+        IBlacklistService blacklistService, IWhitelistService whitelistService, ILogger<StatsViewModel> statsLogger,
+        ILogger<MainWindowViewModel> logger,
         ILogger<MonitoringViewModel> monitoringLogger, ILogger<GamesViewModel> gamesLogger,
         ILogger<SettingsViewModel> settingsLogger)
     {
@@ -39,9 +41,11 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         try
         {
             MonitoringViewModel = new MonitoringViewModel(backupManager, monitoringLogger);
-            GamesViewModel = new GamesViewModel(gamesService, backupService, gamesLogger);
+            GamesViewModel = new GamesViewModel(gamesService, backupService, blacklistService, whitelistService,
+                gamesLogger);
             StatsViewModel = new StatsViewModel(gamesService, backupService, settingsService, statsLogger);
-            SettingsViewModel = new SettingsViewModel(mainWindow.StorageProvider, settingsLogger);
+            SettingsViewModel = new SettingsViewModel(mainWindow.StorageProvider, blacklistService, whitelistService,
+                settingsLogger);
             CurrentViewModel = MonitoringViewModel;
 
             _ = CheckForUpdatesOnStartupAsync();

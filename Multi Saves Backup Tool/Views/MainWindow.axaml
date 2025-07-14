@@ -11,8 +11,8 @@
         x:DataType="vm:MainWindowViewModel"
         Icon="avares://Multi Saves Backup Tool/Assets/msbt.ico"
         Title="{x:Static properties:Resources.MainWindow_Title}"
-        MinHeight="600"
-        MinWidth="860"
+        MinHeight="630"
+        MinWidth="1260"
         WindowStartupLocation="CenterScreen"
         Background="#272727">
 

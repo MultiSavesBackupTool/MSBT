@@ -21,26 +21,34 @@ namespace Multi_Saves_Backup_Tool.ViewModels;
 public class GamesViewModel : ViewModelBase
 {
     private readonly IBackupService _backupService;
+    private readonly IBlacklistService _blacklistService;
     private readonly IGamesService _gamesService;
-    private readonly InstalledGamesScanner _installedGamesScanner = new();
-    private ObservableCollection<GameModel>? _games;
-    private string _searchText = string.Empty;
+    private readonly InstalledGamesScanner _installedGamesScanner;
+    private readonly IWhitelistService _whitelistService;
     private ObservableCollection<GameModel>? _filteredGames;
+    private ObservableCollection<GameModel>? _games;
 
     private bool _isLoading;
+    private string _searchText = string.Empty;
 
     [SupportedOSPlatform("windows")]
-    public GamesViewModel(IGamesService gamesService, IBackupService backupService,
-        ILogger<GamesViewModel>? logger = null) : base(logger)
+    public GamesViewModel(IGamesService gamesService, IBackupService backupService, IBlacklistService blacklistService,
+        IWhitelistService whitelistService, ILogger<GamesViewModel>? logger = null) : base(logger)
     {
         _gamesService = gamesService ?? throw new ArgumentNullException(nameof(gamesService));
         _backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
+        _blacklistService = blacklistService ?? throw new ArgumentNullException(nameof(blacklistService));
+        _whitelistService = whitelistService ?? throw new ArgumentNullException(nameof(whitelistService));
 
         DeleteGameCommand = new AsyncRelayCommand<GameModel>(DeleteGameAsync, CanDeleteGame);
         EditGameCommand = new Services.RelayCommand<GameModel>(EditGame, CanEditGame);
         OpenSaveCommand = new Services.RelayCommand<GameModel>(OpenSave, CanOpenSave);
         RestoreBackupCommand = new AsyncRelayCommand<GameModel>(RestoreBackupAsync, CanRestoreBackup);
         ScanInstalledGamesCommand = new AsyncRelayCommand(ScanInstalledGamesAsync, CanScanInstalledGames);
+        AddToBlacklistCommand = new AsyncRelayCommand<GameModel>(AddToBlacklistAsync, CanAddToBlacklist);
+        AddToWhitelistCommand = new AsyncRelayCommand<GameModel>(AddToWhitelistAsync, CanAddToWhitelist);
+
+        _installedGamesScanner = new InstalledGamesScanner(_blacklistService, _whitelistService);
 
         _ = LoadGamesAsync();
     }
@@ -114,6 +122,8 @@ public class GamesViewModel : ViewModelBase
     public ICommand OpenSaveCommand { get; }
     public IAsyncRelayCommand RestoreBackupCommand { get; }
     public IAsyncRelayCommand ScanInstalledGamesCommand { get; }
+    public IAsyncRelayCommand<GameModel> AddToBlacklistCommand { get; }
+    public IAsyncRelayCommand<GameModel> AddToWhitelistCommand { get; }
 
     public event EventHandler<GameModel>? EditGameRequested;
 
@@ -150,6 +160,8 @@ public class GamesViewModel : ViewModelBase
                 game.PropertyChanged += Game_PropertyChanged;
                 UpdateBackupCount(game);
             }
+
+            await RemoveBlacklistedGamesAsync();
         }
         catch (Exception ex)
         {
@@ -286,6 +298,7 @@ public class GamesViewModel : ViewModelBase
             FilteredGames = null;
             return;
         }
+
         if (string.IsNullOrWhiteSpace(SearchText))
         {
             FilteredGames = new ObservableCollection<GameModel>(Games);
@@ -326,6 +339,8 @@ public class GamesViewModel : ViewModelBase
                 await SaveGamesAsync();
                 LogInformation("Added {Count} new games from scan", newGames.Count);
             }
+
+            await RemoveBlacklistedGamesAsync();
         }
         catch (Exception ex)
         {
@@ -334,6 +349,76 @@ public class GamesViewModel : ViewModelBase
         finally
         {
             IsLoading = false;
+        }
+    }
+
+    private async Task RemoveBlacklistedGamesAsync()
+    {
+        if (Games == null) return;
+
+        try
+        {
+            var gamesToRemove = new List<GameModel>();
+
+            foreach (var game in Games)
+                if (game.GameName != null && _blacklistService.IsBlacklisted(game.GameName))
+                    gamesToRemove.Add(game);
+
+            if (gamesToRemove.Count > 0)
+            {
+                foreach (var game in gamesToRemove)
+                {
+                    Games.Remove(game);
+                    LogInformation("Removed blacklisted game: {GameName}", game.GameName);
+                }
+
+                await SaveGamesAsync();
+                LogInformation("Removed {Count} blacklisted games from the list", gamesToRemove.Count);
+            }
+        }
+        catch (Exception ex)
+        {
+            LogError(ex, "Error removing blacklisted games");
+        }
+    }
+
+    private async Task AddToBlacklistAsync(GameModel? game)
+    {
+        if (game == null) return;
+
+        try
+        {
+            if (game.GameName != null)
+            {
+                await _blacklistService.AddToBlacklistAsync(game.GameName);
+                await _blacklistService.ContributeToServerAsync(game.GameName);
+
+                Games?.Remove(game);
+
+                LogInformation("Added {GameName} to blacklist and contributed to server", game.GameName);
+            }
+        }
+        catch (Exception ex)
+        {
+            LogError(ex, "Error adding {GameName} to blacklist", game.GameName);
+        }
+    }
+
+    private async Task AddToWhitelistAsync(GameModel? game)
+    {
+        if (game == null) return;
+
+        try
+        {
+            var whitelistEntry = WhitelistEntry.FromGameModel(game);
+            await _whitelistService.AddToWhitelistAsync(whitelistEntry);
+            await _whitelistService.ContributeToServerAsync(whitelistEntry);
+
+            LogInformation("Added {GameName} to whitelist and contributed to server", game.GameName);
+        }
+        catch (Exception ex)
+        {
+            LogError(ex, "Error adding {GameName} to whitelist", game.GameName);
         }
     }
 
@@ -360,5 +445,15 @@ public class GamesViewModel : ViewModelBase
     private bool CanScanInstalledGames()
     {
         return !IsLoading;
+    }
+
+    private bool CanAddToBlacklist(GameModel? game)
+    {
+        return game != null && !IsLoading;
+    }
+
+    private bool CanAddToWhitelist(GameModel? game)
+    {
+        return game != null && !IsLoading;
     }
 }

@@ -78,6 +78,16 @@
                                             CommandParameter="{Binding}"
                                             Padding="8,4"
                                             IsEnabled="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).IsNotLoading}" />
+                                    <Button Content="{x:Static properties:Resources.GamesView_AddToWhitelist}"
+                                            Command="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).AddToWhitelistCommand}"
+                                            CommandParameter="{Binding}"
+                                            Padding="8,4"
+                                            IsEnabled="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).IsNotLoading}" />
+                                    <Button Content="{x:Static properties:Resources.GamesView_AddToBlacklist}"
+                                            Command="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).AddToBlacklistCommand}"
+                                            CommandParameter="{Binding}"
+                                            Padding="8,4"
+                                            IsEnabled="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).IsNotLoading}" />
                                     <Button Content="{x:Static properties:Resources.GamesView_Delete}"
                                             Command="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).DeleteGameCommand}"
                                             CommandParameter="{Binding}"

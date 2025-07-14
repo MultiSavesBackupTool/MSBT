@@ -43,4 +43,6 @@ public static class AppPaths
     public static string SettingsFilePath => Path.Combine(ConfigPath, "settings.json");
     public static string GamesFilePath => Path.Combine(DataPath, "games.json");
     public static string ServiceStateFilePath => Path.Combine(DataPath, "backup_state.json");
+    public static string BlacklistFilePath => Path.Combine(ConfigPath, "blacklist.json");
+    public static string WhitelistFilePath => Path.Combine(ConfigPath, "whitelist.json");
 }

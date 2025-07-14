@@ -7,6 +7,7 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Services;
+using Multi_Saves_Backup_Tool.Services.GameDiscovery;
 using Multi_Saves_Backup_Tool.ViewModels;
 using Multi_Saves_Backup_Tool.Views;
 using Serilog;
@@ -67,6 +68,8 @@ public class App : Application
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<IGamesService, GamesService>();
         services.AddSingleton<IBackupService, BackupService>();
+        services.AddSingleton<IBlacklistService, BlacklistService>();
+        services.AddSingleton<IWhitelistService, WhitelistService>();
         services.AddSingleton<BackupManager>();
         services.AddSingleton<MonitoringViewModel>();
         services.AddSingleton<TrayService>(provider =>
@@ -100,8 +103,11 @@ public class App : Application
                 _backupManager = _serviceProvider.GetRequiredService<BackupManager>();
 
                 var mainWindow = new MainWindow();
+                var blacklistService = _serviceProvider.GetRequiredService<IBlacklistService>();
+                var whitelistService = _serviceProvider.GetRequiredService<IWhitelistService>();
                 var mainViewModel = new MainWindowViewModel(mainWindow, gamesService, backupService,
-                    _backupManager, settingsService, statsLogger, mainWindowLogger, monitoringLogger, gamesLogger,
+                    _backupManager, settingsService, blacklistService, whitelistService, statsLogger, mainWindowLogger,
+                    monitoringLogger, gamesLogger,
                     settingsLogger);
 
                 mainWindow.DataContext = mainViewModel;

@@ -133,6 +133,24 @@
     <data name="GamesView_SearchGames" xml:space="preserve">
         <value>Search games...</value>
     </data>
+    <data name="GamesView_SyncBlacklist" xml:space="preserve">
+        <value>Sync Blacklist</value>
+    </data>
+    <data name="GamesView_AddToBlacklist" xml:space="preserve">
+        <value>Add to Blacklist</value>
+    </data>
+    <data name="GamesView_AddToWhitelist" xml:space="preserve">
+        <value>Add to Whitelist</value>
+    </data>
+    <data name="SettingsView_CommunityLists" xml:space="preserve">
+        <value>Community Lists</value>
+    </data>
+    <data name="SettingsView_SyncBlacklist" xml:space="preserve">
+        <value>Sync Blacklist</value>
+    </data>
+    <data name="SettingsView_SyncWhitelist" xml:space="preserve">
+        <value>Sync Whitelist</value>
+    </data>
 
     <!-- ==========================================
          ADD GAME OVERLAY STRINGS

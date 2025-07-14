@@ -11,16 +11,19 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Models;
 using Multi_Saves_Backup_Tool.Paths;
+using Multi_Saves_Backup_Tool.Services.GameDiscovery;
 using Properties;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
 
 public partial class SettingsViewModel : ViewModelBase
 {
+    private readonly IBlacklistService? _blacklistService;
     private readonly string _gamesPath;
     private readonly string _serviceStatePath;
     private readonly string _settingsPath;
     private readonly IStorageProvider? _storageProvider;
+    private readonly IWhitelistService? _whitelistService;
 
     [ObservableProperty] private ServiceSettings _settings;
 
@@ -35,6 +38,14 @@ public partial class SettingsViewModel : ViewModelBase
     public SettingsViewModel(IStorageProvider storageProvider, ILogger<SettingsViewModel>? logger = null) : this(logger)
     {
         _storageProvider = storageProvider;
+    }
+
+    public SettingsViewModel(IStorageProvider storageProvider, IBlacklistService blacklistService,
+        IWhitelistService whitelistService, ILogger<SettingsViewModel>? logger = null) : this(logger)
+    {
+        _storageProvider = storageProvider;
+        _blacklistService = blacklistService;
+        _whitelistService = whitelistService;
     }
 
     public string CurrentVersion =>
@@ -195,6 +206,36 @@ public partial class SettingsViewModel : ViewModelBase
         catch (Exception ex)
         {
             Debug.WriteLine($"Error importing settings: {ex}");
+        }
+    }
+
+    [RelayCommand]
+    private async Task SyncBlacklist()
+    {
+        if (_blacklistService == null) return;
+
+        try
+        {
+            await _blacklistService.SyncWithServerAsync();
+        }
+        catch
+        {
+            // Silently handle sync errors
+        }
+    }
+
+    [RelayCommand]
+    private async Task SyncWhitelist()
+    {
+        if (_whitelistService == null) return;
+
+        try
+        {
+            await _whitelistService.SyncWithServerAsync();
+        }
+        catch
+        {
+            // Silently handle sync errors
         }
     }
 

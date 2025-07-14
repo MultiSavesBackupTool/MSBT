@@ -14,7 +14,9 @@ using Multi_Saves_Backup_Tool.Models;
 
 namespace Multi_Saves_Backup_Tool.Services.GameDiscovery;
 
-public class InstalledGamesScanner
+public class InstalledGamesScanner(
+    IBlacklistService? blacklistService = null,
+    IWhitelistService? whitelistService = null)
 {
     [SupportedOSPlatform("windows")]
     public async Task<IEnumerable<GameModel>> ScanForInstalledGamesAsync(CancellationToken cancellationToken = default)
@@ -32,12 +34,44 @@ public class InstalledGamesScanner
         foreach (var games in results)
         foreach (var game in games)
         {
-            var savePaths = await GetSavePathsFromPcGamingWikiAsync(game);
-            game.SavePath = savePaths.Any() ? savePaths.FirstOrDefault() : string.Empty;
+            if (blacklistService != null && game.GameName != null && blacklistService.IsBlacklisted(game.GameName))
+            {
+                Debug.WriteLine($"Skipping blacklisted game: {game.GameName}");
+                continue;
+            }
+
+            await PopulateSaveInformationAsync(game);
             allGames.Add(game);
         }
 
         return allGames.DistinctBy(g => g.GameExe);
+    }
+
+    [SupportedOSPlatform("windows")]
+    private async Task PopulateSaveInformationAsync(GameModel game)
+    {
+        if (game.GameName == null) return;
+
+        if (whitelistService != null)
+        {
+            var whitelistEntry = whitelistService.GetWhitelistEntry(game.GameName);
+            if (whitelistEntry != null)
+            {
+                Debug.WriteLine($"Using whitelist data for: {game.GameName}");
+                game.SavePath = whitelistEntry.SavePath;
+                game.ModPath = whitelistEntry.ModPath;
+                game.AddPath = whitelistEntry.AddPath;
+                game.SpecialBackupMark = whitelistEntry.SpecialBackupMark;
+                return;
+            }
+        }
+
+        var savePaths = await GetSavePathsFromPcGamingWikiAsync(game);
+        if (savePaths.Any())
+        {
+            Debug.WriteLine($"Using PCGamingWiki data for: {game.GameName}");
+            game.SavePath = savePaths.FirstOrDefault() ?? string.Empty;
+        }
     }
 
     [SupportedOSPlatform("windows")]

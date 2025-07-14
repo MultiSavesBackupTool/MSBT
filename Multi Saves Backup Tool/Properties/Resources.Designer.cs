@@ -201,6 +201,22 @@ namespace Properties
             }
         }
 
+        public static string GamesView_AddToBlacklist
+        {
+            get
+            {
+                return ResourceManager.GetString("GamesView_AddToBlacklist", resourceCulture);
+            }
+        }
+
+        public static string GamesView_AddToWhitelist
+        {
+            get
+            {
+                return ResourceManager.GetString("GamesView_AddToWhitelist", resourceCulture);
+            }
+        }
+
         // ==========================================
         // ADD GAME OVERLAY STRINGS
         // ==========================================
@@ -493,6 +509,150 @@ namespace Properties
             get
             {
                 return ResourceManager.GetString("ImportTitle", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_CommunityLists
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_CommunityLists", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_SyncBlacklist
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_SyncBlacklist", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_SyncWhitelist
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_SyncWhitelist", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_CustomScanDirectories
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_CustomScanDirectories", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_AddDirectory
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_AddDirectory", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_RemoveDirectory
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_RemoveDirectory", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_BrowseDirectory
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_BrowseDirectory", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_DirectoryName
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_DirectoryName", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_DirectoryPath
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_DirectoryPath", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_ScanSubdirectories
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_ScanSubdirectories", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_Enabled
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_Enabled", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_CustomScanDescription
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_CustomScanDescription", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_SelectDirectoryTitle
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_SelectDirectoryTitle", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_NewDirectory
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_NewDirectory", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_SelectCustomDirectory
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_SelectCustomDirectory", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_CustomGameDirectories
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_CustomGameDirectories", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_CustomGameDirectoriesDescription
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_CustomGameDirectoriesDescription", resourceCulture);
+            }
+        }
+
+        public static string SettingsView_AddCustomDirectory
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_AddCustomDirectory", resourceCulture);
             }
         }
 
