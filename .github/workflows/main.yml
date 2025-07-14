@@ -12,7 +12,7 @@ permissions:
 jobs:
   build-windows:
     name: Build Windows installer
-    runs-on: lukiwin
+    runs-on: windows-ci
     steps:
       - name: Clean previous artifacts
         shell: powershell
@@ -55,7 +55,7 @@ jobs:
 
   createrelease:
     name: Create GitHub Release
-    runs-on: lukilinux
+    runs-on: linux-ci
     needs:
       - build-windows
     steps:
@@ -72,7 +72,7 @@ jobs:
           
   uploadwindows:
     name: Upload Windows installer
-    runs-on: lukiwin
+    runs-on: windows-ci
     needs:
       - createrelease
       - build-windows
