@@ -104,17 +104,29 @@ public class BlacklistService : IBlacklistService
 
         try
         {
+            var response = await _httpClient.GetStringAsync(ServerUrl);
+            var serverBlacklist = JsonSerializer.Deserialize<object[][]>(response) ?? [];
+            
+            bool exists = serverBlacklist.Any(e =>
+                e.Length > 0 && string.Equals(e[0]?.ToString(), gameName, StringComparison.OrdinalIgnoreCase));
+
+            if (exists)
+            {
+                _logger.LogInformation("Game {GameName} already exists on the server blacklist. Skipping contribution.", gameName);
+                return;
+            }
+
             _logger.LogInformation("Contributing {GameName} to server blacklist", gameName);
             var data = new { gameName };
             var json = JsonSerializer.Serialize(data);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync(ServerUrl, content);
-            if (response.IsSuccessStatusCode)
+            var postResponse = await _httpClient.PostAsync(ServerUrl, content);
+            if (postResponse.IsSuccessStatusCode)
                 _logger.LogInformation("Successfully contributed {GameName} to server", gameName);
             else
                 _logger.LogWarning("Failed to contribute {GameName} to server. Status: {StatusCode}",
-                    gameName, response.StatusCode);
+                    gameName, postResponse.StatusCode);
         }
         catch (Exception ex)
         {

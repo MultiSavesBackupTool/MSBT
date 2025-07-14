@@ -70,19 +70,34 @@ public class WhitelistService : IWhitelistService
         {
             _logger.LogInformation("Syncing whitelist with server...");
             var response = await _httpClient.GetStringAsync(ServerUrl);
-            var serverWhitelist = JsonSerializer.Deserialize<string[][]>(response) ?? [];
+            var serverWhitelist = JsonSerializer.Deserialize<object[][]>(response) ?? [];
 
             var newEntries = new List<WhitelistEntry>();
 
             foreach (var entry in serverWhitelist)
                 if (entry.Length >= 4)
                 {
+                    var gameName = entry[0]?.ToString() ?? string.Empty;
+                    var savePath = entry[1]?.ToString();
+                    var modPath = entry.Length > 2 ? entry[2]?.ToString() : null;
+                    var addPath = entry.Length > 3 ? entry[3]?.ToString() : null;
+                    var specialMark = false;
+                    if (entry.Length > 4)
+                    {
+                        if (entry[4] is System.Text.Json.JsonElement je && je.ValueKind == System.Text.Json.JsonValueKind.Number)
+                            specialMark = je.GetInt32() == 1;
+                        else if (entry[4] is int i)
+                            specialMark = i == 1;
+                        else if (entry[4]?.ToString() == "1")
+                            specialMark = true;
+                    }
+
                     var whitelistEntry = new WhitelistEntry(
-                        entry[0],
-                        entry[1],
-                        entry.Length > 2 && !string.IsNullOrEmpty(entry[2]) ? entry[2] : null,
-                        entry.Length > 3 && !string.IsNullOrEmpty(entry[3]) ? entry[3] : null,
-                        entry.Length > 4 && int.TryParse(entry[4], out var specialMark) && specialMark == 1
+                        gameName,
+                        savePath,
+                        modPath,
+                        addPath,
+                        specialMark
                     );
 
                     if (_whitelist.TryAdd(whitelistEntry.GameName, whitelistEntry)) newEntries.Add(whitelistEntry);
@@ -111,6 +126,18 @@ public class WhitelistService : IWhitelistService
 
         try
         {
+            var response = await _httpClient.GetStringAsync(ServerUrl);
+            var serverWhitelist = JsonSerializer.Deserialize<object[][]>(response) ?? [];
+            
+            bool exists = serverWhitelist.Any(e =>
+                e.Length > 0 && string.Equals(e[0]?.ToString(), entry.GameName, StringComparison.OrdinalIgnoreCase));
+
+            if (exists)
+            {
+                _logger.LogInformation("Game {GameName} already exists on the server whitelist. Skipping contribution.", entry.GameName);
+                return;
+            }
+
             _logger.LogInformation("Contributing {GameName} to server whitelist", entry.GameName);
             var data = new
             {
@@ -124,12 +151,12 @@ public class WhitelistService : IWhitelistService
             var json = JsonSerializer.Serialize(data);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync(ServerUrl, content);
-            if (response.IsSuccessStatusCode)
+            var postResponse = await _httpClient.PostAsync(ServerUrl, content);
+            if (postResponse.IsSuccessStatusCode)
                 _logger.LogInformation("Successfully contributed {GameName} to server", entry.GameName);
             else
                 _logger.LogWarning("Failed to contribute {GameName} to server. Status: {StatusCode}",
-                    entry.GameName, response.StatusCode);
+                    entry.GameName, postResponse.StatusCode);
         }
         catch (Exception ex)
         {
