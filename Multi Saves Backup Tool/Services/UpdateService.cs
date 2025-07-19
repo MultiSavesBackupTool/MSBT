@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -70,25 +71,33 @@ public class UpdateService : IDisposable
                 var latestVersionString = release.TagName.TrimStart('v');
                 Debug.WriteLine($"Current version: {_currentVersion}, Latest version: {latestVersionString}");
 
-                if (!latestVersionString.Contains('.'))
-                    latestVersionString = $"{latestVersionString}.0.0.0";
-
-                if (!Version.TryParse(latestVersionString, out var latestVersionParsed) ||
-                    !Version.TryParse(_currentVersion, out var currentVersionParsed))
+                // Try custom version format first, then fallback to standard semantic versioning
+                var hasUpdate = false;
+                if (IsCustomVersionFormat(latestVersionString) && IsCustomVersionFormat(_currentVersion))
                 {
-                    Debug.WriteLine(
-                        $"Could not parse versions for comparison: '{latestVersionString}' and '{_currentVersion}'");
-                    var hasUpdateFallback = string.Compare(latestVersionString, _currentVersion,
-                        StringComparison.OrdinalIgnoreCase) > 0;
-                    var downloadUrlFallback = GetDownloadUrlForCurrentPlatform(release.Assets);
-                    Debug.WriteLine(
-                        $"Using fallback comparison. Has update: {hasUpdateFallback}, Download URL: {downloadUrlFallback}");
-                    return (hasUpdateFallback, latestVersionString, downloadUrlFallback);
+                    hasUpdate = CompareCustomVersions(latestVersionString, _currentVersion) > 0;
+                    Debug.WriteLine($"Using custom version comparison. Has update: {hasUpdate}");
                 }
+                else
+                {
+                    // Fallback to standard semantic versioning
+                    if (!latestVersionString.Contains('.'))
+                        latestVersionString = $"{latestVersionString}.0.0.0";
 
-                var hasUpdate = latestVersionParsed.CompareTo(currentVersionParsed) > 0;
-                Debug.WriteLine(
-                    $"Version comparison: Current={currentVersionParsed}, Latest={latestVersionParsed}, HasUpdate={hasUpdate}");
+                    if (!Version.TryParse(latestVersionString, out var latestVersionParsed) ||
+                        !Version.TryParse(_currentVersion, out var currentVersionParsed))
+                    {
+                        Debug.WriteLine(
+                            $"Could not parse versions for comparison: '{latestVersionString}' and '{_currentVersion}'");
+                        hasUpdate = string.Compare(latestVersionString, _currentVersion,
+                            StringComparison.OrdinalIgnoreCase) > 0;
+                    }
+                    else
+                    {
+                        hasUpdate = latestVersionParsed.CompareTo(currentVersionParsed) > 0;
+                    }
+                    Debug.WriteLine($"Using standard version comparison. Has update: {hasUpdate}");
+                }
 
                 string? downloadUrl = null;
                 if (hasUpdate)
@@ -113,6 +122,65 @@ public class UpdateService : IDisposable
         {
             Debug.WriteLine($"Error checking for updates: {ex.Message}");
             return (false, _currentVersion, null);
+        }
+    }
+
+    private bool IsCustomVersionFormat(string version)
+    {
+        if (string.IsNullOrWhiteSpace(version))
+            return false;
+
+        // Pattern: YY.S.M.B where YY=year, S=season (P/S/A/W), M=minor, B=patch
+        var pattern = @"^(\d{2})\.([PSAW])\.(\d+)\.(\d+)$";
+        return Regex.IsMatch(version, pattern, RegexOptions.IgnoreCase);
+    }
+
+    private int CompareCustomVersions(string version1, string version2)
+    {
+        try
+        {
+            var match1 = Regex.Match(version1, @"^(\d{2})\.([PSAW])\.(\d+)\.(\d+)$", RegexOptions.IgnoreCase);
+            var match2 = Regex.Match(version2, @"^(\d{2})\.([PSAW])\.(\d+)\.(\d+)$", RegexOptions.IgnoreCase);
+
+            if (!match1.Success || !match2.Success)
+                return 0;
+
+            // Extract components
+            var year1 = int.Parse(match1.Groups[1].Value);
+            var year2 = int.Parse(match2.Groups[1].Value);
+            
+            var season1 = match1.Groups[2].Value.ToUpper();
+            var season2 = match2.Groups[2].Value.ToUpper();
+            
+            var minor1 = int.Parse(match1.Groups[3].Value);
+            var minor2 = int.Parse(match2.Groups[3].Value);
+            
+            var patch1 = int.Parse(match1.Groups[4].Value);
+            var patch2 = int.Parse(match2.Groups[4].Value);
+
+            // Compare year first
+            if (year1 != year2)
+                return year1.CompareTo(year2);
+
+            // Compare season (P < S < A < W)
+            var seasonOrder = new Dictionary<string, int> { { "P", 0 }, { "S", 1 }, { "A", 2 }, { "W", 3 } };
+            var season1Order = seasonOrder[season1];
+            var season2Order = seasonOrder[season2];
+            
+            if (season1Order != season2Order)
+                return season1Order.CompareTo(season2Order);
+
+            // Compare minor release
+            if (minor1 != minor2)
+                return minor1.CompareTo(minor2);
+
+            // Compare patch
+            return patch1.CompareTo(patch2);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error comparing custom versions '{version1}' and '{version2}': {ex.Message}");
+            return 0;
         }
     }
 

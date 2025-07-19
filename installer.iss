@@ -34,6 +34,7 @@ Name: "startup"; Description: "{cm:StartupDesc}"; GroupDescription: "{cm:Additio
 
 [Files]
 Source: "publish\release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "publish\release\*.dll"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

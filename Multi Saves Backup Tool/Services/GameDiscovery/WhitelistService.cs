@@ -77,18 +77,18 @@ public class WhitelistService : IWhitelistService
             foreach (var entry in serverWhitelist)
                 if (entry.Length >= 4)
                 {
-                    var gameName = entry[0]?.ToString() ?? string.Empty;
-                    var savePath = entry[1]?.ToString();
-                    var modPath = entry.Length > 2 ? entry[2]?.ToString() : null;
-                    var addPath = entry.Length > 3 ? entry[3]?.ToString() : null;
+                    var gameName = entry[0].ToString() ?? string.Empty;
+                    var savePath = entry[1].ToString() ?? string.Empty;
+                    var modPath = entry.Length > 2 ? entry[2].ToString() : null;
+                    var addPath = entry.Length > 3 ? entry[3].ToString() : null;
                     var specialMark = false;
                     if (entry.Length > 4)
                     {
-                        if (entry[4] is System.Text.Json.JsonElement je && je.ValueKind == System.Text.Json.JsonValueKind.Number)
+                        if (entry[4] is JsonElement je && je.ValueKind == JsonValueKind.Number)
                             specialMark = je.GetInt32() == 1;
                         else if (entry[4] is int i)
                             specialMark = i == 1;
-                        else if (entry[4]?.ToString() == "1")
+                        else if (entry[4].ToString() == "1")
                             specialMark = true;
                     }
 
@@ -130,7 +130,7 @@ public class WhitelistService : IWhitelistService
             var serverWhitelist = JsonSerializer.Deserialize<object[][]>(response) ?? [];
             
             bool exists = serverWhitelist.Any(e =>
-                e.Length > 0 && string.Equals(e[0]?.ToString(), entry.GameName, StringComparison.OrdinalIgnoreCase));
+                e.Length > 0 && string.Equals(e[0].ToString(), entry.GameName, StringComparison.OrdinalIgnoreCase));
 
             if (exists)
             {

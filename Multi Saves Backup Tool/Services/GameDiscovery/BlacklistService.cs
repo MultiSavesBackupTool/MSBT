@@ -108,7 +108,7 @@ public class BlacklistService : IBlacklistService
             var serverBlacklist = JsonSerializer.Deserialize<object[][]>(response) ?? [];
             
             bool exists = serverBlacklist.Any(e =>
-                e.Length > 0 && string.Equals(e[0]?.ToString(), gameName, StringComparison.OrdinalIgnoreCase));
+                e.Length > 0 && string.Equals(e[0].ToString(), gameName, StringComparison.OrdinalIgnoreCase));
 
             if (exists)
             {
