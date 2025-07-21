@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace Multi_Saves_Backup_Tool.Models;
 
@@ -16,10 +17,15 @@ public class GameModel : INotifyPropertyChanged
     private string? _gameExeAlt;
     private string? _gameName = string.Empty;
     private bool _isEnabled = true;
+    private bool _isHidden;
+    private bool _isSelected;
     private string? _modPath;
+    private string? _platform;
     private string? _savePath = string.Empty;
     private int _setOldFilesStatus;
     private bool _specialBackupMark;
+
+    [JsonIgnore] public bool ShowHiddenGames { get; set; }
 
     public string? GameName
     {
@@ -119,6 +125,32 @@ public class GameModel : INotifyPropertyChanged
         set => SetField(ref _specialBackupMark, value);
     }
 
+    [JsonIgnore]
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set
+        {
+            if (_isSelected != value)
+            {
+                _isSelected = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public string? Platform
+    {
+        get => _platform;
+        set => SetField(ref _platform, value);
+    }
+
+    public bool IsHidden
+    {
+        get => _isHidden;
+        set => SetField(ref _isHidden, value);
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -169,7 +201,9 @@ public class GameModel : INotifyPropertyChanged
             IsEnabled = IsEnabled,
             BackupInterval = BackupInterval,
             BackupCount = BackupCount,
-            SpecialBackupMark = SpecialBackupMark
+            SpecialBackupMark = SpecialBackupMark,
+            IsHidden = IsHidden,
+            Platform = Platform
         };
     }
 

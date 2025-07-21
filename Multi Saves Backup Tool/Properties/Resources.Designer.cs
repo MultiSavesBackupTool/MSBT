@@ -67,14 +67,6 @@ namespace Properties
             }
         }
 
-        public static string MainWindow_Stats
-        {
-            get
-            {
-                return ResourceManager.GetString("MainWindow_Stats", resourceCulture);
-            }
-        }
-        
         public static string MainWindow_Settings
         {
             get
@@ -131,6 +123,54 @@ namespace Properties
             get
             {
                 return ResourceManager.GetString("MonitoringView_NextBackup", resourceCulture);
+            }
+        }
+
+        public static string MonitoringView_RestartService
+        {
+            get
+            {
+                return ResourceManager.GetString("MonitoringView_RestartService", resourceCulture);
+            }
+        }
+
+        public static string MonitoringView_DisplayOptions
+        {
+            get
+            {
+                return ResourceManager.GetString("MonitoringView_DisplayOptions", resourceCulture);
+            }
+        }
+
+        public static string MonitoringView_ArchivesCounts
+        {
+            get
+            {
+                return ResourceManager.GetString("MonitoringView_ArchivesCounts", resourceCulture);
+            }
+        }
+
+        public static string MonitoringView_ArchivesSize
+        {
+            get
+            {
+                return ResourceManager.GetString("MonitoringView_ArchivesSize", resourceCulture);
+            }
+        }
+
+        public static string MonitoringView_NextBackupStatus
+        {
+            get
+            {
+                return ResourceManager.GetString("MonitoringView_NextBackupStatus", resourceCulture);
+            }
+        }
+
+        public static string MonitoringView_StatusBadge
+        {
+            get
+            {
+                return ResourceManager.GetString("MonitoringView_StatusBadge", resourceCulture);
             }
         }
 
@@ -214,6 +254,108 @@ namespace Properties
             get
             {
                 return ResourceManager.GetString("GamesView_AddToWhitelist", resourceCulture);
+            }
+        }
+
+        public static string GamesView_SyncBlacklist
+        {
+            get
+            {
+                return ResourceManager.GetString("GamesView_SyncBlacklist", resourceCulture);
+            }
+        }
+
+        public static string GamesView_DisableGame
+        {
+            get
+            {
+                return ResourceManager.GetString("GamesView_DisableGame", resourceCulture);
+            }
+        }
+
+        public static string GamesView_EnableGame
+        {
+            get
+            {
+                return ResourceManager.GetString("GamesView_EnableGame", resourceCulture);
+            }
+        }
+
+        public static string GamesView_GamesCount
+        {
+            get
+            {
+                return ResourceManager.GetString("GamesView_GamesCount", resourceCulture);
+            }
+        }
+
+        public static string GamesView_GlobalActions
+        {
+            get
+            {
+                return ResourceManager.GetString("GamesView_GlobalActions", resourceCulture);
+            }
+        }
+
+        public static string GamesView_EnableGameGlobal
+        {
+            get
+            {
+                return ResourceManager.GetString("GamesView_EnableGameGlobal", resourceCulture);
+            }
+        }
+
+        public static string GamesView_DisableGameGlobal
+        {
+            get
+            {
+                return ResourceManager.GetString("GamesView_DisableGameGlobal", resourceCulture);
+            }
+        }
+
+        public static string GamesView_AddToWhiteListGlobal
+        {
+            get
+            {
+                return ResourceManager.GetString("GamesView_AddToWhiteListGlobal", resourceCulture);
+            }
+        }
+
+        public static string GamesView_AddToBlackListGlobal
+        {
+            get
+            {
+                return ResourceManager.GetString("GamesView_AddToBlackListGlobal", resourceCulture);
+            }
+        }
+        
+        public static string GamesView_HideGame {
+            get {
+                return ResourceManager.GetString("GamesView_HideGame", resourceCulture);
+            }
+        }
+        
+        public static string GamesView_HideSelected {
+            get {
+                return ResourceManager.GetString("GamesView_HideSelected", resourceCulture);
+            }
+        }
+        
+        public static string GamesView_ShowHiddenGames {
+            get {
+                return ResourceManager.GetString("GamesView_ShowHiddenGames", resourceCulture);
+            }
+        }
+        
+        public static string GamesView_UnhideGame {
+            get {
+                return ResourceManager.GetString("GamesView_UnhideGame", resourceCulture);
+            }
+        }
+        
+        public static string GamesView_UnhideSelected {
+            get {
+                return ResourceManager.GetString("GamesView_UnhideSelected", resourceCulture);
             }
         }
 
@@ -600,59 +742,27 @@ namespace Properties
             }
         }
 
-        public static string SettingsView_CustomScanDescription
+        public static string SettingsView_minutes
         {
             get
             {
-                return ResourceManager.GetString("SettingsView_CustomScanDescription", resourceCulture);
+                return ResourceManager.GetString("SettingsView_minutes", resourceCulture);
             }
         }
 
-        public static string SettingsView_SelectDirectoryTitle
+        public static string SettingsView_simultaneousbackups
         {
             get
             {
-                return ResourceManager.GetString("SettingsView_SelectDirectoryTitle", resourceCulture);
+                return ResourceManager.GetString("SettingsView_simultaneousbackups", resourceCulture);
             }
         }
 
-        public static string SettingsView_NewDirectory
+        public static string SettingsView_synccommunitytext
         {
             get
             {
-                return ResourceManager.GetString("SettingsView_NewDirectory", resourceCulture);
-            }
-        }
-
-        public static string SettingsView_SelectCustomDirectory
-        {
-            get
-            {
-                return ResourceManager.GetString("SettingsView_SelectCustomDirectory", resourceCulture);
-            }
-        }
-
-        public static string SettingsView_CustomGameDirectories
-        {
-            get
-            {
-                return ResourceManager.GetString("SettingsView_CustomGameDirectories", resourceCulture);
-            }
-        }
-
-        public static string SettingsView_CustomGameDirectoriesDescription
-        {
-            get
-            {
-                return ResourceManager.GetString("SettingsView_CustomGameDirectoriesDescription", resourceCulture);
-            }
-        }
-
-        public static string SettingsView_AddCustomDirectory
-        {
-            get
-            {
-                return ResourceManager.GetString("SettingsView_AddCustomDirectory", resourceCulture);
+                return ResourceManager.GetString("SettingsView_synccommunitytext", resourceCulture);
             }
         }
 
@@ -672,22 +782,6 @@ namespace Properties
             get
             {
                 return ResourceManager.GetString("StatsView_ArchivesCounts", resourceCulture);
-            }
-        }
-
-        public static string StatsView_GamesCountArchives
-        {
-            get
-            {
-                return ResourceManager.GetString("StatsView_GamesCountArchives", resourceCulture);
-            }
-        }
-
-        public static string StatsView_GamesSizesArchives
-        {
-            get
-            {
-                return ResourceManager.GetString("StatsView_GamesSizesArchives", resourceCulture);
             }
         }
 

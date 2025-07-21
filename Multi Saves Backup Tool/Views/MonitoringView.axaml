@@ -4,51 +4,181 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:Multi_Saves_Backup_Tool.ViewModels"
              xmlns:properties="clr-namespace:Properties"
+             x:DataType="vm:MonitoringViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Multi_Saves_Backup_Tool.Views.MonitoringView"
-             x:DataType="vm:MonitoringViewModel">
+             x:Name="RootControl">
 
     <Design.DataContext>
         <vm:MonitoringViewModel />
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto,*" Margin="20">
-        <!-- Service Status -->
-        <StackPanel Grid.Row="0" Spacing="10" Margin="0,0,0,20">
-            <Grid ColumnDefinitions="*,Auto">
-                <StackPanel Grid.Column="0">
-                    <TextBlock Text="{x:Static properties:Resources.MonitoringView_ServiceStatus}" FontSize="14" />
-                    <TextBlock Text="{Binding ServiceStatus}" FontSize="20" FontWeight="Bold" />
-                </StackPanel>
-                <StackPanel Grid.Column="1" HorizontalAlignment="Right">
-                    <TextBlock Text="{x:Static properties:Resources.MonitoringView_LastUpdate}" FontSize="14" />
-                    <TextBlock Text="{Binding LastUpdateTime}" FontWeight="SemiBold" />
-                </StackPanel>
-            </Grid>
-        </StackPanel>
+    <Grid RowDefinitions="Auto,Auto,*">
 
-        <!-- Games Table -->
-        <Border Grid.Row="1" BorderBrush="{DynamicResource SystemControlHighlightBaseMediumLowBrush}"
-                BorderThickness="1" CornerRadius="4">
-            <DataGrid ItemsSource="{Binding Games}"
-                      IsReadOnly="True"
-                      AutoGenerateColumns="False"
-                      GridLinesVisibility="All">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="{x:Static properties:Resources.MonitoringView_GameName}"
-                                        Binding="{Binding GameName}"
-                                        Width="2*" />
-                    <DataGridTextColumn Header="{x:Static properties:Resources.MonitoringView_Status}"
-                                        Binding="{Binding Status}"
-                                        Width="*" />
-                    <DataGridTextColumn Header="{x:Static properties:Resources.MonitoringView_LastBackup}"
-                                        Binding="{Binding LastBackupTime}"
-                                        Width="2*" />
-                    <DataGridTextColumn Header="{x:Static properties:Resources.MonitoringView_NextBackup}"
-                                        Binding="{Binding NextBackupScheduled}"
-                                        Width="2*" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </Border>
+        <Grid Grid.Row="0" Margin="12" RowDefinitions="Auto,Auto">
+
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,12">
+
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Text="{x:Static properties:Resources.MonitoringView_ServiceStatus}"
+                               FontSize="14"
+                               Opacity="0.7"
+                               Margin="0,0,0,4" />
+                    <TextBlock Text="{Binding ServiceStatus}"
+                               FontSize="20"
+                               FontWeight="SemiBold" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right">
+                        <TextBlock Text="{x:Static properties:Resources.MonitoringView_LastUpdate}"
+                                   FontSize="14"
+                                   Opacity="0.7"
+                                   HorizontalAlignment="Right" />
+                        <TextBlock Text="{Binding LastUpdateTime}"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Right" />
+                    </StackPanel>
+                </StackPanel>
+                
+                <Grid Grid.Column="2" ColumnDefinitions="*,Auto,*" Margin="24,0,0,0" VerticalAlignment="Center">
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="{x:Static properties:Resources.StatsView_ArchivesCounts}"
+                                   FontSize="14"
+                                   Opacity="0.7"
+                                   Margin="0,0,0,4" />
+                        <TextBlock Text="{Binding ArchivesCounts}"
+                                   FontSize="18"
+                                   FontWeight="SemiBold" />
+                    </StackPanel>
+
+                    <Border Grid.Column="1" Width="1" Height="40"
+                            Background="{DynamicResource CardStrokeColorDefaultBrush}" Margin="16,0" />
+
+                    <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                        <TextBlock Text="{x:Static properties:Resources.StatsView_SizesArchives}"
+                                   FontSize="14"
+                                   Opacity="0.7"
+                                   Margin="0,0,0,4"
+                                   HorizontalAlignment="Right" />
+                        <TextBlock Text="{Binding SizesArchives}"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Right" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+
+
+        <Grid Grid.Row="1" Margin="12,0,12,12">
+            <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
+                    BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="12">
+                <DockPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="20" DockPanel.Dock="Left">
+                        <TextBlock Text="{x:Static properties:Resources.MonitoringView_DisplayOptions}"
+                                   FontWeight="Medium"
+                                   VerticalAlignment="Center"
+                                   Opacity="0.8" />
+
+                        <CheckBox Content="{x:Static properties:Resources.MonitoringView_ArchivesCounts}"
+                                  IsChecked="{Binding ShowArchiveCount}"
+                                  VerticalAlignment="Center" />
+
+                        <CheckBox Content="{x:Static properties:Resources.MonitoringView_ArchivesSize}"
+                                  IsChecked="{Binding ShowArchiveSize}"
+                                  VerticalAlignment="Center" />
+
+                        <CheckBox Content="{x:Static properties:Resources.MonitoringView_NextBackupStatus}"
+                                  IsChecked="{Binding ShowNextBackup}"
+                                  VerticalAlignment="Center" />
+
+                        <CheckBox Content="{x:Static properties:Resources.MonitoringView_StatusBadge}"
+                                  IsChecked="{Binding ShowStatusBadge}"
+                                  VerticalAlignment="Center" />
+                    </StackPanel>
+                    <Button Content="{x:Static properties:Resources.MonitoringView_RestartService}"
+                            Command="{Binding RestartServiceCommand}"
+                            VerticalAlignment="Center"
+                            MinWidth="140"
+                            Classes="accent"
+                            DockPanel.Dock="Right"
+                            HorizontalAlignment="Right" />
+                </DockPanel>
+            </Border>
+        </Grid>
+
+        <ScrollViewer Grid.Row="2" Margin="16,0">
+            <ItemsControl ItemsSource="{Binding Games}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                Margin="0,0,0,8"
+                                Padding="16"
+                                CornerRadius="8">
+
+                            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding GameName}"
+                                               FontWeight="SemiBold"
+                                               FontSize="16"
+                                               Margin="0,0,0,4" />
+
+                                    <TextBlock
+                                        Text="{Binding LastBackupTime, StringFormat='{x:Static properties:Resources.MonitoringView_LastBackup}'}"
+                                        FontSize="13"
+                                        Opacity="0.8"
+                                        Margin="0,0,0,2" />
+
+                                    <TextBlock
+                                        Text="{Binding NextBackupScheduled, StringFormat='{x:Static properties:Resources.MonitoringView_NextBackup}'}"
+                                        FontSize="12"
+                                        Opacity="0.6"
+                                        IsVisible="{Binding ShowNextBackup}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Right"
+                                            Spacing="4"
+                                            Margin="0,0,12,0">
+
+                                    <StackPanel IsVisible="{Binding ShowArchiveCount}">
+                                        <TextBlock Text="Archives" FontSize="11" />
+                                        <TextBlock Text="{Binding GamesCountArchives}" FontSize="13" />
+                                    </StackPanel>
+
+                                    <StackPanel IsVisible="{Binding ShowArchiveSize}">
+                                        <TextBlock Text="Size" FontSize="11" />
+                                        <TextBlock Text="{Binding GamesSizesArchives}" FontSize="13" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <Border Grid.Column="2"
+                                        Background="{DynamicResource AccentFillColorDefaultBrush}"
+                                        CornerRadius="12"
+                                        Padding="8,4"
+                                        Margin="0,0,8,0"
+                                        VerticalAlignment="Center"
+                                        IsVisible="{Binding ShowStatusBadge}">
+                                    <TextBlock Text="{Binding Status}"
+                                               Foreground="White"
+                                               FontSize="12"
+                                               FontWeight="Medium"
+                                               VerticalAlignment="Center" />
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
     </Grid>
+
 </UserControl>

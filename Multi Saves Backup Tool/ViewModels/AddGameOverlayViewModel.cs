@@ -170,7 +170,8 @@ public partial class AddGameOverlayViewModel : ViewModelBase
             BackupInterval = BackupInterval,
             SpecialBackupMark = SpecialBackupMark,
             IsEnabled = !IsEditMode || (_editingGame?.IsEnabled ?? true),
-            BackupCount = IsEditMode ? _editingGame?.BackupCount ?? 0 : 0
+            BackupCount = IsEditMode ? _editingGame?.BackupCount ?? 0 : 0,
+            IsHidden = IsEditMode && _editingGame is { IsHidden: true }
         };
 
         if (IsEditMode && _editingGame != null)

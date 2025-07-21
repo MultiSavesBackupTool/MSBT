@@ -77,9 +77,6 @@
     <data name="MainWindow_Games" xml:space="preserve">
         <value>Игры</value>
     </data>
-    <data name="MainWindow_Stats" xml:space="preserve">
-        <value>Статистика</value>
-    </data>
     <data name="MainWindow_Settings" xml:space="preserve">
         <value>Настройки</value>
     </data>
@@ -100,10 +97,28 @@
         <value>Статус</value>
     </data>
     <data name="MonitoringView_LastBackup" xml:space="preserve">
-        <value>Последнее резервное копирование</value>
+        <value>Последнее резервное копирование: {0}</value>
     </data>
     <data name="MonitoringView_NextBackup" xml:space="preserve">
-        <value>Следующее резервное копирование</value>
+        <value>Следующее резервное копирование: {0}</value>
+    </data>
+    <data name="MonitoringView_RestartService" xml:space="preserve">
+        <value>Перезапустить сервис</value>
+    </data>
+    <data name="MonitoringView_DisplayOptions" xml:space="preserve">
+        <value>Параметры отображения</value>
+    </data>
+    <data name="MonitoringView_ArchivesCounts" xml:space="preserve">
+        <value>Количество архивов</value>
+    </data>
+    <data name="MonitoringView_ArchivesSize" xml:space="preserve">
+        <value>Общий размер архивов</value>
+    </data>
+    <data name="MonitoringView_NextBackupStatus" xml:space="preserve">
+        <value>Статус следующего бэкапа</value>
+    </data>
+    <data name="MonitoringView_StatusBadge" xml:space="preserve">
+        <value>Индикатор статуса</value>
     </data>
 
     <!-- ==========================================
@@ -138,6 +153,48 @@
     </data>
     <data name="GamesView_AddToWhitelist" xml:space="preserve">
         <value>Добавить в белый список</value>
+    </data>
+    <data name="GamesView_SyncBlacklist" xml:space="preserve">
+        <value>Синхронизировать черный список</value>
+    </data>
+    <data name="GamesView_DisableGame" xml:space="preserve">
+        <value>Отключить игру</value>
+    </data>
+    <data name="GamesView_EnableGame" xml:space="preserve">
+        <value>Включить игру</value>
+    </data>
+    <data name="GamesView_GamesCount" xml:space="preserve">
+        <value>Всего игр:</value>
+    </data>
+    <data name="GamesView_GlobalActions" xml:space="preserve">
+        <value>Глобальные действия</value>
+    </data>
+    <data name="GamesView_EnableGameGlobal" xml:space="preserve">
+        <value>Включить выбранные</value>
+    </data>
+    <data name="GamesView_DisableGameGlobal" xml:space="preserve">
+        <value>Отключить выбранные</value>
+    </data>
+    <data name="GamesView_AddToWhiteListGlobal" xml:space="preserve">
+        <value>Добавить выбранные в белый список</value>
+    </data>
+    <data name="GamesView_AddToBlackListGlobal" xml:space="preserve">
+        <value>Добавить выбранные в черный список</value>
+    </data>
+    <data name="GamesView_HideGame" xml:space="preserve">
+        <value>Скрыть игру</value>
+    </data>
+    <data name="GamesView_HideSelected" xml:space="preserve">
+        <value>Скрыть выбранные</value>
+    </data>
+    <data name="GamesView_ShowHiddenGames" xml:space="preserve">
+        <value>Показать скрытые игры</value>
+    </data>
+    <data name="GamesView_UnhideGame" xml:space="preserve">
+        <value>Показать игру</value>
+    </data>
+    <data name="GamesView_UnhideSelected" xml:space="preserve">
+        <value>Показать выбранные</value>
     </data>
 
     <!-- ==========================================
@@ -266,6 +323,9 @@
     <data name="SettingsView_SyncWhitelist" xml:space="preserve">
         <value>Синхронизировать белый список</value>
     </data>
+    <data name="SettingsView_synccommunitytext" xml:space="preserve">
+        <value>Синхронизируйте с сообществом для лучшего покрытия</value>
+    </data>
     <data name="SettingsView_CustomScanDirectories" xml:space="preserve">
         <value>Кастомные директории сканирования</value>
     </data>
@@ -279,16 +339,22 @@
         <value>Обзор</value>
     </data>
     <data name="SettingsView_DirectoryName" xml:space="preserve">
-        <value>Directory Name</value>
+        <value>Имя директории</value>
     </data>
     <data name="SettingsView_DirectoryPath" xml:space="preserve">
-        <value>Directory Path</value>
+        <value>Путь к директории</value>
     </data>
     <data name="SettingsView_ScanSubdirectories" xml:space="preserve">
-        <value>Scan Subdirectories</value>
+        <value>Сканировать поддиректории</value>
     </data>
     <data name="SettingsView_Enabled" xml:space="preserve">
-        <value>Enabled</value>
+        <value>Включено</value>
+    </data>
+    <data name="SettingsView_minutes" xml:space="preserve">
+        <value>минут</value>
+    </data>
+    <data name="SettingsView_simultaneousbackups" xml:space="preserve">
+        <value>Параллельных бэкапов</value>
     </data>
 
     <!-- ==========================================
@@ -300,13 +366,6 @@
     <data name="StatsView_ArchivesCounts" xml:space="preserve">
         <value>Количество всех архивов:</value>
     </data>
-    <data name="StatsView_GamesCountArchives" xml:space="preserve">
-        <value>Количество архивов</value>
-    </data>
-    <data name="StatsView_GamesSizesArchives" xml:space="preserve">
-        <value>Общий размер</value>
-    </data>
-
     <!-- ==========================================
          СТРОКИ СТАТУСА
          ========================================== -->

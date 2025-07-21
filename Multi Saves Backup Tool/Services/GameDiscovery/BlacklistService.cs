@@ -106,13 +106,14 @@ public class BlacklistService : IBlacklistService
         {
             var response = await _httpClient.GetStringAsync(ServerUrl);
             var serverBlacklist = JsonSerializer.Deserialize<object[][]>(response) ?? [];
-            
-            bool exists = serverBlacklist.Any(e =>
+
+            var exists = serverBlacklist.Any(e =>
                 e.Length > 0 && string.Equals(e[0].ToString(), gameName, StringComparison.OrdinalIgnoreCase));
 
             if (exists)
             {
-                _logger.LogInformation("Game {GameName} already exists on the server blacklist. Skipping contribution.", gameName);
+                _logger.LogInformation("Game {GameName} already exists on the server blacklist. Skipping contribution.",
+                    gameName);
                 return;
             }
 

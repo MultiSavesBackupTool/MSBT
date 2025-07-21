@@ -6,100 +6,305 @@
              xmlns:models="using:Multi_Saves_Backup_Tool.Models"
              xmlns:properties="clr-namespace:Properties"
              xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:conv="clr-namespace:Multi_Saves_Backup_Tool.Converters"
              x:DataType="vm:GamesViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Multi_Saves_Backup_Tool.Views.GamesView"
              x:Name="RootControl">
 
+    <UserControl.Resources>
+        <conv:EnableDisableConverter x:Key="EnableDisableConverter" />
+        <conv:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisibilityConverter" />
+        <conv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+    </UserControl.Resources>
+
     <Design.DataContext>
         <vm:GamesViewModel />
     </Design.DataContext>
 
-    <DockPanel>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10,10,0,10" Spacing="10">
-            <Button Content="{x:Static properties:Resources.GamesView_AddGame}"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top"
-                    Click="AddGameButton_Click"
-                    IsEnabled="{Binding IsNotLoading}" />
-            <Button Content="{x:Static properties:Resources.GamesView_ScanInstalledGames}"
-                    Command="{Binding ScanInstalledGamesCommand}"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top"
-                    IsEnabled="{Binding IsNotLoading}" />
-            <controls:ProgressRing IsVisible="{Binding IsLoading}"
-                                   IsIndeterminate="True"
-                                   Width="20"
-                                   Height="20"
-                                   VerticalAlignment="Center" />
-            <TextBox Width="250"
-                     Watermark="{x:Static properties:Resources.GamesView_SearchGames}"
-                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
-        </StackPanel>
+    <Grid RowDefinitions="Auto,*">
 
-        <ScrollViewer>
+        <Grid Grid.Row="0" Margin="12" RowDefinitions="Auto,Auto">
+
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+                <TextBox Grid.Column="0"
+                         Width="300"
+                         HorizontalAlignment="Left"
+                         Watermark="{x:Static properties:Resources.GamesView_SearchGames}"
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                    <TextBlock VerticalAlignment="Center"
+                               Opacity="0.7"
+                               FontSize="14">
+                        <Run Text="{x:Static properties:Resources.GamesView_GamesCount}" />
+                        <Run Text="{Binding FilteredGames.Count}" />
+                    </TextBlock>
+                    <Button VerticalAlignment="Center">
+                        <Button.Content>
+                            <PathIcon
+                                Data="M3,17.25V21H6.75L17.81,9.93C18.2,9.54 18.2,8.89 17.81,8.5L15.5,6.19C15.11,5.8 14.46,5.8 14.07,6.19L3,17.25Z"
+                                Width="16" Height="16" />
+                        </Button.Content>
+                        <Button.Flyout>
+                            <MenuFlyout>
+                                <MenuItem Header="{x:Static properties:Resources.GamesView_ShowHiddenGames}"
+                                          Command="{Binding ToggleShowHiddenGamesCommand}">
+                                    <MenuItem.Icon>
+                                        <CheckBox IsChecked="{Binding ShowHiddenGames}" IsHitTestVisible="False" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="Show only enabled"
+                                          Command="{Binding ToggleShowOnlyEnabledCommand}">
+                                    <MenuItem.Icon>
+                                        <CheckBox IsChecked="{Binding ShowOnlyEnabled}" IsHitTestVisible="False" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="Show only disabled"
+                                          Command="{Binding ToggleShowOnlyDisabledCommand}">
+                                    <MenuItem.Icon>
+                                        <CheckBox IsChecked="{Binding ShowOnlyDisabled}" IsHitTestVisible="False" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                    <Button Content="{x:Static properties:Resources.GamesView_GlobalActions}"
+                            VerticalAlignment="Center">
+                        <Button.Flyout>
+                            <MenuFlyout>
+                                <MenuItem Header="{x:Static properties:Resources.GamesView_EnableGameGlobal}"
+                                          Command="{Binding EnableSelectedCommand}" />
+                                <MenuItem Header="{x:Static properties:Resources.GamesView_DisableGameGlobal}"
+                                          Command="{Binding DisableSelectedCommand}" />
+                                <MenuItem Header="{x:Static properties:Resources.GamesView_AddToWhiteListGlobal}"
+                                          Command="{Binding AddSelectedToWhitelistCommand}" />
+                                <MenuItem Header="{x:Static properties:Resources.GamesView_AddToBlackListGlobal}"
+                                          Command="{Binding AddSelectedToBlacklistCommand}" />
+                                <MenuItem Header="{x:Static properties:Resources.GamesView_HideSelected}"
+                                          Command="{Binding HideSelectedCommand}"
+                                          IsVisible="{Binding ShowHiddenGames, Converter={StaticResource InverseBooleanConverter}}" />
+                                <MenuItem Header="{x:Static properties:Resources.GamesView_UnhideSelected}"
+                                          Command="{Binding HideSelectedCommand}"
+                                          IsVisible="{Binding ShowHiddenGames}" />
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                    <Button Content="{x:Static properties:Resources.GamesView_AddGame}"
+                            Click="AddGameButton_Click"
+                            IsEnabled="{Binding IsNotLoading}"
+                            Classes="accent" />
+                    <Button Content="{x:Static properties:Resources.GamesView_ScanInstalledGames}"
+                            Command="{Binding ScanInstalledGamesCommand}"
+                            IsEnabled="{Binding IsNotLoading}" />
+                    <controls:ProgressRing IsVisible="{Binding IsLoading}"
+                                           IsIndeterminate="True"
+                                           Width="24"
+                                           Height="24"
+                                           VerticalAlignment="Center" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <ScrollViewer Grid.Row="1" Margin="16,0">
             <ItemsControl ItemsSource="{Binding FilteredGames}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="models:GameModel">
-                        <Border Background="#22000000"
-                                Margin="10,5"
-                                Padding="10"
-                                CornerRadius="4">
-                            <Grid ColumnDefinitions="Auto,*,Auto">
-                                <CheckBox IsChecked="{Binding IsEnabled}"
+                        <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                Margin="0,0,0,8"
+                                Padding="16"
+                                CornerRadius="8">
+
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
+
+                                <CheckBox Grid.Column="0"
+                                          IsChecked="{Binding IsSelected, Mode=TwoWay}"
                                           VerticalAlignment="Center"
-                                          IsEnabled="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).IsNotLoading}" />
-                                <StackPanel Grid.Column="1" Margin="10,0">
+                                          Margin="0,0,16,0" />
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <TextBlock Text="{Binding GameName}"
-                                               FontWeight="Bold" />
+                                               FontWeight="SemiBold"
+                                               FontSize="16"
+                                               Margin="0,0,0,4" />
                                     <TextBlock Text="{Binding SavePath}"
-                                               FontSize="12"
-                                               Opacity="0.7" />
+                                               FontSize="13"
+                                               Opacity="0.8"
+                                               TextWrapping="NoWrap"
+                                               TextTrimming="CharacterEllipsis"
+                                               Margin="0,0,0,2" />
                                     <TextBlock Text="{Binding GameExe}"
-                                               FontSize="10"
-                                               Opacity="0.5" />
+                                               FontSize="12"
+                                               Opacity="0.6"
+                                               TextWrapping="NoWrap"
+                                               TextTrimming="CharacterEllipsis" />
                                 </StackPanel>
-                                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10">
+
+                                <Border Grid.Column="2"
+                                        Background="{DynamicResource AccentFillColorDefaultBrush}"
+                                        CornerRadius="12"
+                                        Padding="8,4"
+                                        Margin="0,0,8,0"
+                                        VerticalAlignment="Center"
+                                        IsVisible="{Binding Platform, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
+                                    <TextBlock Text="{Binding Platform}"
+                                               Foreground="White"
+                                               FontSize="12"
+                                               FontWeight="Medium"
+                                               VerticalAlignment="Center" />
+                                </Border>
+
+                                <Border Grid.Column="3"
+                                        Background="{DynamicResource AccentFillColorSecondaryBrush}"
+                                        CornerRadius="12"
+                                        Padding="8,4"
+                                        Margin="8,0,12,0"
+                                        VerticalAlignment="Center">
                                     <TextBlock
                                         Text="{Binding BackupCount, StringFormat={x:Static properties:Resources.GamesView_BackupCount}}"
-                                        VerticalAlignment="Center" />
-                                    <Button Content="{x:Static properties:Resources.GamesView_OpenGameFolder}"
-                                            Command="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).OpenSaveCommand}"
-                                            CommandParameter="{Binding}"
-                                            Padding="8,4"
-                                            IsEnabled="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).IsNotLoading}" />
-                                    <Button Content="{x:Static properties:Resources.GamesView_RestoreBackup}"
-                                            Command="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).RestoreBackupCommand}"
-                                            CommandParameter="{Binding}"
-                                            Padding="8,4"
-                                            IsEnabled="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).IsNotLoading}" />
-                                    <Button Content="{x:Static properties:Resources.GamesView_EditGame}"
-                                            Command="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).EditGameCommand}"
-                                            CommandParameter="{Binding}"
-                                            Padding="8,4"
-                                            IsEnabled="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).IsNotLoading}" />
-                                    <Button Content="{x:Static properties:Resources.GamesView_AddToWhitelist}"
-                                            Command="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).AddToWhitelistCommand}"
-                                            CommandParameter="{Binding}"
-                                            Padding="8,4"
-                                            IsEnabled="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).IsNotLoading}" />
-                                    <Button Content="{x:Static properties:Resources.GamesView_AddToBlacklist}"
-                                            Command="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).AddToBlacklistCommand}"
-                                            CommandParameter="{Binding}"
-                                            Padding="8,4"
-                                            IsEnabled="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).IsNotLoading}" />
-                                    <Button Content="{x:Static properties:Resources.GamesView_Delete}"
-                                            Command="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).DeleteGameCommand}"
-                                            CommandParameter="{Binding}"
-                                            Padding="8,4"
-                                            IsEnabled="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).IsNotLoading}" />
-                                </StackPanel>
+                                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                        FontSize="12"
+                                        FontWeight="Medium" />
+                                </Border>
+
+                                <Button Grid.Column="4"
+                                        VerticalAlignment="Center"
+                                        Padding="8"
+                                        IsEnabled="{Binding $parent[ItemsControl].((vm:GamesViewModel)DataContext).IsNotLoading}">
+                                    <Button.Content>
+                                        <PathIcon
+                                            Data="M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z"
+                                            Width="16" Height="16" />
+                                    </Button.Content>
+                                    <Button.Flyout>
+                                        <MenuFlyout>
+                                            <MenuItem
+                                                Header="{Binding IsEnabled, Converter={StaticResource EnableDisableConverter}}"
+                                                Command="{Binding #RootControl.((vm:GamesViewModel)DataContext).ToggleGameEnabledCommand}"
+                                                CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <PathIcon
+                                                        Data="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12Z" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+
+                                            <Separator />
+
+                                            <MenuItem Header="{x:Static properties:Resources.GamesView_OpenGameFolder}"
+                                                      Command="{Binding #RootControl.((vm:GamesViewModel)DataContext).OpenSaveCommand}"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <PathIcon
+                                                        Data="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+
+                                            <MenuItem Header="{x:Static properties:Resources.GamesView_RestoreBackup}"
+                                                      Command="{Binding #RootControl.((vm:GamesViewModel)DataContext).RestoreBackupCommand}"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <PathIcon
+                                                        Data="M12,3A9,9 0 0,0 3,12H0L4,16L8,12H5A7,7 0 0,1 12,5A7,7 0 0,1 19,12A7,7 0 0,1 12,19C10.5,19 9.09,18.5 7.94,17.7L6.5,19.14C8.04,20.3 9.94,21 12,21A9,9 0 0,0 21,12A9,9 0 0,0 12,3M14,12A2,2 0 0,0 12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12Z" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+
+                                            <Separator />
+
+                                            <MenuItem Header="{x:Static properties:Resources.GamesView_EditGame}"
+                                                      Command="{Binding #RootControl.((vm:GamesViewModel)DataContext).EditGameCommand}"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <PathIcon
+                                                        Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+
+                                            <Separator />
+
+                                            <MenuItem Header="{x:Static properties:Resources.GamesView_AddToWhitelist}"
+                                                      Command="{Binding #RootControl.((vm:GamesViewModel)DataContext).AddToWhitelistCommand}"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <PathIcon
+                                                        Data="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M11,16.5L18,9.5L16.59,8.09L11,13.67L7.91,10.59L6.5,12L11,16.5Z" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+
+                                            <MenuItem Header="{x:Static properties:Resources.GamesView_AddToBlacklist}"
+                                                      Command="{Binding #RootControl.((vm:GamesViewModel)DataContext).AddToBlacklistCommand}"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <PathIcon
+                                                        Data="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M14.5,9L13.09,7.59L12,8.67L10.91,7.59L9.5,9L10.59,10.09L9.5,11.17L10.91,12.59L12,11.5L13.09,12.59L14.5,11.17L13.41,10.09L14.5,9Z" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+
+                                            <Separator />
+
+                                            <MenuItem Header="{x:Static properties:Resources.GamesView_HideGame}"
+                                                      Command="{Binding #RootControl.((vm:GamesViewModel)DataContext).HideGameCommand}"
+                                                      CommandParameter="{Binding}"
+                                                      IsVisible="{Binding ShowHiddenGames, Converter={StaticResource InverseBooleanConverter}}">
+                                                <MenuItem.Icon>
+                                                    <PathIcon
+                                                        Data="M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5ZM12,17C9.24,17 7,14.76 7,12C7,9.24 9.24,7 12,7C14.76,7 17,9.24 17,12C17,14.76 14.76,17 12,17ZM12,9C10.34,9 9,10.34 9,12C9,13.66 10.34,15 12,15C13.66,15 15,13.66 15,12C15,10.34 13.66,9 12,9Z"
+                                                        Width="16" Height="16" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="{x:Static properties:Resources.GamesView_UnhideGame}"
+                                                      Command="{Binding #RootControl.((vm:GamesViewModel)DataContext).HideGameCommand}"
+                                                      CommandParameter="{Binding}"
+                                                      IsVisible="{Binding ShowHiddenGames}">
+                                                <MenuItem.Icon>
+                                                    <PathIcon
+                                                        Data="M1,12C2.73,7.61 7,4.5 12,4.5C17,4.5 21.27,7.61 23,12C21.27,16.39 17,19.5 12,19.5C7,19.5 2.73,16.39 1,12ZM12,17C14.76,17 17,14.76 17,12C17,9.24 14.76,7 12,7C9.24,7 7,9.24 7,12C7,14.76 9.24,17 12,17Z"
+                                                        Width="16" Height="16" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+
+                                            <Separator />
+
+                                            <MenuItem Header="{x:Static properties:Resources.CreateBackup}"
+                                                      Command="{Binding #RootControl.((vm:GamesViewModel)DataContext).CreateBackupCommand}"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <PathIcon
+                                                        Data="M17,3A2,2 0 0,1 19,5V19A2,2 0 0,1 17,21H7A2,2 0 0,1 5,19V5A2,2 0 0,1 7,3H17M17,5H7V19H17V5M12,17A2,2 0 0,0 14,15A2,2 0 0,0 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17Z"
+                                                        Width="16" Height="16" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="{x:Static properties:Resources.CreateProtectedBackup}"
+                                                      Command="{Binding #RootControl.((vm:GamesViewModel)DataContext).CreateProtectedBackupCommand}"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <PathIcon
+                                                        Data="M17,3A2,2 0 0,1 19,5V19A2,2 0 0,1 17,21H7A2,2 0 0,1 5,19V5A2,2 0 0,1 7,3H17M17,5H7V19H17V5M12,17A2,2 0 0,0 14,15V13A2,2 0 0,0 12,11A2,2 0 0,0 10,13V15A2,2 0 0,0 12,17Z M12,13A2,2 0 0,1 14,15V13A2,2 0 0,0 12,11A2,2 0 0,0 10,13V15A2,2 0 0,1 12,13Z"
+                                                        Width="16" Height="16" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+
+                                            <Separator />
+
+                                            <MenuItem Header="{x:Static properties:Resources.GamesView_Delete}"
+                                                      Command="{Binding #RootControl.((vm:GamesViewModel)DataContext).DeleteGameCommand}"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <PathIcon
+                                                        Data="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6M9,8V17H11V8H9M13,8V17H15V8H13Z"
+                                                        Foreground="{DynamicResource SystemFillColorCriticalBrush}" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </MenuFlyout>
+                                    </Button.Flyout>
+                                </Button>
+
                             </Grid>
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
-    </DockPanel>
+    </Grid>
 
 </UserControl>

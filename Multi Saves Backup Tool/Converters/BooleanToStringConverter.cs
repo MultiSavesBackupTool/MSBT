@@ -1,49 +1,31 @@
 ﻿using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
-using Properties;
 
 namespace Multi_Saves_Backup_Tool.Converters;
 
 public class BooleanToStringConverter : IValueConverter
 {
-    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        try
-        {
-            if (value is bool boolValue && parameter is string paramString && !string.IsNullOrWhiteSpace(paramString))
-            {
-                string?[] options = paramString.Split('|');
-                if (options.Length == 2)
-                {
-                    var trueKey = options[0];
-                    var falseKey = options[1];
+        if (parameter is not string paramString)
+            return value?.ToString();
 
-                    if (!string.IsNullOrWhiteSpace(trueKey) && !string.IsNullOrWhiteSpace(falseKey))
-                        try
-                        {
-                            var trueValue = Resources.ResourceManager.GetString(trueKey, Resources.Culture) ?? trueKey;
-                            var falseValue = Resources.ResourceManager.GetString(falseKey, Resources.Culture) ??
-                                             falseKey;
-                            return boolValue ? trueValue : falseValue;
-                        }
-                        catch
-                        {
-                            return boolValue ? trueKey : falseKey;
-                        }
-                }
-            }
+        var parts = paramString.Split(';');
+        if (parts.Length != 2)
+            return value?.ToString();
 
-            return value?.ToString() ?? string.Empty;
-        }
-        catch (Exception)
-        {
-            return value?.ToString() ?? string.Empty;
-        }
+        var boolValue = false;
+        if (value is bool b)
+            boolValue = b;
+        else if (value is bool)
+            boolValue = (bool)value;
+
+        return boolValue ? parts[0] : parts[1];
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        throw new NotImplementedException("ConvertBack is not implemented for BooleanToStringConverter");
+        throw new NotImplementedException();
     }
 }

@@ -38,9 +38,6 @@
                     <ui:NavigationViewItem Content="{x:Static properties:Resources.MainWindow_Games}"
                                            IconSource="Games"
                                            Tag="games" />
-                    <ui:NavigationViewItem Content="{x:Static properties:Resources.MainWindow_Stats}"
-                                           IconSource="Target"
-                                           Tag="stats" />
                 </ui:NavigationView.MenuItems>
 
                 <ui:NavigationView.FooterMenuItems>
@@ -57,15 +54,11 @@
                         </DataTemplate>
 
                         <DataTemplate DataType="{x:Type vm:GamesViewModel}">
-                            <views:GamesView DataContext="{Binding}" />
+                            <views:GamesView />
                         </DataTemplate>
 
                         <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                             <views:SettingsView />
-                        </DataTemplate>
-
-                        <DataTemplate DataType="{x:Type vm:StatsViewModel}">
-                            <views:StatsView />
                         </DataTemplate>
 
                     </ContentControl.DataTemplates>

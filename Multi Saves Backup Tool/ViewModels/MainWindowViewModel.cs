@@ -30,7 +30,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [SupportedOSPlatform("windows")]
     public MainWindowViewModel(Window mainWindow, IGamesService gamesService,
         IBackupService backupService, BackupManager backupManager, ISettingsService settingsService,
-        IBlacklistService blacklistService, IWhitelistService whitelistService, ILogger<StatsViewModel> statsLogger,
+        IBlacklistService blacklistService, IWhitelistService whitelistService,
         ILogger<MainWindowViewModel> logger,
         ILogger<MonitoringViewModel> monitoringLogger, ILogger<GamesViewModel> gamesLogger,
         ILogger<SettingsViewModel> settingsLogger)
@@ -40,10 +40,10 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         try
         {
-            MonitoringViewModel = new MonitoringViewModel(backupManager, monitoringLogger);
+            MonitoringViewModel = new MonitoringViewModel(backupManager, gamesService, backupService, settingsService,
+                monitoringLogger);
             GamesViewModel = new GamesViewModel(gamesService, backupService, blacklistService, whitelistService,
-                gamesLogger);
-            StatsViewModel = new StatsViewModel(gamesService, backupService, settingsService, statsLogger);
+                backupManager, gamesLogger);
             SettingsViewModel = new SettingsViewModel(mainWindow.StorageProvider, blacklistService, whitelistService,
                 settingsLogger);
             CurrentViewModel = MonitoringViewModel;
@@ -60,7 +60,6 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     private MonitoringViewModel MonitoringViewModel { get; }
     private GamesViewModel GamesViewModel { get; }
-    private StatsViewModel StatsViewModel { get; }
     private SettingsViewModel SettingsViewModel { get; }
 
     public void Dispose()
@@ -157,7 +156,6 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             {
                 "monitoring" => MonitoringViewModel,
                 "games" => GamesViewModel,
-                "stats" => StatsViewModel,
                 "settings" => SettingsViewModel,
                 _ => CurrentViewModel
             };

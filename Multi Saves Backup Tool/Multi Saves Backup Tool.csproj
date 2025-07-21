@@ -13,9 +13,9 @@
         <RuntimeIdentifier>win-x64</RuntimeIdentifier>
         <DebugType>none</DebugType>
         <DebugSymbols>false</DebugSymbols>
-        <Version>94.0.0.0</Version>
-        <AssemblyVersion>94.0.0.0</AssemblyVersion>
-        <FileVersion>94.0.0.0</FileVersion>
+        <Version>100.0.0.0</Version>
+        <AssemblyVersion>100.0.0.0</AssemblyVersion>
+        <FileVersion>100.0.0.0</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -68,6 +68,9 @@
         <Compile Update="Views\StatsView.axaml.cs">
             <DependentUpon>StatsView.axaml</DependentUpon>
             <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\MonitoringStatsView.axaml.cs">
+            <DependentUpon>MonitoringStatsView.axaml</DependentUpon>
         </Compile>
     </ItemGroup>
 

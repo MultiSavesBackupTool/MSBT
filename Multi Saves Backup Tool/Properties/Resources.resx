@@ -77,9 +77,6 @@
     <data name="MainWindow_Games" xml:space="preserve">
         <value>Games</value>
     </data>
-    <data name="MainWindow_Stats" xml:space="preserve">
-        <value>Statistics</value>
-    </data>
     <data name="MainWindow_Settings" xml:space="preserve">
         <value>Settings</value>
     </data>
@@ -100,10 +97,28 @@
         <value>Status</value>
     </data>
     <data name="MonitoringView_LastBackup" xml:space="preserve">
-        <value>Last Backup</value>
+        <value>Last Backup: {0}</value>
     </data>
     <data name="MonitoringView_NextBackup" xml:space="preserve">
-        <value>Next Backup</value>
+        <value>Next Backup: {0}</value>
+    </data>
+    <data name="MonitoringView_RestartService" xml:space="preserve">
+        <value>Restart Service</value>
+    </data>
+    <data name="MonitoringView_DisplayOptions" xml:space="preserve">
+        <value>Display Options</value>
+    </data>
+    <data name="MonitoringView_ArchivesCounts" xml:space="preserve">
+        <value>Number of Archives</value>
+    </data>
+    <data name="MonitoringView_ArchivesSize" xml:space="preserve">
+        <value>Total Archives Size</value>
+    </data>
+    <data name="MonitoringView_NextBackupStatus" xml:space="preserve">
+        <value>Next Backup Status</value>
+    </data>
+    <data name="MonitoringView_StatusBadge" xml:space="preserve">
+        <value>Status Badge</value>
     </data>
 
     <!-- ==========================================
@@ -142,6 +157,21 @@
     <data name="GamesView_AddToWhitelist" xml:space="preserve">
         <value>Add to Whitelist</value>
     </data>
+    <data name="GamesView_GlobalActions" xml:space="preserve">
+        <value>Global Actions</value>
+    </data>
+    <data name="GamesView_EnableGameGlobal" xml:space="preserve">
+        <value>Enable Selected</value>
+    </data>
+    <data name="GamesView_DisableGameGlobal" xml:space="preserve">
+        <value>Disable Selected</value>
+    </data>
+    <data name="GamesView_AddToWhiteListGlobal" xml:space="preserve">
+        <value>Add Selected to Whitelist</value>
+    </data>
+    <data name="GamesView_AddToBlackListGlobal" xml:space="preserve">
+        <value>Add Selected to Blacklist</value>
+    </data>
     <data name="SettingsView_CommunityLists" xml:space="preserve">
         <value>Community Lists</value>
     </data>
@@ -150,6 +180,30 @@
     </data>
     <data name="SettingsView_SyncWhitelist" xml:space="preserve">
         <value>Sync Whitelist</value>
+    </data>
+    <data name="GamesView_DisableGame" xml:space="preserve">
+        <value>Disable Game</value>
+    </data>
+    <data name="GamesView_EnableGame" xml:space="preserve">
+        <value>Enable Game</value>
+    </data>
+    <data name="GamesView_GamesCount" xml:space="preserve">
+        <value>Total games:</value>
+    </data>
+    <data name="GamesView_HideGame" xml:space="preserve">
+        <value>Hide Game</value>
+    </data>
+    <data name="GamesView_HideSelected" xml:space="preserve">
+        <value>Hide Selected</value>
+    </data>
+    <data name="GamesView_ShowHiddenGames" xml:space="preserve">
+        <value>Show Hidden Games</value>
+    </data>
+    <data name="GamesView_UnhideGame" xml:space="preserve">
+        <value>Unhide Game</value>
+    </data>
+    <data name="GamesView_UnhideSelected" xml:space="preserve">
+        <value>Unhide Selected</value>
     </data>
 
     <!-- ==========================================
@@ -269,6 +323,39 @@
     <data name="ImportTitle" xml:space="preserve">
         <value>Import Settings</value>
     </data>
+    <data name="SettingsView_CustomScanDirectories" xml:space="preserve">
+        <value>Custom scan directories</value>
+    </data>
+    <data name="SettingsView_AddDirectory" xml:space="preserve">
+        <value>Add directory</value>
+    </data>
+    <data name="SettingsView_RemoveDirectory" xml:space="preserve">
+        <value>Remove</value>
+    </data>
+    <data name="SettingsView_BrowseDirectory" xml:space="preserve">
+        <value>Browse</value>
+    </data>
+    <data name="SettingsView_DirectoryName" xml:space="preserve">
+        <value>Directory Name</value>
+    </data>
+    <data name="SettingsView_DirectoryPath" xml:space="preserve">
+        <value>Directory Path</value>
+    </data>
+    <data name="SettingsView_ScanSubdirectories" xml:space="preserve">
+        <value>Scan Subdirectories</value>
+    </data>
+    <data name="SettingsView_Enabled" xml:space="preserve">
+        <value>Enabled</value>
+    </data>
+    <data name="SettingsView_minutes" xml:space="preserve">
+        <value>minutes</value>
+    </data>
+    <data name="SettingsView_simultaneousbackups" xml:space="preserve">
+        <value>Simultaneous Backups</value>
+    </data>
+    <data name="SettingsView_synccommunitytext" xml:space="preserve">
+        <value>Sync with community lists for better coverage</value>
+    </data>
 
     <!-- ==========================================
          STATS VIEW STRINGS
@@ -279,13 +366,6 @@
     <data name="StatsView_ArchivesCounts" xml:space="preserve">
         <value>Number of all archives:</value>
     </data>
-    <data name="StatsView_GamesCountArchives" xml:space="preserve">
-        <value>Number of archives</value>
-    </data>
-    <data name="StatsView_GamesSizesArchives" xml:space="preserve">
-        <value>Total size</value>
-    </data>
-
     <!-- ==========================================
          STATUS STRINGS
          ========================================== -->

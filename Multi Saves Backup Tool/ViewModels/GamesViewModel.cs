@@ -15,11 +15,13 @@ using Multi_Saves_Backup_Tool.Models;
 using Multi_Saves_Backup_Tool.Services;
 using Multi_Saves_Backup_Tool.Services.GameDiscovery;
 using Properties;
+using RelayCommand = Multi_Saves_Backup_Tool.Services.RelayCommand;
 
 namespace Multi_Saves_Backup_Tool.ViewModels;
 
 public class GamesViewModel : ViewModelBase
 {
+    private readonly BackupManager _backupManager;
     private readonly IBackupService _backupService;
     private readonly IBlacklistService _blacklistService;
     private readonly IGamesService _gamesService;
@@ -30,15 +32,20 @@ public class GamesViewModel : ViewModelBase
 
     private bool _isLoading;
     private string _searchText = string.Empty;
+    private bool _showHiddenGames;
+    private bool _showOnlyDisabled;
+    private bool _showOnlyEnabled;
 
     [SupportedOSPlatform("windows")]
     public GamesViewModel(IGamesService gamesService, IBackupService backupService, IBlacklistService blacklistService,
-        IWhitelistService whitelistService, ILogger<GamesViewModel>? logger = null) : base(logger)
+        IWhitelistService whitelistService, BackupManager backupManager,
+        ILogger<GamesViewModel>? logger = null) : base(logger)
     {
         _gamesService = gamesService ?? throw new ArgumentNullException(nameof(gamesService));
         _backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
         _blacklistService = blacklistService ?? throw new ArgumentNullException(nameof(blacklistService));
         _whitelistService = whitelistService ?? throw new ArgumentNullException(nameof(whitelistService));
+        _backupManager = backupManager ?? throw new ArgumentNullException(nameof(backupManager));
 
         DeleteGameCommand = new AsyncRelayCommand<GameModel>(DeleteGameAsync, CanDeleteGame);
         EditGameCommand = new Services.RelayCommand<GameModel>(EditGame, CanEditGame);
@@ -47,6 +54,21 @@ public class GamesViewModel : ViewModelBase
         ScanInstalledGamesCommand = new AsyncRelayCommand(ScanInstalledGamesAsync, CanScanInstalledGames);
         AddToBlacklistCommand = new AsyncRelayCommand<GameModel>(AddToBlacklistAsync, CanAddToBlacklist);
         AddToWhitelistCommand = new AsyncRelayCommand<GameModel>(AddToWhitelistAsync, CanAddToWhitelist);
+        CreateBackupCommand = new AsyncRelayCommand<GameModel>(CreateBackupAsync, CanCreateBackup);
+        CreateProtectedBackupCommand = new AsyncRelayCommand<GameModel>(CreateProtectedBackupAsync, CanCreateBackup);
+
+        ToggleGameEnabledCommand = new Services.RelayCommand<GameModel>(ToggleGameEnabled, CanToggleGameEnabled);
+        HideGameCommand = new Services.RelayCommand<GameModel>(HideGame, CanHideGame);
+        HideSelectedCommand = new RelayCommand(HideSelected, CanHideSelected);
+
+        EnableSelectedCommand = new RelayCommand(EnableSelected, CanEnableSelected);
+        DisableSelectedCommand = new RelayCommand(DisableSelected, CanDisableSelected);
+        AddSelectedToWhitelistCommand = new AsyncRelayCommand(AddSelectedToWhitelistAsync, CanAddSelectedToWhitelist);
+        AddSelectedToBlacklistCommand = new AsyncRelayCommand(AddSelectedToBlacklistAsync, CanAddSelectedToBlacklist);
+
+        ToggleShowHiddenGamesCommand = new RelayCommand(ToggleShowHiddenGames);
+        ToggleShowOnlyEnabledCommand = new RelayCommand(ToggleShowOnlyEnabled);
+        ToggleShowOnlyDisabledCommand = new RelayCommand(ToggleShowOnlyDisabled);
 
         _installedGamesScanner = new InstalledGamesScanner(_blacklistService, _whitelistService);
 
@@ -118,6 +140,56 @@ public class GamesViewModel : ViewModelBase
 
     public bool IsNotLoading => !IsLoading;
 
+    public IEnumerable<GameModel> SelectedGames => Games?.Where(g => g.IsSelected) ?? [];
+
+    public bool ShowHiddenGames
+    {
+        get => _showHiddenGames;
+        set
+        {
+            if (_showHiddenGames != value)
+            {
+                _showHiddenGames = value;
+                OnPropertyChanged();
+                if (Games != null)
+                    foreach (var g in Games)
+                        g.ShowHiddenGames = value;
+                if (FilteredGames != null)
+                    foreach (var g in FilteredGames)
+                        g.ShowHiddenGames = value;
+                UpdateFilteredGames();
+            }
+        }
+    }
+
+    public bool ShowOnlyEnabled
+    {
+        get => _showOnlyEnabled;
+        set
+        {
+            if (_showOnlyEnabled != value)
+            {
+                _showOnlyEnabled = value;
+                OnPropertyChanged();
+                UpdateFilteredGames();
+            }
+        }
+    }
+
+    public bool ShowOnlyDisabled
+    {
+        get => _showOnlyDisabled;
+        set
+        {
+            if (_showOnlyDisabled != value)
+            {
+                _showOnlyDisabled = value;
+                OnPropertyChanged();
+                UpdateFilteredGames();
+            }
+        }
+    }
+
     public IAsyncRelayCommand DeleteGameCommand { get; }
     public ICommand EditGameCommand { get; }
     public ICommand OpenSaveCommand { get; }
@@ -125,6 +197,18 @@ public class GamesViewModel : ViewModelBase
     public IAsyncRelayCommand ScanInstalledGamesCommand { get; }
     public IAsyncRelayCommand<GameModel> AddToBlacklistCommand { get; }
     public IAsyncRelayCommand<GameModel> AddToWhitelistCommand { get; }
+    public ICommand ToggleGameEnabledCommand { get; }
+    public ICommand EnableSelectedCommand { get; }
+    public ICommand DisableSelectedCommand { get; }
+    public ICommand AddSelectedToWhitelistCommand { get; }
+    public ICommand AddSelectedToBlacklistCommand { get; }
+    public ICommand HideGameCommand { get; }
+    public ICommand HideSelectedCommand { get; }
+    public ICommand ToggleShowHiddenGamesCommand { get; }
+    public ICommand ToggleShowOnlyEnabledCommand { get; }
+    public ICommand ToggleShowOnlyDisabledCommand { get; }
+    public IAsyncRelayCommand<GameModel> CreateBackupCommand { get; }
+    public IAsyncRelayCommand<GameModel> CreateProtectedBackupCommand { get; }
 
     public event EventHandler<GameModel>? EditGameRequested;
 
@@ -155,7 +239,8 @@ public class GamesViewModel : ViewModelBase
         {
             IsLoading = true;
             var gamesList = await _gamesService.LoadGamesAsync();
-            Games = new ObservableCollection<GameModel>(gamesList!);
+            var sortedGamesList = gamesList.OrderBy(g => g?.GameName, StringComparer.OrdinalIgnoreCase).ToList();
+            Games = new ObservableCollection<GameModel>(sortedGamesList!);
             foreach (var game in Games)
             {
                 game.PropertyChanged += Game_PropertyChanged;
@@ -300,21 +385,29 @@ public class GamesViewModel : ViewModelBase
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(SearchText))
-        {
-            FilteredGames = new ObservableCollection<GameModel>(Games);
-        }
-        else
+        IEnumerable<GameModel> filtered = Games;
+
+        filtered = filtered.Where(g => ShowHiddenGames ? g.IsHidden : !g.IsHidden);
+
+        if (ShowOnlyEnabled)
+            filtered = filtered.Where(g => g.IsEnabled);
+        if (ShowOnlyDisabled)
+            filtered = filtered.Where(g => !g.IsEnabled);
+
+        if (!string.IsNullOrWhiteSpace(SearchText))
         {
             var lower = SearchText.ToLowerInvariant();
-            FilteredGames = new ObservableCollection<GameModel>(
-                Games.Where(g =>
-                    (!string.IsNullOrEmpty(g.GameName) && g.GameName.ToLowerInvariant().Contains(lower)) ||
-                    (!string.IsNullOrEmpty(g.SavePath) && g.SavePath.ToLowerInvariant().Contains(lower)) ||
-                    (!string.IsNullOrEmpty(g.GameExe) && g.GameExe.ToLowerInvariant().Contains(lower))
-                )
+            filtered = filtered.Where(g =>
+                (!string.IsNullOrEmpty(g.GameName) && g.GameName.ToLowerInvariant().Contains(lower)) ||
+                (!string.IsNullOrEmpty(g.SavePath) && g.SavePath.ToLowerInvariant().Contains(lower)) ||
+                (!string.IsNullOrEmpty(g.GameExe) && g.GameExe.ToLowerInvariant().Contains(lower))
             );
         }
+
+        FilteredGames = new ObservableCollection<GameModel>(filtered);
+        if (FilteredGames != null)
+            foreach (var g in FilteredGames)
+                g.ShowHiddenGames = ShowHiddenGames;
     }
 
     [SupportedOSPlatform("windows")]
@@ -423,6 +516,157 @@ public class GamesViewModel : ViewModelBase
         }
     }
 
+    private async Task CreateBackupAsync(GameModel? game)
+    {
+        if (game == null) return;
+        try
+        {
+            await _backupManager.ProcessGameBackupAsync(game, false);
+            LogInformation("Backup created for game {GameName}", game.GameName);
+            UpdateBackupCount(game);
+        }
+        catch (Exception ex)
+        {
+            LogError(ex, "Error creating backup for game {GameName}", game.GameName);
+        }
+    }
+
+    private async Task CreateProtectedBackupAsync(GameModel? game)
+    {
+        if (game == null) return;
+        try
+        {
+            await _backupManager.ProcessGameBackupAsync(game, true);
+            LogInformation("Protected backup created for game {GameName}", game.GameName);
+            UpdateBackupCount(game);
+        }
+        catch (Exception ex)
+        {
+            LogError(ex, "Error creating protected backup for game {GameName}", game.GameName);
+        }
+    }
+
+    private bool CanCreateBackup(GameModel? game)
+    {
+        return IsNotLoading && game != null && game.IsEnabled;
+    }
+
+    private void ToggleGameEnabled(GameModel? game)
+    {
+        if (game == null) return;
+        game.IsEnabled = !game.IsEnabled;
+    }
+
+    private bool CanToggleGameEnabled(GameModel? game)
+    {
+        return game != null && !IsLoading;
+    }
+
+    private void EnableSelected()
+    {
+        foreach (var game in SelectedGames)
+            game.IsEnabled = true;
+    }
+
+    private void DisableSelected()
+    {
+        foreach (var game in SelectedGames)
+            game.IsEnabled = false;
+    }
+
+    private bool CanEnableSelected()
+    {
+        return SelectedGames.Any();
+    }
+
+    private bool CanDisableSelected()
+    {
+        return SelectedGames.Any();
+    }
+
+    private async Task AddSelectedToWhitelistAsync()
+    {
+        foreach (var game in SelectedGames)
+            await AddToWhitelistAsync(game);
+    }
+
+    private async Task AddSelectedToBlacklistAsync()
+    {
+        foreach (var game in SelectedGames)
+            await AddToBlacklistAsync(game);
+    }
+
+    private bool CanAddSelectedToWhitelist()
+    {
+        return SelectedGames.Any();
+    }
+
+    private bool CanAddSelectedToBlacklist()
+    {
+        return SelectedGames.Any();
+    }
+
+    private void HideGame(GameModel? game)
+    {
+        if (game == null) return;
+        game.IsHidden = !ShowHiddenGames;
+        UpdateFilteredGames();
+        _ = SaveGamesAsync();
+    }
+
+    private bool CanHideGame(GameModel? game)
+    {
+        if (game == null || IsLoading)
+            return false;
+        if (ShowHiddenGames)
+            return game.IsHidden;
+        return !game.IsHidden;
+    }
+
+    private void HideSelected()
+    {
+        foreach (var game in SelectedGames)
+            if (ShowHiddenGames)
+            {
+                if (game.IsHidden)
+                    game.IsHidden = false;
+            }
+            else
+            {
+                if (!game.IsHidden)
+                    game.IsHidden = true;
+            }
+
+        UpdateFilteredGames();
+        _ = SaveGamesAsync();
+    }
+
+    private bool CanHideSelected()
+    {
+        if (ShowHiddenGames)
+            return SelectedGames.Any(g => g.IsHidden);
+        return SelectedGames.Any(g => !g.IsHidden);
+    }
+
+    private void ToggleShowHiddenGames()
+    {
+        ShowHiddenGames = !ShowHiddenGames;
+    }
+
+    private void ToggleShowOnlyEnabled()
+    {
+        ShowOnlyEnabled = !ShowOnlyEnabled;
+        if (ShowOnlyEnabled && ShowOnlyDisabled)
+            ShowOnlyDisabled = false;
+    }
+
+    private void ToggleShowOnlyDisabled()
+    {
+        ShowOnlyDisabled = !ShowOnlyDisabled;
+        if (ShowOnlyEnabled && ShowOnlyDisabled)
+            ShowOnlyEnabled = false;
+    }
+
     private void RaiseAllCanExecuteChanged()
     {
         DeleteGameCommand.NotifyCanExecuteChanged();
@@ -432,6 +676,11 @@ public class GamesViewModel : ViewModelBase
         ScanInstalledGamesCommand.NotifyCanExecuteChanged();
         AddToBlacklistCommand.NotifyCanExecuteChanged();
         AddToWhitelistCommand.NotifyCanExecuteChanged();
+        CreateBackupCommand.NotifyCanExecuteChanged();
+        CreateProtectedBackupCommand.NotifyCanExecuteChanged();
+        (ToggleShowHiddenGamesCommand as RelayCommand)?.RaiseCanExecuteChanged();
+        (ToggleShowOnlyEnabledCommand as RelayCommand)?.RaiseCanExecuteChanged();
+        (ToggleShowOnlyDisabledCommand as RelayCommand)?.RaiseCanExecuteChanged();
     }
 
     private bool CanDeleteGame(GameModel? game)

@@ -219,7 +219,8 @@ public class InstalledGamesScanner(
                 {
                     GameName = nameMatch.Groups[1].Value,
                     GameExe = exePath,
-                    IsEnabled = false
+                    IsEnabled = false,
+                    Platform = "Steam"
                 };
             }
         }
@@ -246,7 +247,8 @@ public class InstalledGamesScanner(
                 {
                     GameName = displayName.GetString() ?? "Unknown",
                     GameExe = exePath,
-                    IsEnabled = false
+                    IsEnabled = false,
+                    Platform = "Epic"
                 };
             }
         }
@@ -279,7 +281,13 @@ public class InstalledGamesScanner(
             {
                 GameName = displayName,
                 GameExe = exePath,
-                IsEnabled = false
+                IsEnabled = false,
+                Platform = publisher?.Contains("steam", StringComparison.OrdinalIgnoreCase) == true ? "Steam" :
+                    publisher?.Contains("epic", StringComparison.OrdinalIgnoreCase) == true ? "Epic" :
+                    publisher?.Contains("ubisoft", StringComparison.OrdinalIgnoreCase) == true ? "Ubisoft" :
+                    publisher?.Contains("ea", StringComparison.OrdinalIgnoreCase) == true ? "EA" :
+                    publisher?.Contains("activision", StringComparison.OrdinalIgnoreCase) == true ? "Activision" :
+                    null
             };
         }
         catch (Exception ex)

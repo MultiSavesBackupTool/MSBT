@@ -70,7 +70,16 @@ public class App : Application
         services.AddSingleton<IBackupService, BackupService>();
         services.AddSingleton<IBlacklistService, BlacklistService>();
         services.AddSingleton<IWhitelistService, WhitelistService>();
-        services.AddSingleton<BackupManager>();
+        services.AddSingleton<BackupManager>(provider =>
+            new BackupManager(
+                provider.GetRequiredService<ILogger<BackupManager>>(),
+                provider.GetRequiredService<ISettingsService>(),
+                provider.GetRequiredService<IGamesService>(),
+                provider.GetRequiredService<IBackupService>(),
+                provider.GetRequiredService<IBlacklistService>(),
+                provider.GetRequiredService<IWhitelistService>()
+            )
+        );
         services.AddSingleton<MonitoringViewModel>();
         services.AddSingleton<TrayService>(provider =>
             new TrayService(
@@ -95,7 +104,6 @@ public class App : Application
                 var gamesService = _serviceProvider.GetRequiredService<IGamesService>();
                 var backupService = _serviceProvider.GetRequiredService<IBackupService>();
                 var settingsService = _serviceProvider.GetRequiredService<ISettingsService>();
-                var statsLogger = _serviceProvider.GetRequiredService<ILogger<StatsViewModel>>();
                 var mainWindowLogger = _serviceProvider.GetRequiredService<ILogger<MainWindowViewModel>>();
                 var monitoringLogger = _serviceProvider.GetRequiredService<ILogger<MonitoringViewModel>>();
                 var gamesLogger = _serviceProvider.GetRequiredService<ILogger<GamesViewModel>>();
@@ -106,7 +114,7 @@ public class App : Application
                 var blacklistService = _serviceProvider.GetRequiredService<IBlacklistService>();
                 var whitelistService = _serviceProvider.GetRequiredService<IWhitelistService>();
                 var mainViewModel = new MainWindowViewModel(mainWindow, gamesService, backupService,
-                    _backupManager, settingsService, blacklistService, whitelistService, statsLogger, mainWindowLogger,
+                    _backupManager, settingsService, blacklistService, whitelistService, mainWindowLogger,
                     monitoringLogger, gamesLogger,
                     settingsLogger);
 

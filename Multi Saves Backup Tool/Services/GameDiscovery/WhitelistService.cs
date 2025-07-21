@@ -84,7 +84,7 @@ public class WhitelistService : IWhitelistService
                     var specialMark = false;
                     if (entry.Length > 4)
                     {
-                        if (entry[4] is JsonElement je && je.ValueKind == JsonValueKind.Number)
+                        if (entry[4] is JsonElement { ValueKind: JsonValueKind.Number } je)
                             specialMark = je.GetInt32() == 1;
                         else if (entry[4] is int i)
                             specialMark = i == 1;
@@ -128,13 +128,14 @@ public class WhitelistService : IWhitelistService
         {
             var response = await _httpClient.GetStringAsync(ServerUrl);
             var serverWhitelist = JsonSerializer.Deserialize<object[][]>(response) ?? [];
-            
-            bool exists = serverWhitelist.Any(e =>
+
+            var exists = serverWhitelist.Any(e =>
                 e.Length > 0 && string.Equals(e[0].ToString(), entry.GameName, StringComparison.OrdinalIgnoreCase));
 
             if (exists)
             {
-                _logger.LogInformation("Game {GameName} already exists on the server whitelist. Skipping contribution.", entry.GameName);
+                _logger.LogInformation("Game {GameName} already exists on the server whitelist. Skipping contribution.",
+                    entry.GameName);
                 return;
             }
 

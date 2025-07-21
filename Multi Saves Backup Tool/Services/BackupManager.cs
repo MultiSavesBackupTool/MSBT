@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Models;
 using Multi_Saves_Backup_Tool.Paths;
+using Multi_Saves_Backup_Tool.Services.GameDiscovery;
 
 namespace Multi_Saves_Backup_Tool.Services;
 
@@ -15,13 +16,18 @@ public class BackupManager(
     ILogger<BackupManager> logger,
     ISettingsService settingsService,
     IGamesService gamesService,
-    IBackupService backupService)
+    IBackupService backupService,
+    IBlacklistService blacklistService,
+    IWhitelistService whitelistService)
     : IDisposable
 {
     private static readonly string StateFilePath = AppPaths.ServiceStateFilePath;
 
     private readonly IBackupService _backupService =
         backupService ?? throw new ArgumentNullException(nameof(backupService));
+
+    private readonly IBlacklistService _blacklistService =
+        blacklistService ?? throw new ArgumentNullException(nameof(blacklistService));
 
     private readonly IGamesService
         _gamesService = gamesService ?? throw new ArgumentNullException(nameof(gamesService));
@@ -30,6 +36,9 @@ public class BackupManager(
 
     private readonly ISettingsService _settingsService =
         settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+
+    private readonly IWhitelistService _whitelistService =
+        whitelistService ?? throw new ArgumentNullException(nameof(whitelistService));
 
     private Task? _backupTask;
     private CancellationTokenSource? _cancellationTokenSource;
@@ -200,6 +209,24 @@ public class BackupManager(
 
         try
         {
+            try
+            {
+                await _blacklistService.SyncWithServerAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to sync blacklist with server");
+            }
+
+            try
+            {
+                await _whitelistService.SyncWithServerAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to sync whitelist with server");
+            }
+
             _logger.LogInformation("Starting backup process at: {time}", DateTimeOffset.Now);
 
             if (stoppingToken.IsCancellationRequested)
