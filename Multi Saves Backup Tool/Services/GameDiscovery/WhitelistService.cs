@@ -37,7 +37,13 @@ public class WhitelistService : IWhitelistService
     public async Task<IEnumerable<WhitelistEntry>> GetWhitelistAsync()
     {
         if (_whitelist.Count == 0) await LoadWhitelistAsync();
-        return _whitelist.Values.ToList();
+        return _whitelist.Values.Select(e => new WhitelistEntry(
+            e.GameName,
+            ExpandUserPath(e.SavePath),
+            ExpandUserPath(e.ModPath),
+            ExpandUserPath(e.AddPath),
+            e.SpecialBackupMark
+        )).ToList();
     }
 
     public async Task AddToWhitelistAsync(WhitelistEntry entry)
@@ -178,7 +184,15 @@ public class WhitelistService : IWhitelistService
         if (string.IsNullOrWhiteSpace(gameName))
             return null;
 
-        return _whitelist.GetValueOrDefault(gameName);
+        var entry = _whitelist.GetValueOrDefault(gameName);
+        if (entry == null) return null;
+        return new WhitelistEntry(
+            entry.GameName,
+            ExpandUserPath(entry.SavePath),
+            ExpandUserPath(entry.ModPath),
+            ExpandUserPath(entry.AddPath),
+            entry.SpecialBackupMark
+        );
     }
 
     public int GetWhitelistCount()
@@ -245,6 +259,27 @@ public class WhitelistService : IWhitelistService
             { Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "%userprofile%" },
             { Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "%documents%" },
             { Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "%programdata%" }
+        };
+
+        foreach (var kvp in specialFolders)
+            if (path.StartsWith(kvp.Key, StringComparison.OrdinalIgnoreCase))
+                return path.Replace(kvp.Key, kvp.Value, StringComparison.OrdinalIgnoreCase);
+
+        return path;
+    }
+
+    private static string ExpandUserPath(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return path ?? string.Empty;
+
+        var specialFolders = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "%appdata%", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) },
+            { "%localappdata%", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) },
+            { "%userprofile%", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) },
+            { "%documents%", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) },
+            { "%programdata%", Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) }
         };
 
         foreach (var kvp in specialFolders)
