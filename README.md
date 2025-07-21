@@ -128,10 +128,10 @@ This project is open source. Please report any issues on [GitHub Issues](https:/
 
 ## Star History
 
-<a href="https://www.star-history.com/?repos=journey-ad/Moe-Counter&type=Date#TheNightlyGod/MSBT&Date">
+<a href="https://www.star-history.com/?repos=journey-ad/Moe-Counter&type=Date#MultiSavesBackupTool/MSBT&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=TheNightlyGod/MSBT&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=TheNightlyGod/MSBT&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=TheNightlyGod/MSBT&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MultiSavesBackupTool/MSBT&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MultiSavesBackupTool/MSBT&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MultiSavesBackupTool/MSBT&type=Date" />
  </picture>
 </a>
