@@ -118,7 +118,7 @@ This project is open source. Please report any issues on [GitHub Issues](https:/
 
 ## Acknowledgments
 
-- Thank you to the community for 500 views on GitHub!
+- Thank you to the community for 1000 views on GitHub!
 - Special thanks to user Varset for their ideas and bug reports.
 
 ## Star History
