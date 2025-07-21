@@ -205,6 +205,12 @@
     <data name="GamesView_UnhideSelected" xml:space="preserve">
         <value>Unhide Selected</value>
     </data>
+    <data name="GamesView_ShowEnableGames" xml:space="preserve">
+        <value>Show only enabled</value>
+    </data>
+    <data name="GamesView_ShowDisableGames" xml:space="preserve">
+        <value>Show only disabled</value>
+    </data>
 
     <!-- ==========================================
          ADD GAME OVERLAY STRINGS
@@ -366,6 +372,7 @@
     <data name="StatsView_ArchivesCounts" xml:space="preserve">
         <value>Number of all archives:</value>
     </data>
+    
     <!-- ==========================================
          STATUS STRINGS
          ========================================== -->

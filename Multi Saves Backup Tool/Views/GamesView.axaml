@@ -53,13 +53,13 @@
                                         <CheckBox IsChecked="{Binding ShowHiddenGames}" IsHitTestVisible="False" />
                                     </MenuItem.Icon>
                                 </MenuItem>
-                                <MenuItem Header="Show only enabled"
+                                <MenuItem Header="{x:Static properties:Resources.GamesView_ShowEnableGames}"
                                           Command="{Binding ToggleShowOnlyEnabledCommand}">
                                     <MenuItem.Icon>
                                         <CheckBox IsChecked="{Binding ShowOnlyEnabled}" IsHitTestVisible="False" />
                                     </MenuItem.Icon>
                                 </MenuItem>
-                                <MenuItem Header="Show only disabled"
+                                <MenuItem Header="{x:Static properties:Resources.GamesView_ShowDisableGames}"
                                           Command="{Binding ToggleShowOnlyDisabledCommand}">
                                     <MenuItem.Icon>
                                         <CheckBox IsChecked="{Binding ShowOnlyDisabled}" IsHitTestVisible="False" />

@@ -196,6 +196,12 @@
     <data name="GamesView_UnhideSelected" xml:space="preserve">
         <value>Показать выбранные</value>
     </data>
+    <data name="GamesView_ShowEnableGames" xml:space="preserve">
+        <value>Показать только включенные</value>
+    </data>
+    <data name="GamesView_ShowDisableGames" xml:space="preserve">
+        <value>Показать только отключенные</value>
+    </data>
 
     <!-- ==========================================
          СТРОКИ ОКНА ДОБАВЛЕНИЯ ИГРЫ

@@ -358,6 +358,18 @@ namespace Properties
                 return ResourceManager.GetString("GamesView_UnhideSelected", resourceCulture);
             }
         }
+        
+        public static string GamesView_ShowEnableGames {
+            get {
+                return ResourceManager.GetString("GamesView_ShowEnableGames", resourceCulture);
+            }
+        }
+        
+        public static string GamesView_ShowDisableGames {
+            get {
+                return ResourceManager.GetString("GamesView_ShowDisableGames", resourceCulture);
+            }
+        }
 
         // ==========================================
         // ADD GAME OVERLAY STRINGS
