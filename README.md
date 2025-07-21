@@ -8,6 +8,8 @@
    <img alt="MSBT Count" src="https://count.lukiuwu.xyz/@MSBT?name=MSBT&theme=rule34&padding=7&offset=0&align=top&scale=1&pixelated=1&darkmode=auto">
 </p>
 
+[![GitBook](https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=gitbook&logoColor=ffffff&label=%20&labelColor=5c5c5c&color=3F89A1)](https://msbt.lukiuwu.xyz/docs)
+
 [English](README.md) | [Русский](README.ru.md)
 
 A tool for backing up game saves with support for multiple games and automatic scheduling.
