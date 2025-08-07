@@ -10,8 +10,7 @@
 
 <p align="center">
   <a href="https://docs.msbt.lukiuwu.xyz"><img src="https://img.shields.io/badge/Mintlify-%23000000.svg?style=for-the-badge&logo=mintlify&logoColor=white&label=Documented%20on"></a>
-  <a href="https://github.com/MultiSavesBackupTool/MSBT/actions/workflows/main.yml"><img src="https://img.shields.io/github/actions/workflow/status/MultiSavesBackupTool/MSBT/main.yml?style=for-the-badge&logo=github
-"></a>
+  <a href="https://github.com/MultiSavesBackupTool/MSBT/actions/workflows/main.yml"><img src="https://img.shields.io/github/actions/workflow/status/MultiSavesBackupTool/MSBT/main.yml?style=for-the-badge&logo=github"></a>
 </p>
 
 [English](README.md) | [Русский](README.ru.md)
