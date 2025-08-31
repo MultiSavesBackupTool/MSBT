@@ -64,7 +64,8 @@ public class BackupService(ISettingsService settingsService, ILogger<BackupServi
 
                 if (Directory.Exists(game.SavePath))
                 {
-                    await AddToArchiveAsync(archive, game.SavePath, "saves", _cancellationTokenSource.Token, streams);
+                    await AddToArchiveAsync(archive, game.SavePath, "saves", _cancellationTokenSource.Token, streams)
+                        .ConfigureAwait(false);
                     backupSuccess = true;
                 }
                 else
@@ -73,11 +74,12 @@ public class BackupService(ISettingsService settingsService, ILogger<BackupServi
                 }
 
                 if (!string.IsNullOrEmpty(game.ModPath) && Directory.Exists(game.ModPath))
-                    await AddToArchiveAsync(archive, game.ModPath, "mods", _cancellationTokenSource.Token, streams);
+                    await AddToArchiveAsync(archive, game.ModPath, "mods", _cancellationTokenSource.Token, streams)
+                        .ConfigureAwait(false);
 
                 if (!string.IsNullOrEmpty(game.AddPath) && Directory.Exists(game.AddPath))
                     await AddToArchiveAsync(archive, game.AddPath, "additional", _cancellationTokenSource.Token,
-                        streams);
+                        streams).ConfigureAwait(false);
 
                 if (!backupSuccess)
                 {
@@ -122,7 +124,7 @@ public class BackupService(ISettingsService settingsService, ILogger<BackupServi
                 foreach (var stream in streams)
                     try
                     {
-                        stream.Dispose();
+                        await stream.DisposeAsync();
                     }
                     catch (Exception ex)
                     {
@@ -497,35 +499,49 @@ public class BackupService(ISettingsService settingsService, ILogger<BackupServi
     {
         if (sourcePath == null) return;
 
-        foreach (var file in Directory.GetFiles(sourcePath, "*", SearchOption.AllDirectories))
+        var files = Directory.GetFiles(sourcePath, "*", SearchOption.AllDirectories);
+
+        const int batchSize = 10;
+        for (var i = 0; i < files.Length; i += batchSize)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            var batch = files.Skip(i).Take(batchSize);
+            var tasks = batch.Select(file => ProcessFileAsync(file, sourcePath, entryPrefix, archive, streams));
+
+            await Task.WhenAll(tasks);
+
+            await Task.Yield();
+        }
+    }
+
+    private Task ProcessFileAsync(string file, string sourcePath, string entryPrefix,
+        ZipArchive archive, List<FileStream> streams)
+    {
+        try
+        {
             var relativePath = Path.GetRelativePath(sourcePath, file);
             var entryPath = Path.Combine(entryPrefix, relativePath).Replace('\\', '/');
 
-            try
-            {
-                var fileStream = new FileStream(file, FileMode.Open, FileAccess.Read,
-                    FileShare.Read | FileShare.Write);
-                streams.Add(fileStream);
-                archive.AddEntry(entryPath, fileStream);
-            }
-            catch (IOException ioEx)
-            {
-                _logger.LogWarning(ioEx, "File in use, skipping: {File}", file);
-            }
-            catch (UnauthorizedAccessException uaEx)
-            {
-                _logger.LogWarning(uaEx, "Access denied, skipping: {File}", file);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error adding file to archive: {File}", file);
-            }
+            var fileStream = new FileStream(file, FileMode.Open, FileAccess.Read,
+                FileShare.Read | FileShare.Write);
+            streams.Add(fileStream);
+            archive.AddEntry(entryPath, fileStream);
+        }
+        catch (IOException ioEx)
+        {
+            _logger.LogWarning(ioEx, "File in use, skipping: {File}", file);
+        }
+        catch (UnauthorizedAccessException uaEx)
+        {
+            _logger.LogWarning(uaEx, "Access denied, skipping: {File}", file);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error adding file to archive: {File}", file);
         }
 
-        await Task.CompletedTask;
+        return Task.CompletedTask;
     }
 
     private string? ExtractDateFromDirectoryName(string directoryName)
@@ -554,19 +570,42 @@ public class BackupService(ISettingsService settingsService, ILogger<BackupServi
 
     private async Task CopyDirectoryAsync(string sourceDir, string destinationDir)
     {
-        await Task.Run(() =>
+        await Task.Run(async () =>
         {
             Directory.CreateDirectory(destinationDir);
 
-            foreach (var file in Directory.GetFiles(sourceDir, "*", SearchOption.AllDirectories))
-            {
-                var relativePath = Path.GetRelativePath(sourceDir, file);
-                var destFile = Path.Combine(destinationDir, relativePath);
+            var files = Directory.GetFiles(sourceDir, "*", SearchOption.AllDirectories);
 
-                Directory.CreateDirectory(Path.GetDirectoryName(destFile) ?? string.Empty);
-                File.Copy(file, destFile, true);
+            const int batchSize = 5;
+            for (var i = 0; i < files.Length; i += batchSize)
+            {
+                var batch = files.Skip(i).Take(batchSize);
+                var tasks = batch.Select(file => CopyFileAsync(file, sourceDir, destinationDir));
+
+                await Task.WhenAll(tasks);
+
+                await Task.Yield();
             }
         });
+    }
+
+    private Task CopyFileAsync(string sourceFile, string sourceDir, string destinationDir)
+    {
+        try
+        {
+            var relativePath = Path.GetRelativePath(sourceDir, sourceFile);
+            var destFile = Path.Combine(destinationDir, relativePath);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(destFile) ?? string.Empty);
+            File.Copy(sourceFile, destFile, true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error copying file {SourceFile} to {DestFile}", sourceFile,
+                Path.Combine(destinationDir, Path.GetRelativePath(sourceDir, sourceFile)));
+        }
+
+        return Task.CompletedTask;
     }
 
     private bool IsValidDate(string? dateStr)

@@ -18,8 +18,8 @@ public class BooleanToStringConverter : IValueConverter
         var boolValue = false;
         if (value is bool b)
             boolValue = b;
-        else if (value is bool)
-            boolValue = (bool)value;
+        else if (value is bool value1)
+            boolValue = value1;
 
         return boolValue ? parts[0] : parts[1];
     }

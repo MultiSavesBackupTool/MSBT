@@ -217,7 +217,7 @@ public class MonitoringViewModel : ViewModelBase, IDisposable
         _statsTimer?.Dispose();
         var interval = _settingsService.CurrentSettings.BackupSettings.GetScanInterval();
         _statsTimer = new Timer(interval.TotalMilliseconds);
-        _statsTimer.Elapsed += (s, e) => Dispatcher.UIThread.Post(UpdateStatsAsync);
+        _statsTimer.Elapsed += (_, _) => Dispatcher.UIThread.Post(UpdateStatsAsync);
         _statsTimer.AutoReset = true;
         _statsTimer.Start();
     }

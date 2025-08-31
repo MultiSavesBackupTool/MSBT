@@ -40,7 +40,7 @@
                                    HorizontalAlignment="Right" />
                     </StackPanel>
                 </StackPanel>
-                
+
                 <Grid Grid.Column="2" ColumnDefinitions="*,Auto,*" Margin="24,0,0,0" VerticalAlignment="Center">
                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
                         <TextBlock Text="{x:Static properties:Resources.StatsView_ArchivesCounts}"

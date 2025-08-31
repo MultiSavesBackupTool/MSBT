@@ -443,9 +443,13 @@ public class BackupManager(
 
             if (_backupService.VerifyBackupPaths(game))
             {
-                await _backupService.ProcessSpecialBackup(game);
-                await _backupService.CreateBackupAsync(game, isProtected);
-                _backupService.CleanupOldBackups(game);
+                await _backupService.ProcessSpecialBackup(game).ConfigureAwait(false);
+                await Task.Yield();
+
+                await _backupService.CreateBackupAsync(game, isProtected).ConfigureAwait(false);
+                await Task.Yield();
+
+                _ = Task.Run(() => _backupService.CleanupOldBackups(game));
 
                 gameState.LastBackupTime = DateTime.Now;
                 gameState.Status = "Success";

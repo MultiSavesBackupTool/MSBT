@@ -1,16 +1,24 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
-using System.Reflection;
+using System.Linq;
+using System.Net.Http;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using Multi_Saves_Backup_Tool.Models;
 using Multi_Saves_Backup_Tool.Paths;
+using Multi_Saves_Backup_Tool.Services;
 using Multi_Saves_Backup_Tool.Services.GameDiscovery;
 using Properties;
 
@@ -20,6 +28,7 @@ public partial class SettingsViewModel : ViewModelBase
 {
     private readonly IBlacklistService? _blacklistService;
     private readonly string _gamesPath;
+    private readonly INotificationService? _notificationService;
     private readonly string _serviceStatePath;
     private readonly string _settingsPath;
     private readonly IStorageProvider? _storageProvider;
@@ -41,15 +50,17 @@ public partial class SettingsViewModel : ViewModelBase
     }
 
     public SettingsViewModel(IStorageProvider storageProvider, IBlacklistService blacklistService,
-        IWhitelistService whitelistService, ILogger<SettingsViewModel>? logger = null) : this(logger)
+        IWhitelistService whitelistService, INotificationService notificationService,
+        ILogger<SettingsViewModel>? logger = null) : this(logger)
     {
         _storageProvider = storageProvider;
         _blacklistService = blacklistService;
         _whitelistService = whitelistService;
+        _notificationService = notificationService;
     }
 
     public string CurrentVersion =>
-        "Version: " + Assembly.GetExecutingAssembly().GetName().Version;
+        "Version: " + VersionInfo.CurrentVersion;
 
     public string BackupRootFolder
     {
@@ -283,5 +294,83 @@ public partial class SettingsViewModel : ViewModelBase
     {
         SaveSettings(Settings);
         return Task.CompletedTask;
+    }
+
+    [RelayCommand]
+    private async Task UploadLogs()
+    {
+        try
+        {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+                _notificationService?.ShowTaskRunning(Resources.SettingsView_Logssend));
+
+            var directory = AppPaths.DataPath;
+            if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
+                return;
+
+            var logFiles = Directory.GetFiles(directory, "backup_service*.log", SearchOption.TopDirectoryOnly);
+            if (logFiles.Length == 0)
+                return;
+
+            var latest = new DirectoryInfo(directory)
+                .GetFiles("backup_service*.log", SearchOption.TopDirectoryOnly)
+                .OrderByDescending(f => f.LastWriteTimeUtc)
+                .First();
+
+            string logText;
+            await using (var fs = new FileStream(latest.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                const int maxBytes = 512 * 1024;
+                if (fs.Length > maxBytes) fs.Seek(-maxBytes, SeekOrigin.End);
+
+                using var reader = new StreamReader(fs);
+                logText = await reader.ReadToEndAsync();
+            }
+
+            const string pastebinDevKey = "auI_FCP3qaHeyaApaVnrRSJ23uNuPn6P";
+            if (string.IsNullOrWhiteSpace(pastebinDevKey))
+                return;
+
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var randomBytes = new byte[12];
+            RandomNumberGenerator.Fill(randomBytes);
+
+            var latestname = new StringBuilder(12);
+            foreach (var b in randomBytes) latestname.Append(chars[b % chars.Length]);
+
+            using var httpClient = new HttpClient();
+            using var form = new FormUrlEncodedContent([
+                new KeyValuePair<string, string>("api_dev_key", pastebinDevKey),
+                new KeyValuePair<string, string>("api_option", "paste"),
+                new KeyValuePair<string, string>("api_paste_code", logText),
+                new KeyValuePair<string, string>("api_paste_name", latestname.ToString()),
+                new KeyValuePair<string, string>("api_paste_private", "1"),
+                new KeyValuePair<string, string>("api_paste_expire_date", "1D")
+            ]);
+
+            var response = await httpClient.PostAsync("https://pastebin.com/api/api_post.php", form);
+            var respText = await response.Content.ReadAsStringAsync();
+            Debug.WriteLine($"Pastebin: {respText}");
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                if (!string.IsNullOrWhiteSpace(respText) && respText.StartsWith("http"))
+                {
+                    var window =
+                        Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+                            ? desktop.MainWindow
+                            : null;
+                    var clipboard = window?.Clipboard;
+                    _notificationService?.ShowTaskCompleted(Resources.SettingsView_Logssend,
+                        Resources.SettingsView_ClipboardLogs);
+                    clipboard?.SetTextAsync(respText);
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+                _notificationService?.ShowTaskError(Resources.SettingsView_Logssend));
+            Debug.WriteLine($"Error uploading logs: {ex}");
+        }
     }
 }

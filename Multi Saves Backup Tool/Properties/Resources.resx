@@ -211,6 +211,18 @@
     <data name="GamesView_ShowDisableGames" xml:space="preserve">
         <value>Show only disabled</value>
     </data>
+    <data name="GamesView_ConfirmRestoreTitle" xml:space="preserve">
+        <value>Restore backup?</value>
+    </data>
+    <data name="GamesView_ConfirmRestoreDec" xml:space="preserve">
+        <value>Are you sure you want to restore the save? This action cannot be undone.</value>
+    </data>
+    <data name="GamesView_ConfirmRestoreConfirm" xml:space="preserve">
+        <value>Restore</value>
+    </data>
+    <data name="GamesView_ConfirmRestoreCancel" xml:space="preserve">
+        <value>Cancel</value>
+    </data>
 
     <!-- ==========================================
          ADD GAME OVERLAY STRINGS
@@ -362,6 +374,12 @@
     <data name="SettingsView_synccommunitytext" xml:space="preserve">
         <value>Sync with community lists for better coverage</value>
     </data>
+    <data name="SettingsView_Logssend" xml:space="preserve">
+        <value>Send log</value>
+    </data>
+    <data name="SettingsView_ClipboardLogs" xml:space="preserve">
+        <value>Link to log copied to clipboard</value>
+    </data>
 
     <!-- ==========================================
          STATS VIEW STRINGS
@@ -372,7 +390,7 @@
     <data name="StatsView_ArchivesCounts" xml:space="preserve">
         <value>Number of all archives:</value>
     </data>
-    
+
     <!-- ==========================================
          STATUS STRINGS
          ========================================== -->
@@ -509,5 +527,18 @@ or close the application — this will only take a moment.</value>
     </data>
     <data name="PCGamingWikiSaveParser_Error" xml:space="preserve">
         <value>Error retrieving data from PCGamingWiki</value>
+    </data>
+
+    <!-- ==========================================
+         NOTIFICATION STRINGS
+         ========================================== -->
+    <data name="Notification_TaskRunning" xml:space="preserve">
+        <value>Task started...</value>
+    </data>
+    <data name="Notification_TaskCompleted" xml:space="preserve">
+        <value>Task completed.</value>
+    </data>
+    <data name="Notification_TaskError" xml:space="preserve">
+        <value>Task error ;(</value>
     </data>
 </root>

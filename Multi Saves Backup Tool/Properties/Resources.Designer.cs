@@ -370,6 +370,30 @@ namespace Properties
                 return ResourceManager.GetString("GamesView_ShowDisableGames", resourceCulture);
             }
         }
+        
+        public static string GamesView_ConfirmRestoreTitle {
+            get {
+                return ResourceManager.GetString("GamesView_ConfirmRestoreTitle", resourceCulture);
+            }
+        }
+        
+        public static string GamesView_ConfirmRestoreDec {
+            get {
+                return ResourceManager.GetString("GamesView_ConfirmRestoreDec", resourceCulture);
+            }
+        }
+        
+        public static string GamesView_ConfirmRestoreConfirm {
+            get {
+                return ResourceManager.GetString("GamesView_ConfirmRestoreConfirm", resourceCulture);
+            }
+        }
+        
+        public static string GamesView_ConfirmRestoreCancel {
+            get {
+                return ResourceManager.GetString("GamesView_ConfirmRestoreCancel", resourceCulture);
+            }
+        }
 
         // ==========================================
         // ADD GAME OVERLAY STRINGS
@@ -777,6 +801,22 @@ namespace Properties
                 return ResourceManager.GetString("SettingsView_synccommunitytext", resourceCulture);
             }
         }
+        
+        public static string SettingsView_Logssend
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_Logssend", resourceCulture);
+            }
+        }
+        
+        public static string SettingsView_ClipboardLogs
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingsView_ClipboardLogs", resourceCulture);
+            }
+        }
 
         // ==========================================
         // STATS VIEW STRINGS
@@ -1103,6 +1143,33 @@ namespace Properties
             get
             {
                 return ResourceManager.GetString("PCGamingWikiSaveParser_Error", resourceCulture);
+            }
+        }
+        
+        // ==========================================
+        // NOTIFICATION STRINGS
+        // ==========================================
+        public static string Notification_TaskRunning
+        {
+            get
+            {
+                return ResourceManager.GetString("Notification_TaskRunning", resourceCulture);
+            }
+        }
+
+        public static string Notification_TaskCompleted
+        {
+            get
+            {
+                return ResourceManager.GetString("Notification_TaskCompleted", resourceCulture);
+            }
+        }
+
+        public static string Notification_TaskError
+        {
+            get
+            {
+                return ResourceManager.GetString("Notification_TaskError", resourceCulture);
             }
         }
     }

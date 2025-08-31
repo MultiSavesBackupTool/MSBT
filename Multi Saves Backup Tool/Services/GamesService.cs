@@ -114,14 +114,14 @@ public class GamesService : IGamesService, IDisposable
             return;
         }
 
-        await _cacheLock.WaitAsync();
+        await _cacheLock.WaitAsync().ConfigureAwait(false);
         try
         {
             _isSaving = true;
             var gamesPath = AppPaths.GamesFilePath;
             var gamesList = games.ToList();
             var json = JsonSerializer.Serialize(gamesList, new JsonSerializerOptions { WriteIndented = true });
-            await File.WriteAllTextAsync(gamesPath, json);
+            await File.WriteAllTextAsync(gamesPath, json).ConfigureAwait(false);
             _cachedGames = gamesList.AsReadOnly();
         }
         finally
@@ -204,7 +204,7 @@ public class GamesService : IGamesService, IDisposable
 
     private async Task ClearCacheAsync()
     {
-        await _cacheLock.WaitAsync();
+        await _cacheLock.WaitAsync().ConfigureAwait(false);
         try
         {
             _cachedGames = null;
@@ -235,22 +235,22 @@ public class GamesService : IGamesService, IDisposable
             if (args.ChangeType == WatcherChangeTypes.Changed && !_isSaving)
             {
                 _logger.LogInformation("Games configuration file changed, reloading immediately");
-                await ClearCacheAsync();
-                await LoadGamesAsync();
+                await ClearCacheAsync().ConfigureAwait(false);
+                await LoadGamesAsync().ConfigureAwait(false);
             }
         };
 
         _watcher.Created += async (_, _) =>
         {
             _logger.LogInformation("Games configuration file created, reloading immediately");
-            await ClearCacheAsync();
-            await LoadGamesAsync();
+            await ClearCacheAsync().ConfigureAwait(false);
+            await LoadGamesAsync().ConfigureAwait(false);
         };
 
         _watcher.Deleted += async (_, _) =>
         {
             _logger.LogInformation("Games configuration file deleted, clearing cache");
-            await ClearCacheAsync();
+            await ClearCacheAsync().ConfigureAwait(false);
         };
 
         _watcher.Error += (_, ex) =>

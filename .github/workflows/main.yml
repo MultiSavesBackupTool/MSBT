@@ -12,7 +12,7 @@ permissions:
 jobs:
   build-windows:
     name: Build Windows installer
-    runs-on: windows-ci
+    runs-on: Windows
     steps:
       - name: Clean previous artifacts
         shell: powershell
@@ -55,7 +55,7 @@ jobs:
 
   createrelease:
     name: Create GitHub Release
-    runs-on: linux-ci
+    runs-on: Linux
     needs:
       - build-windows
     steps:
@@ -64,7 +64,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ github.run_number }}.0.0.0
-          name: Release v${{ github.run_number }}.0.0.0
+          name: Release v25.A.1.0
           draft: false
           prerelease: false
         env:
@@ -72,7 +72,7 @@ jobs:
           
   uploadwindows:
     name: Upload Windows installer
-    runs-on: windows-ci
+    runs-on: Windows
     needs:
       - createrelease
       - build-windows

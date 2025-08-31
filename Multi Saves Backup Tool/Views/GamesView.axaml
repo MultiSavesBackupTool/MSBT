@@ -14,7 +14,6 @@
 
     <UserControl.Resources>
         <conv:EnableDisableConverter x:Key="EnableDisableConverter" />
-        <conv:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisibilityConverter" />
         <conv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
     </UserControl.Resources>
 
@@ -140,20 +139,6 @@
                                                TextWrapping="NoWrap"
                                                TextTrimming="CharacterEllipsis" />
                                 </StackPanel>
-
-                                <Border Grid.Column="2"
-                                        Background="{DynamicResource AccentFillColorDefaultBrush}"
-                                        CornerRadius="12"
-                                        Padding="8,4"
-                                        Margin="0,0,8,0"
-                                        VerticalAlignment="Center"
-                                        IsVisible="{Binding Platform, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                                    <TextBlock Text="{Binding Platform}"
-                                               Foreground="White"
-                                               FontSize="12"
-                                               FontWeight="Medium"
-                                               VerticalAlignment="Center" />
-                                </Border>
 
                                 <Border Grid.Column="3"
                                         Background="{DynamicResource AccentFillColorSecondaryBrush}"

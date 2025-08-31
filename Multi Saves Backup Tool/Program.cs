@@ -10,6 +10,7 @@ namespace Multi_Saves_Backup_Tool;
 internal static class Program
 {
     private static Mutex? _mutex;
+    private static readonly TimeSpan LogRetention = TimeSpan.FromDays(3);
 
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
@@ -25,6 +26,8 @@ internal static class Program
         try
         {
             var dataAppDir = AppPaths.DataPath;
+
+            CleanupOldLogs(dataAppDir);
 
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.File(
@@ -57,5 +60,32 @@ internal static class Program
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();
+    }
+
+    private static void CleanupOldLogs(string directory)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
+                return;
+
+            var cutoff = DateTime.UtcNow - LogRetention;
+            var files = Directory.GetFiles(directory, "backup_service*.log", SearchOption.TopDirectoryOnly);
+
+            foreach (var file in files)
+                try
+                {
+                    var lastWrite = File.GetLastWriteTimeUtc(file);
+                    if (lastWrite < cutoff) File.Delete(file);
+                }
+                catch
+                {
+                    // Ignore individual file errors
+                }
+        }
+        catch
+        {
+            // Ignore cleanup errors
+        }
     }
 }

@@ -202,6 +202,18 @@
     <data name="GamesView_ShowDisableGames" xml:space="preserve">
         <value>Показать только отключенные</value>
     </data>
+    <data name="GamesView_ConfirmRestoreTitle" xml:space="preserve">
+        <value>Восстановить сохранение?</value>
+    </data>
+    <data name="GamesView_ConfirmRestoreDec" xml:space="preserve">
+        <value>Вы уверены что хотите восстановить сохранение? Это действие нельзя откатить.</value>
+    </data>
+    <data name="GamesView_ConfirmRestoreConfirm" xml:space="preserve">
+        <value>Восстановить</value>
+    </data>
+    <data name="GamesView_ConfirmRestoreCancel" xml:space="preserve">
+        <value>Отмена</value>
+    </data>
 
     <!-- ==========================================
          СТРОКИ ОКНА ДОБАВЛЕНИЯ ИГРЫ
@@ -362,6 +374,12 @@
     <data name="SettingsView_simultaneousbackups" xml:space="preserve">
         <value>Параллельных бэкапов</value>
     </data>
+    <data name="SettingsView_Logssend" xml:space="preserve">
+        <value>Отправить логи</value>
+    </data>
+    <data name="SettingsView_ClipboardLogs" xml:space="preserve">
+        <value>Ссылка на лог скопирована в буфер обмена</value>
+    </data>
 
     <!-- ==========================================
          СТРОКИ ПРОСМОТРА СТАТИСТИКИ
@@ -372,6 +390,7 @@
     <data name="StatsView_ArchivesCounts" xml:space="preserve">
         <value>Количество всех архивов:</value>
     </data>
+
     <!-- ==========================================
          СТРОКИ СТАТУСА
          ========================================== -->
@@ -508,5 +527,18 @@
     </data>
     <data name="PCGamingWikiSaveParser_Error" xml:space="preserve">
         <value>Ошибка при получении данных с PCGamingWiki</value>
+    </data>
+
+    <!-- ==========================================
+         СТРОКИ NOTIFICATION
+         ========================================== -->
+    <data name="Notification_TaskRunning" xml:space="preserve">
+        <value>Задача запущена...</value>
+    </data>
+    <data name="Notification_TaskCompleted" xml:space="preserve">
+        <value>Задача выполнена.</value>
+    </data>
+    <data name="Notification_TaskError" xml:space="preserve">
+        <value>Произошла ошибка при выполнение задачи ;(</value>
     </data>
 </root>

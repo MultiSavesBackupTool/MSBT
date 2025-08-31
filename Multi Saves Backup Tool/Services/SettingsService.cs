@@ -104,7 +104,7 @@ public class SettingsService : ISettingsService, IDisposable
         if (settings == null)
             throw new ArgumentNullException(nameof(settings));
 
-        await _settingsLock.WaitAsync();
+        await _settingsLock.WaitAsync().ConfigureAwait(false);
         try
         {
             ValidateSettings(settings);
@@ -114,7 +114,7 @@ public class SettingsService : ISettingsService, IDisposable
             var directory = Path.GetDirectoryName(_settingsPath);
             if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
-            await File.WriteAllTextAsync(_settingsPath, json);
+            await File.WriteAllTextAsync(_settingsPath, json).ConfigureAwait(false);
             CurrentSettings = settings;
             _logger.LogInformation("Settings successfully saved to {Path}", _settingsPath);
         }
@@ -131,10 +131,10 @@ public class SettingsService : ISettingsService, IDisposable
 
     public async Task ReloadSettingsAsync()
     {
-        await _settingsLock.WaitAsync();
+        await _settingsLock.WaitAsync().ConfigureAwait(false);
         try
         {
-            await Task.Delay(100);
+            await Task.Delay(100).ConfigureAwait(false);
 
             if (!File.Exists(_settingsPath))
             {
@@ -143,7 +143,7 @@ public class SettingsService : ISettingsService, IDisposable
                 return;
             }
 
-            var json = await File.ReadAllTextAsync(_settingsPath);
+            var json = await File.ReadAllTextAsync(_settingsPath).ConfigureAwait(false);
             if (string.IsNullOrWhiteSpace(json))
             {
                 _logger.LogWarning("Settings file is empty at {Path}, using defaults", _settingsPath);

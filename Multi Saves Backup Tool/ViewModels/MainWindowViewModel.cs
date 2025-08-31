@@ -30,7 +30,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [SupportedOSPlatform("windows")]
     public MainWindowViewModel(Window mainWindow, IGamesService gamesService,
         IBackupService backupService, BackupManager backupManager, ISettingsService settingsService,
-        IBlacklistService blacklistService, IWhitelistService whitelistService,
+        INotificationService notificationService, IBlacklistService blacklistService,
+        IWhitelistService whitelistService,
         ILogger<MainWindowViewModel> logger,
         ILogger<MonitoringViewModel> monitoringLogger, ILogger<GamesViewModel> gamesLogger,
         ILogger<SettingsViewModel> settingsLogger)
@@ -43,9 +44,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             MonitoringViewModel = new MonitoringViewModel(backupManager, gamesService, backupService, settingsService,
                 monitoringLogger);
             GamesViewModel = new GamesViewModel(gamesService, backupService, blacklistService, whitelistService,
-                backupManager, gamesLogger);
+                backupManager, notificationService, gamesLogger);
             SettingsViewModel = new SettingsViewModel(mainWindow.StorageProvider, blacklistService, whitelistService,
-                settingsLogger);
+                notificationService, settingsLogger);
             CurrentViewModel = MonitoringViewModel;
 
             _ = CheckForUpdatesOnStartupAsync();

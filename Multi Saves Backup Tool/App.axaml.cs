@@ -3,6 +3,7 @@ using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Notifications;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -98,28 +99,36 @@ public class App : Application
         {
             if (_serviceProvider == null) throw new InvalidOperationException("Service provider is not initialized");
 
+            var mainWindow = new MainWindow();
+            desktop.MainWindow = mainWindow;
+
+            var notificationManager = new WindowNotificationManager(mainWindow);
+
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+            services.AddSingleton<INotificationService>(_ => new NotificationService(notificationManager));
+            _serviceProvider = services.BuildServiceProvider();
+
             try
             {
                 var trayService = _serviceProvider.GetRequiredService<TrayService>();
                 var gamesService = _serviceProvider.GetRequiredService<IGamesService>();
                 var backupService = _serviceProvider.GetRequiredService<IBackupService>();
                 var settingsService = _serviceProvider.GetRequiredService<ISettingsService>();
-                var mainWindowLogger = _serviceProvider.GetRequiredService<ILogger<MainWindowViewModel>>();
+                var notificationService = _serviceProvider.GetRequiredService<INotificationService>();
+                var blacklistService = _serviceProvider.GetRequiredService<IBlacklistService>();
+                var whitelistService = _serviceProvider.GetRequiredService<IWhitelistService>();
+                var mainwindowLogger = _serviceProvider.GetRequiredService<ILogger<MainWindowViewModel>>();
                 var monitoringLogger = _serviceProvider.GetRequiredService<ILogger<MonitoringViewModel>>();
                 var gamesLogger = _serviceProvider.GetRequiredService<ILogger<GamesViewModel>>();
                 var settingsLogger = _serviceProvider.GetRequiredService<ILogger<SettingsViewModel>>();
                 _backupManager = _serviceProvider.GetRequiredService<BackupManager>();
 
-                var mainWindow = new MainWindow();
-                var blacklistService = _serviceProvider.GetRequiredService<IBlacklistService>();
-                var whitelistService = _serviceProvider.GetRequiredService<IWhitelistService>();
                 var mainViewModel = new MainWindowViewModel(mainWindow, gamesService, backupService,
-                    _backupManager, settingsService, blacklistService, whitelistService, mainWindowLogger,
-                    monitoringLogger, gamesLogger,
-                    settingsLogger);
+                    _backupManager, settingsService, notificationService, blacklistService,
+                    whitelistService, mainwindowLogger, monitoringLogger, gamesLogger, settingsLogger);
 
                 mainWindow.DataContext = mainViewModel;
-                desktop.MainWindow = mainWindow;
                 trayService.Initialize();
 
                 try

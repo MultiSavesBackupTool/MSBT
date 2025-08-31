@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.UI.Controls;
 using Microsoft.Extensions.Logging;
@@ -26,6 +27,7 @@ public class GamesViewModel : ViewModelBase
     private readonly IBlacklistService _blacklistService;
     private readonly IGamesService _gamesService;
     private readonly InstalledGamesScanner _installedGamesScanner;
+    private readonly INotificationService _notificationService;
     private readonly IWhitelistService _whitelistService;
     private ObservableCollection<GameModel>? _filteredGames;
     private ObservableCollection<GameModel>? _games;
@@ -39,6 +41,7 @@ public class GamesViewModel : ViewModelBase
     [SupportedOSPlatform("windows")]
     public GamesViewModel(IGamesService gamesService, IBackupService backupService, IBlacklistService blacklistService,
         IWhitelistService whitelistService, BackupManager backupManager,
+        INotificationService notificationService,
         ILogger<GamesViewModel>? logger = null) : base(logger)
     {
         _gamesService = gamesService ?? throw new ArgumentNullException(nameof(gamesService));
@@ -46,6 +49,7 @@ public class GamesViewModel : ViewModelBase
         _blacklistService = blacklistService ?? throw new ArgumentNullException(nameof(blacklistService));
         _whitelistService = whitelistService ?? throw new ArgumentNullException(nameof(whitelistService));
         _backupManager = backupManager ?? throw new ArgumentNullException(nameof(backupManager));
+        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
 
         DeleteGameCommand = new AsyncRelayCommand<GameModel>(DeleteGameAsync, CanDeleteGame);
         EditGameCommand = new Services.RelayCommand<GameModel>(EditGame, CanEditGame);
@@ -78,7 +82,7 @@ public class GamesViewModel : ViewModelBase
     public ObservableCollection<GameModel>? Games
     {
         get => _games;
-        set
+        private set
         {
             if (_games != value)
             {
@@ -140,7 +144,7 @@ public class GamesViewModel : ViewModelBase
 
     public bool IsNotLoading => !IsLoading;
 
-    public IEnumerable<GameModel> SelectedGames => Games?.Where(g => g.IsSelected) ?? [];
+    private IEnumerable<GameModel> SelectedGames => Games?.Where(g => g.IsSelected) ?? [];
 
     public bool ShowHiddenGames
     {
@@ -212,11 +216,22 @@ public class GamesViewModel : ViewModelBase
 
     public event EventHandler<GameModel>? EditGameRequested;
 
-    private async void Games_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void Games_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         try
         {
-            await SaveGamesAsync();
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await SaveGamesAsync().ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    LogError(ex, "Error saving games in collection changed");
+                }
+            });
+
             if (e.OldItems != null)
                 foreach (GameModel item in e.OldItems)
                     if (item != null)
@@ -238,7 +253,7 @@ public class GamesViewModel : ViewModelBase
         try
         {
             IsLoading = true;
-            var gamesList = await _gamesService.LoadGamesAsync();
+            var gamesList = await _gamesService.LoadGamesAsync().ConfigureAwait(false);
             var sortedGamesList = gamesList.OrderBy(g => g?.GameName, StringComparer.OrdinalIgnoreCase).ToList();
             Games = new ObservableCollection<GameModel>(sortedGamesList!);
             foreach (var game in Games)
@@ -247,7 +262,7 @@ public class GamesViewModel : ViewModelBase
                 UpdateBackupCount(game);
             }
 
-            await RemoveBlacklistedGamesAsync();
+            await RemoveBlacklistedGamesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -259,12 +274,22 @@ public class GamesViewModel : ViewModelBase
         }
     }
 
-    private async void Game_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void Game_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(GameModel.IsEnabled))
             try
             {
-                await SaveGamesAsync();
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await SaveGamesAsync().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogError(ex, "Error saving games after property change");
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -276,13 +301,21 @@ public class GamesViewModel : ViewModelBase
     {
         try
         {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+                _notificationService.ShowTaskRunning(Resources.AddGameOverlay_Save));
+
             await _gamesService.SaveGamesAsync(Games);
         }
         catch (Exception ex)
         {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+                _notificationService.ShowTaskError(Resources.AddGameOverlay_Save));
             LogError(ex, "Error saving games");
             throw;
         }
+
+        await Dispatcher.UIThread.InvokeAsync(() =>
+            _notificationService.ShowTaskCompleted(Resources.AddGameOverlay_Save));
     }
 
     public void AddGame(GameModel game)
@@ -339,7 +372,7 @@ public class GamesViewModel : ViewModelBase
                 DefaultButton = ContentDialogButton.Secondary
             };
 
-            var result = await dialog.ShowAsync();
+            var result = await dialog.ShowAsync().ConfigureAwait(false);
 
             if (result == ContentDialogResult.Primary) Games?.Remove(game);
         }
@@ -355,11 +388,30 @@ public class GamesViewModel : ViewModelBase
 
         try
         {
-            await _backupService.RestoreLatestBackupAsync(game);
+            var dialog = new ContentDialog
+            {
+                Title = Resources.GamesView_ConfirmRestoreTitle,
+                Content = Resources.GamesView_ConfirmRestoreDec,
+                PrimaryButtonText = Resources.GamesView_ConfirmRestoreConfirm,
+                CloseButtonText = Resources.GamesView_ConfirmRestoreCancel
+            };
+            var result = await dialog.ShowAsync().ConfigureAwait(false);
+            if (result != ContentDialogResult.Primary)
+                return;
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+                _notificationService.ShowTaskRunning(Resources.GamesView_RestoreBackup));
+
+            await _backupService.RestoreLatestBackupAsync(game).ConfigureAwait(false);
             LogInformation("Successfully restored backup for game {GameName}", game.GameName);
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+                _notificationService.ShowTaskCompleted(Resources.GamesView_RestoreBackup));
         }
         catch (Exception ex)
         {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+                _notificationService.ShowTaskError(Resources.GamesView_RestoreBackup));
             LogError(ex, "Error restoring backup for game {GameName}", game.GameName);
         }
     }
@@ -413,10 +465,13 @@ public class GamesViewModel : ViewModelBase
     [SupportedOSPlatform("windows")]
     private async Task ScanInstalledGamesAsync()
     {
+        await Dispatcher.UIThread.InvokeAsync(() =>
+            _notificationService.ShowTaskRunning(Resources.GamesView_ScanInstalledGames));
+
         try
         {
             IsLoading = true;
-            var foundGames = await _installedGamesScanner.ScanForInstalledGamesAsync();
+            var foundGames = await _installedGamesScanner.ScanForInstalledGamesAsync().ConfigureAwait(false);
             var newGames = new List<GameModel>();
 
             foreach (var game in foundGames)
@@ -432,12 +487,17 @@ public class GamesViewModel : ViewModelBase
 
                 await SaveGamesAsync();
                 LogInformation("Added {Count} new games from scan", newGames.Count);
+
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                    _notificationService.ShowTaskCompleted(Resources.GamesView_ScanInstalledGames));
             }
 
             await RemoveBlacklistedGamesAsync();
         }
         catch (Exception ex)
         {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+                _notificationService.ShowTaskError(Resources.GamesView_ScanInstalledGames));
             LogError(ex, "Error scanning for installed games");
         }
         finally
@@ -480,6 +540,9 @@ public class GamesViewModel : ViewModelBase
     {
         if (game == null) return;
 
+        await Dispatcher.UIThread.InvokeAsync(() =>
+            _notificationService.ShowTaskRunning(Resources.GamesView_AddToBlacklist));
+
         try
         {
             if (game.GameName != null)
@@ -490,10 +553,15 @@ public class GamesViewModel : ViewModelBase
                 Games?.Remove(game);
 
                 LogInformation("Added {GameName} to blacklist and contributed to server", game.GameName);
+
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                    _notificationService.ShowTaskCompleted(Resources.GamesView_AddToBlacklist));
             }
         }
         catch (Exception ex)
         {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+                _notificationService.ShowTaskError(Resources.GamesView_AddToBlacklist));
             LogError(ex, "Error adding {GameName} to blacklist", game.GameName);
         }
     }
@@ -502,6 +570,9 @@ public class GamesViewModel : ViewModelBase
     {
         if (game == null) return;
 
+        await Dispatcher.UIThread.InvokeAsync(() =>
+            _notificationService.ShowTaskRunning(Resources.GamesView_AddToWhitelist));
+
         try
         {
             var whitelistEntry = WhitelistEntry.FromGameModel(game);
@@ -509,9 +580,14 @@ public class GamesViewModel : ViewModelBase
             await _whitelistService.ContributeToServerAsync(whitelistEntry);
 
             LogInformation("Added {GameName} to whitelist and contributed to server", game.GameName);
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+                _notificationService.ShowTaskCompleted(Resources.GamesView_AddToWhitelist));
         }
         catch (Exception ex)
         {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+                _notificationService.ShowTaskError(Resources.GamesView_AddToWhitelist));
             LogError(ex, "Error adding {GameName} to whitelist", game.GameName);
         }
     }
@@ -519,14 +595,24 @@ public class GamesViewModel : ViewModelBase
     private async Task CreateBackupAsync(GameModel? game)
     {
         if (game == null) return;
+
+        await Dispatcher.UIThread.InvokeAsync(() =>
+            _notificationService.ShowTaskRunning(Resources.CreateBackup));
+
         try
         {
-            await _backupManager.ProcessGameBackupAsync(game, false);
+            await _backupManager.ProcessGameBackupAsync(game, false).ConfigureAwait(false);
             LogInformation("Backup created for game {GameName}", game.GameName);
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+                _notificationService.ShowTaskCompleted(Resources.CreateBackup));
+
             UpdateBackupCount(game);
         }
         catch (Exception ex)
         {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+                _notificationService.ShowTaskError(Resources.CreateBackup));
             LogError(ex, "Error creating backup for game {GameName}", game.GameName);
         }
     }
@@ -534,21 +620,31 @@ public class GamesViewModel : ViewModelBase
     private async Task CreateProtectedBackupAsync(GameModel? game)
     {
         if (game == null) return;
+
+        await Dispatcher.UIThread.InvokeAsync(() =>
+            _notificationService.ShowTaskRunning(Resources.CreateProtectedBackup));
+
         try
         {
-            await _backupManager.ProcessGameBackupAsync(game, true);
+            await _backupManager.ProcessGameBackupAsync(game, true).ConfigureAwait(false);
             LogInformation("Protected backup created for game {GameName}", game.GameName);
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+                _notificationService.ShowTaskCompleted(Resources.CreateProtectedBackup));
+
             UpdateBackupCount(game);
         }
         catch (Exception ex)
         {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+                _notificationService.ShowTaskError(Resources.CreateProtectedBackup));
             LogError(ex, "Error creating protected backup for game {GameName}", game.GameName);
         }
     }
 
     private bool CanCreateBackup(GameModel? game)
     {
-        return IsNotLoading && game != null && game.IsEnabled;
+        return IsNotLoading && game is { IsEnabled: true };
     }
 
     private void ToggleGameEnabled(GameModel? game)
@@ -611,7 +707,17 @@ public class GamesViewModel : ViewModelBase
         if (game == null) return;
         game.IsHidden = !ShowHiddenGames;
         UpdateFilteredGames();
-        _ = SaveGamesAsync();
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await SaveGamesAsync();
+            }
+            catch (Exception ex)
+            {
+                LogError(ex, "Error saving games after hiding game");
+            }
+        });
     }
 
     private bool CanHideGame(GameModel? game)
@@ -638,7 +744,17 @@ public class GamesViewModel : ViewModelBase
             }
 
         UpdateFilteredGames();
-        _ = SaveGamesAsync();
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await SaveGamesAsync();
+            }
+            catch (Exception ex)
+            {
+                LogError(ex, "Error saving games after hiding selected");
+            }
+        });
     }
 
     private bool CanHideSelected()
@@ -700,7 +816,7 @@ public class GamesViewModel : ViewModelBase
 
     private bool CanRestoreBackup(GameModel? game)
     {
-        return game != null && !IsLoading;
+        return game != null && !IsLoading && _backupService.GetBackupCount(game) > 0;
     }
 
     private bool CanScanInstalledGames()

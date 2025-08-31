@@ -25,6 +25,9 @@
                     <Button Content="{x:Static properties:Resources.ImportTitle}"
                             Command="{Binding ImportSettingsCommand}"
                             VerticalAlignment="Center" />
+                    <Button Content="{x:Static properties:Resources.SettingsView_Logssend}"
+                            Command="{Binding UploadLogsCommand}"
+                            VerticalAlignment="Center" />
                     <Button Content="{x:Static properties:Resources.SettingsView_Save}"
                             Command="{Binding SaveCurrentSettingsCommand}"
                             Classes="accent"
