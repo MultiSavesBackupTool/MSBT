@@ -1,7 +1,7 @@
 # Multi Saves Backup Tool
 
 <p align="center">
-   <img alt="MSBT Logo" src="msbt_logo.png">
+   <img alt="MSBT Banner" src="banner.jpg">
 </p>
 
 <p align="center">
